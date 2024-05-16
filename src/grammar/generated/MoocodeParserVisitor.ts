@@ -1,4 +1,4 @@
-// Generated from c://dev//moocode-utils//src//grammar//MoocodeParser.g4 by ANTLR 4.13.1
+// Generated from c://dev//moocode-parsing//src//grammar//MoocodeParser.g4 by ANTLR 4.13.1
 
 import {ParseTreeVisitor} from 'antlr4';
 
