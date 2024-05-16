@@ -46,22 +46,22 @@ jobs:
           npm run clean:grammar
       - run: |
           cd repo
-          cp ./src/grammar/moocodeLexer.g4 ./
+          cp ./src/grammar/MoocodeLexer.g4 ./
       - run: |
           cd repo
-          cp ./src/grammar/moocodeParser.g4 ./
+          cp ./src/grammar/MoocodeParser.g4 ./
       - run: |
           cd repo
-          java -jar ./bin/antlr-4.13.1-complete.jar -Dlanguage=TypeScript ./moocodeLexer.g4
+          java -jar ./bin/antlr-4.13.1-complete.jar -Dlanguage=TypeScript ./MoocodeLexer.g4
       - run: |
           cd repo
-          java -jar ./bin/antlr-4.13.1-complete.jar -Dlanguage=TypeScript -listener -visitor ./moocodeParser.g4
+          java -jar ./bin/antlr-4.13.1-complete.jar -Dlanguage=TypeScript -listener -visitor ./MoocodeParser.g4
       - run: |
           cd repo
           mkdir ./src/grammar/generated
       - run: |
           cd repo
-          mv ./moocode*.ts ./src/grammar/generated
+          mv ./Moocode*.ts ./src/grammar/generated
 
       - name: Run tests with coverage
         run: |

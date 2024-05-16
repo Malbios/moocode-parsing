@@ -1,7 +1,7 @@
 parser grammar MoocodeParser;
 
 options {
-	tokenVocab = moocodeLexer;
+	tokenVocab = MoocodeLexer;
 	caseInsensitive = true;
 }
 
