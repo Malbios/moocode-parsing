@@ -1,0 +1,139 @@
+There are many, many built-in functions available to MOO programmers.  The following list gives a brief summary of the arguments and purpose of each function; for more information, see the LambdaMOO Programmer's Manual.  
+
+pass(arg, ...)   -- calling a verb defined on this object's parent
+
+time()           -- current time in seconds since midnight GMT, 1 Jan 70
+ctime([time])    -- time (or current time) converted to a human-readable string
+
+eval(string)     -- parsing and executing strings as MOO code
+
+typeof(value)      -- determining the data type of a value
+ tostr(value, ...) -- converting any set of values into a string
+ toint(value)      -- converting any non-list value into an integer
+ tonum(value)      -- converting any non-list value into an integer (obsolete)
+ tofloat(value)    -- converting any non-list value into a floating-point
+ toobj(value)      -- converting any non-list value into an object
+ toliteral(value)  -- converting any value into a literal string
+length(value)      -- returns the length of a string or list
+
+equal(val1, val2)          -- is val1 indistinguishable from val2
+min(n1, n2, ...)           -- minimum of n1,n2,...
+max(n1, n2, ...)           -- maximum of n1,n2,...
+abs(n)                     -- absolute value of n
+sin(n), cos(n), tan(n)     -- sine, cosine, tangent of n
+asin(n), acos(n), atan(n)  -- arc-sine, arc-cosine, arc-tangent of n
+sinh(n), cosh(n), tanh(n)  -- hyperbolic sine, cosine, tangent of n
+exp(n)                     -- `e' raised to the power of n
+log(n), log10(n)           -- natural or base 10 logarithm of n (n > 0)
+sqrt(n)                    -- square root of n, rounded down
+random(n)                  -- random integer between 1 and n inclusive
+floatstr(float, precision, sci) -- format a floating-point into string
+ceil(f)          -- smallest integer > float f as a floating-point
+floor(f)         -- largest integer < float f as floating-point
+trunc(f)         -- truncate f at the decimal point, as floating-point
+
+index(str1, str2 [, case-matters])  -- index of first str2 in str1
+rindex(str1, str2 [, case-matters]) -- index of last  str2 in str1
+strcmp(str1, str2) -- case-sensitive string comparison
+strsub(subject, what, with [, case-matters]) -- substitution in a string
+match(str1, str2 [, case-matters])  -- match first regular expr str2 in str1
+rmatch(str1, str2 [, case-matters]) -- match last regular expr str2 in str1
+substitute(template, subs)          -- perform substitutions on template
+
+decode_binary(bin-string [, fully]) -- convert from a binary string
+encode_binary(arg, ...)             -- convert to a binary string
+      crypt(string [, salt])        -- one-way string encryption
+string_hash(text)                 -- MD5 cryptographically secure hash of text
+binary_hash(bin-string)           -- same but for a binary string
+ value_hash(value)                -- string_hash(toliteral(value))
+
+ is_member(value, list)           -- is exact value (case sensitive) in list
+listappend(list, value [, index]) -- adding an element at the end of a list
+listinsert(list, value [, index]) -- adding an element at the head of a list
+   listset(list, value, index)    -- updating a list at some index
+listdelete(list, index)           -- removing an element from a list
+    setadd(list, element) -- adding an element to a set represented as a list
+ setremove(list, element) -- removing an element from such a set
+
+   valid(object)             -- testing whether an object exists
+  create(parent [, owner(*)])-- creating a new MOO object
+ recycle(object)             -- destroying a MOO object
+    move(object, where)      -- altering the object-containment hierarchy
+chparent(object, new-parent) -- altering the object-inheritance hierarchy
+  parent(object)             -- object's parent   in the inheritance hierarchy
+children(object)             -- object's children in the inheritance hierarchy
+max_object()       -- the highest-numbered object in the MOO
+renumber(obj)      -- changes an object's number to lowest available one (*)
+reset_max_object() -- resets max_object() to the largest valid object (*)
+
+     properties(object) -- a list of the properties defined on an object
+   add_property(object, prop-name, value, info) -- add a new property
+delete_property(object, prop-name)              -- remove a property
+    property_info(object, prop-name)       -- {owner, perms} info on a property
+set_property_info(object, prop-name, info) -- setting same
+is_clear_property(object, prop-name) -- find out if a property is "clear"
+   clear_property(object, prop-name) -- make a property "clear"
+
+      verbs(object) -- a list of the verbs defined on an object
+   add_verb(object, info, args)  -- add a verb to an object
+delete_verb(object, verb-name)   -- remove a verb from an object
+    verb_info(object, verb-name) -- {owner, perms, names} info for a verb defn.
+    verb_args(object, verb-name) -- {dobj, prep, iobj} argument info for a verb
+    verb_code(object, verb-name [, fully-paren [, indent]]) -- program listing
+set_verb_info(object, verb-name, {owner, perms, names})
+set_verb_args(object, verb-name, {dobj, prep, iobj})   
+set_verb_code(object, verb-name, {line, line, ...})
+disassemble(object, verb-desc)   -- listing of server's internal `compile' 
+
+        is_player(object) -- testing whether or not object is a player
+          players()       -- a list of all players, active or not
+connected_players()       -- a list of all currently-connected players
+     idle_seconds(player) -- seconds since given player typed anything
+connected_seconds(player) -- seconds given player has been logged in
+    boot_player(player)        -- disconnect player from the MOO immediately(*)
+set_player_flag(player, value) -- set/clear player bit; boot player if clear(*)
+connection_name(player)   -- a server-assigned name for player's connection
+
+open_network_connection(@args) -- open a connection to another network site (*)
+notify(player, string)    -- sending text to a player's terminal
+read()                    -- reading a line of input from the player (*)
+buffered_output_length([player])      -- how much output pending
+force_input(player, str [, at-front]) -- put str in player's output queue
+flush_input(player [, show-messages]) -- clear a player's output queue
+output_delimiters(player) -- return {prefix,suffix} set by PREFIX/SUFFIX cmds
+set_connection_option(player, option, value) -- set I/O options for player
+   connection_options(player) -- list current I/O options for player
+    connection_option(player, option) -- return setting of option for player
+
+   listen(conn, point [, print-messages]) -- create server listening point (*)
+u nlisten(canon) -- close the server listening point described by canon (*)
+listeners() -- list of all listening points
+
+        raise(code [, message [, value]]) -- raise code just like an error
+call_function(func-name, arg, ...)        -- call func-name
+function_info([name])   -- descriptions of available built-in functions
+
+caller_perms()         -- the player whose permissions your caller was using
+set_task_perms(player) -- changing permissions of the running task (*)
+callers()      -- list of {obj, verb, owner, vloc, player}: this task's stack
+suspend([secs])  -- suspending the current task for a number of seconds
+resume(task [, value]) -- resume the given task with value returned
+seconds_left() -- number of seconds left in the current task
+ticks_left()   -- number of ticks   left in the current task
+task_id()      -- a random number representing the currently-running task
+queue_info([player]) -- who has tasks, or how many player has
+queued_tasks() -- list of {id,start,0,20000,owner,obj,verb,line,this}
+kill_task(id)  -- delete one of your tasks from the queue
+task_stack(task-id [, include-line-numbers]) -- info about suspended task
+
+server_log(string) -- add a comment to the server log file
+server_version() -- a string of three numbers "major.minor.release"
+memory_usage()   -- {{blocksize, nused, nfree}, ...}, the server's memory stats
+shutdown(msg)    -- print msg and kill the server (*)
+dump_database()  -- what it says (*)
+db_disk_size()   -- size in bytes of recent full database
+
+ value_bytes(value)  -- memory required to store value
+object_bytes(object) -- memory required to store object
+
+(*) => as you might have expected, these usually require wizard permissions.

@@ -1,0 +1,74 @@
+The following kinds of expressions exist in the MOO programming language:
+
+        number
+        # integer
+        # - integer
+        "character string"
+        error-name
+Literal expressions return the obvious values: numbers (floating-point or integers), object numbers, strings, and errors.
+
+        { expression , expression , ... , expression }
+The list-construction expression evaluates the each of the expressions in turn and returns a list whose elements are the results of those expressions.  Any of the expressions may be prefixed with an at-sign ('@'); in this case, that expression must return a list and, rather than that list becoming an element of the final list, its elements are spliced into the final list.
+
+        name
+Variable expressions return the current value of the named variable.  Variable names must start with a letter or underscore ('_') and contain only letters, digits, and underscores.  The following variables are predefined:
+            OBJ, STR, LIST, ERR, INT, FLOAT, NUM (same as INT)
+            player, caller, this, verb, args
+            argstr, dobj, dobjstr, prepstr, iobj, iobjstr
+Their initial values are described in detail in the LambdaMOO Programmer's Manual.
+
+        expression . name
+        expression . ( expression )
+        $ name
+Property-reading expressions return the current value of a named property on the object that is the value of the first subexpression.  In the second form, the second subexpression must return a string, the name of the property to be read.  The third form is an abbreviation for '#0.name'.
+
+        expression : name ( arguments )
+        expression : ( expression ) ( arguments )
+Verb-call expressions invoke a named verb on the object that is the value of the first subexpression, passing the given arguments.  In the second form, the second subexpression must return a string, the name of the verb to invoke.  The syntax and semantics of arguments is exactly as in the list-construction expression but no initial or final curly-braces ('{' or '}') are used.
+
+        function ( arguments )
+The function-call expression invokes one of the MOO primitive functions, as listed in 'help functions', passing the given arguments.
+
+        expression [ expression ]
+The indexing expression first evaluates the two subexpressions; call their values S and N, respectively.  S must be a string or a list and N must be a integer between 1 and the length of S, inclusive.  The Nth element of S is returned.  The elements of a string are themselves one-character strings. The special character `$' maybe used for N as shorthand for the length of the string or list S.
+
+        expression [ expression .. expression ]
+The subsequence expression first evaluates the three subexpressions; call their values S, N1, and N2, respecitively.  S must be a string or a list and N1 and N2 must be integers.  If N1 <= N2, then both must be between 1 and the length of S, inclusive (the shorthand character `$' may be used); the subsequence of S beginning at index N1 and continuing through index N2 is returned.  If N1 > N2, the empty sequence of the same type as S is returned, either "" or {}.
+
+        name = expression
+        expression . name = expression
+        expression . ( expression ) = expression
+        $ name = expression
+Assignment expressions give new values to variables and object properties.  For the second and third forms, the expressions on the left-hand side of the '=' are evaluated first.  Then the right-hand side expression is evaluated and result is stored in the indicated variable or object property.
+There is a special kind of assignment involving lists on the left hand side. See `help scattering' for details.
+
+        expression + expression
+        expression - expression
+        expression * expression
+        expression / expression
+        expression % expression
+        - expression
+        expression ^ expression
+The arithmetic expressions evaluate the subexpressions, all of which must return numbers of the same type (integer or floating-point), and then perform addition, subtraction, multiplication, division, remaindering, negation, or raising to a power, respectively.  For addition, the subexpressions may both return strings as well; in this case, the result is the concatenation of the two strings. For the last operation, raising to a power, if the first expression is an integer, the second must also be an integer. But if it is floating-point, then the second can be either floating point or an integer. This is the only type mixing permitted. You must do explicit type conversions with built-in functions (toint(), tofloat()) before evaluation mixed expressions on the other operations.
+
+        expression == expression
+        expression != expression
+        expression < expression
+        expression <= expression
+        expression > expression
+        expression >= expression
+The comparison expressions evaluate the subexpressions and then test whether or not the first result is equal to, unequal to, less than, less than or equal to, greater than, or greater than or equal to the second result, respectively.  If the indicated relation holds then they return 1 and otherwise they return 0.  Comparisons of strings are performed case-insensitively, those of lists are performed on an element-by-element basis, objects are compared by their object numbers, and errors by an ordering given in the LambdaMOO Programmer's Manual.
+
+        expression ? expression | expression
+        expression && expression
+        expression || expression
+        ! expression
+The logical expressions each return results based upon the truth value of their first subexpression; call the value of this expression X.  The first of these returns the value of the second subexpression if X is a true value and that of the third expression if X is a false value; the unused subexpression is not evaluated.  The definitions of 'true value' and 'false value' are given in 'help truth'.  The expression 'E1 && E2' is an abbreviation for 'E1 ? E2 | E1' except that E1 is only evaluated once.  The expression 'E1 || E2' is an abbreviation for 'E1 ? E1 | E2' except that E1 is only evaluated once.  The expression '! E' is an abbreviation for 'E ? 0 | 1'.
+
+        expression IN expression
+The list-membership expression first evaluates both subexpressions; call their values E and L, respectively.  L must be a list.  If E is an element of L, then the index of the first occurence of E in L is returned.  If E is not an element of L, then 0 is returned.
+
+        `expression-1 ! codes => expression-2'
+NOTE: the open- and close-quotation marks are really part of the syntax; they must be typed in. `Codes' is either the keywoard ANY or a comma-separated list of expressions that when evaluated should yield a list of error codes to be caught if they're raised. If `expression-1' is evaluated without raising an error, then its value is the value of the entire expresion. If it raises an error that is listed in `codes', it is caught. If the `=> expression-2' part was included (it is optional), then it is evaluated and its value is the result of the entire expression. If `expression-2' was omitted, then the error is the value of the expression. If the error was not listed and caught, then the error contines to be raised.
+
+The method for disambiguating the meaning of a complex MOO expression in the absence of sufficient parentheses is described in 'help precedence'.

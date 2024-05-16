@@ -1,0 +1,12 @@
+node_modules/
+dist/
+.nyc_output/
+reports/
+src/grammar/.antlr
+src/grammar/*.interp
+src/grammar/*.java
+src/grammar/*.tokens
+other-files/.antlr
+other-files/*.interp
+other-files/*.java
+other-files/*.tokens

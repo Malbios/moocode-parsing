@@ -1,0 +1,21 @@
+The complete list of error codes:
+
+    E_NONE         No error
+    E_TYPE         Type mismatch
+    E_DIV          Division by zero
+    E_PERM         Permission denied
+    E_PROPNF       Property not found
+    E_VERBNF       Verb not found
+    E_VARNF        Variable not found
+    E_INVIND       Invalid indirection
+    E_RECMOVE      Recursive move
+    E_MAXREC       Too many verb calls
+    E_RANGE        Range error
+    E_ARGS         Incorrect number of arguments
+    E_NACC         Move refused by destination
+    E_INVARG       Invalid argument
+    E_QUOTA        Resource limit exceeded
+    E_FLOAT        Floating-point arithmetic error
+    E_FILE         File error
+    E_EXEC         Exec error
+    E_INTRPT       Interrupted

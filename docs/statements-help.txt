@@ -1,0 +1,62 @@
+The following kinds of statements exist in the MOO programming language:
+
+        ;
+The null statement does nothing.
+
+        expression ;
+The expression statement evaluates the expression and then discards the value.
+
+        IF ( expression ) statements ENDIF
+        IF ( expression ) statements ELSE statements ENDIF
+        IF ( expression )
+          statements
+        ELSEIF ( expression )
+          statements
+        ...
+        ELSE
+          statements
+        ENDIF
+The conditional statement evaluates each expression in turn and executes the statements associated with the first one to return a true value; the ELSE statements are executed if none of the expressions returns a true value.  There can be any number of ELSEIF clauses and the ELSE part is optional.  See 'help truth' for the definition of 'true value'.
+
+        FOR name IN ( expression ) statements ENDFOR
+The list iteration statement first evaluates the expression, which must return a list.  It then executes the statements once for each element of that list, each time with the named variable having the value of the corresponding list element.
+
+        FOR name IN [ expression .. expression ] statements ENDFOR
+The numeric iteration statement first evaluates the two expressions, both of which must return numbers; call those numbers N1 and N2, respectively.  The statements are then executed once for each integer I such that N1 <= I <= N2, in increasing order; each time, the named variable has the corresponding value of I.
+
+        WHILE ( expression ) statements ENDWHILE
+        WHILE name ( expression ) statements ENDWHILE
+The indefinite iteration statement repeatedly evaluates the expression and, each time it returns a true value, executes the statements.  The loop stops the first time that the expression returns a false value.  The definitions of 'true' and 'false' values is in 'help truth'.
+
+        BREAK ;
+        BREAK name ;
+Each `break' statement indicates a specific surrounding loop; if <name> is not given, the statement refers to the innermost one. If it is given, <name> must be the name appearing right after the `for' or `while' keyword of the desired enclosing loop. When the `break' statement is executed, the indicated loop is immediately terminated and executing continues just as if the loop had completed its iterations normally.
+
+        CONTINUE ;
+        CONTINUE name ;
+Allows you to terminate just the current iteration of a loop, making it immediately go on to the next one if any. 
+
+        RETURN ;
+        RETURN expression ;
+The return statement evaluates the expression, if any, and returns the resulting value (or 0 if there is no expression) to the verb that called the current one.  Execution of the current verb is immediately terminated.
+
+        TRY
+          statements-0 ;
+        EXCEPT variable-1 (codes-1)
+          statements-1 ;
+        EXCEPT variable-2 (codes-2)
+          statements-2 ;
+        ... (up to 255)
+        ENDTRY
+Each of the `statements-x' may be any number or combination of MOO statements and function calls. Each of the `codes-x' may be either the keyword `ANY' or else a comma-separated list of expressions that yield error codes. If the execution of `statements-0' raises an error listed in the `codes-x', then the statements associated in that EXCEPT clause where the code was listed are executed. When this occurs, `variable-x' is assigned this information about the error being raised:  {<error code>, <error message>, <value>, <traceback>}. If the error raised is not listed in any EXCEPT clause (which means the `ANY' keyword was not used), then the error continues to be raised. 
+
+        TRY
+          statements-0 ;
+        FINALLY
+          statements-last ;
+        ENDTRY
+In this construct, `statements-0' are executed. Then, whether an error was raised by their execution or not, `statements-last' are executed. If `statements-0' transfers control somewhere else, that transfer is interrupted so that `statements-last' can be run. If `statements-last' transfers control, then that overrides the first transfer. (Transfers include raising an error, returning from this verb, terminating the current iteration of a surrounding loop). `Statements-last' will always be executed, providing a good place for necessary cleanup code that will run even if `statements-0' doesn't simply run normally to completion.
+
+        FORK ( expression ) statements ENDFORK
+        FORK name ( expression ) statements ENDFORK
+The fork statement first executes the expression, which must return a number; call that number N.  It then creates a new MOO task that will, after at least N seconds, execute the statements.  When the new task begins, all variables will have the values they had at the time the FORK statement was executed.  The task executing the FORK statement immediately continues execution.  If a variable name is given after the FORK keyword, then it is assigned the 'queue ID' of the newly-created task.  The value of this variable is visible both to the task executing the fork statement and to the statements in the newly-created task.  See 'help tasks' for more information about forked tasks.

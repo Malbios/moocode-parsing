@@ -1,0 +1,33 @@
+{
+	"version": "2.0.0",
+	"tasks": [
+		{
+			"presentation": {
+				"clear": true,
+				"showReuseMessage": false,
+				"reveal": "silent",
+				"revealProblems": "onProblem"
+			},
+			"type": "npm",
+			"script": "test:mocha",
+			"group": "test",
+			"problemMatcher": [],
+			"label": "npm: test",
+			"detail": "npm run test:mocha"
+		},
+		{
+			"presentation": {
+				"clear": true,
+				"showReuseMessage": false,
+				"reveal": "silent",
+				"revealProblems": "onProblem"
+			},
+			"type": "npm",
+			"script": "test:single",
+			"group": "test",
+			"problemMatcher": [],
+			"label": "npm: test:single",
+			"detail": "mocha -g <test-name>"
+		}
+	]
+}
