@@ -1,0 +1,138 @@
+{
+	"new snippet": {
+		"scope": "snippets",
+		"prefix": "snippet",
+		"body": [
+			",",
+			"\"$1\": {",
+			"\t\"scope\": \"$2\",",
+			"\t\"prefix\": \"$3\",",
+			"\t\"body\": [",
+			"\t\t$0",
+			"\t],",
+			"\t\"description\": \"$4\"",
+			"}"
+		],
+		"description": "New snippet for VSCode snippets file"
+	},
+	"new unit test file (simple)": {
+		"scope": "typescript",
+		"prefix": "ut",
+		"body": [
+			"import { expect } from 'chai';",
+			"",
+			"import CommonHelpers from '../utilities/common';",
+			"import ExpectHelpers from '../utilities/expectations';",
+			"",
+			"suite('$1 tests', () => {",
+			"\tit('', () => {",
+			"\t\tconst parser = CommonHelpers.getParser('');",
+			"\t\tconst result = parser.moocode();",
+			"\t\t",
+			"\t\tExpectHelpers.expectSyntaxErrors(parser, 0);",
+			"\t\t",
+			"\t\t$0",
+			"\t});",
+			"});"
+		],
+		"description": "Simple unit test template"
+	},
+	"new unit test file (test-data)": {
+		"scope": "typescript",
+		"prefix": "ut-data",
+		"body": [
+			"import { expect } from 'chai';",
+			"",
+			"import CommonHelpers from '../utilities/common';",
+			"import ExpectHelpers from '../utilities/expectations';",
+			"",
+			"const testCaseData = [",
+			"\t{ description: '', code: '', expected: '' },",
+			"];",
+			"",
+			"suite('$1 tests', () => {",
+			"\ttestCaseData.forEach(testCaseData => {",
+			"\t\tit(testCaseData.description, () => {",
+			"\t\t\tconst parser = CommonHelpers.getParser(testCaseData.code);",
+			"\t\t\tconst result = parser.moocode();",
+			"",
+			"\t\t\tExpectHelpers.expectSyntaxErrors(parser, 0);",
+			"\t\t\t",
+			"\t\t\t$0",
+			"\t\t});",
+			"\t});",
+			"});"
+		],
+		"description": "unit test template with test-data"
+	},
+	"new parser rule (single)": {
+		"scope": "antlr",
+		"prefix": "antlr-rule-single",
+		"body": [
+			"$1",
+			"\t: $0",
+			"\t;"
+		],
+		"description": "New parser rule (single) for ANTLR grammar"
+	},
+	"new parser rule (multi)": {
+		"scope": "antlr",
+		"prefix": "antlr-rule-multi",
+		"body": [
+			"$1",
+			"\t: $0",
+			"\t| ",
+			"\t;"
+		],
+		"description": "New parser rule (multiple) for ANTLR grammar"
+	},
+	"new unit test test data": {
+		"scope": "typescript",
+		"prefix": "test-data",
+		"body": [
+			",",
+			"{ description: '$1', code: '$2', expected: '$3' }$0"
+		],
+		"description": "New test data for a unit test"
+	},
+	"check that value does equal anything": {
+		"scope": "typescript",
+		"prefix": "jany",
+		"body": [
+			".to.exist;$0"
+		],
+		"description": "Add the check"
+	},
+	"check that value does not equal anything": {
+		"scope": "typescript",
+		"prefix": "jany-not",
+		"body": [
+			".not.to.exist;$0"
+		],
+		"description": "Add the check"
+	},
+	"check that value has expected size": {
+		"scope": "typescript",
+		"prefix": "jsize",
+		"body": [
+			".to.have.length($1);$0"
+		],
+		"description": "Add the check"
+	}
+	// Place your moocode-utils workspace snippets here. Each snippet is defined under a snippet name and has a scope, prefix, body and 
+	// description. Add comma separated ids of the languages where the snippet is applicable in the scope field. If scope 
+	// is left empty or omitted, the snippet gets applied to all languages. The prefix is what is 
+	// used to trigger the snippet and the body will be expanded and inserted. Possible variables are: 
+	// $1, $2 for tab stops, $0 for the final cursor position, and ${1:label}, ${2:another} for placeholders. 
+	// Placeholders with the same ids are connected.
+	// Example:
+	// "Print to console": {
+	// 	"scope": "javascript,typescript",
+	// 	"prefix": "log",
+	// 	"body": [
+	// 		"console.log('$1');",
+	// 		"$2"
+	// 	],
+	// 	"description": "Log output to console"
+	// }
+}

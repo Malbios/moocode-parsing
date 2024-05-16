@@ -1,0 +1,21 @@
+{
+    "extends": "@istanbuljs/nyc-config-typescript",
+    "all": true,
+    "check-coverage": false,
+    "extension": [
+        ".ts"
+    ],
+    "include": [
+        "src/**/*.ts"
+    ],
+    "exclude": [
+        "tests/**/*",
+        "src/grammar/generated/moocodeParserVisitor.ts",
+        "src/grammar/generated/moocodeParserListener.ts"
+    ],
+    "report-dir": "reports",
+    "reporter": [
+        "lcov",
+        "json-summary"
+    ]
+}
