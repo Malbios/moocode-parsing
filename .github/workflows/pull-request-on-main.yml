@@ -1,0 +1,59 @@
+name: Automated Checks (pull request)
+
+on:
+  pull_request:
+    branches: [main]
+    types: [opened, reopened, edited, synchronize]
+
+jobs:
+  lint:
+    uses: ./.github/workflows/action_check-lint.yml
+  
+  unit-tests:
+    runs-on: ubuntu-latest
+
+    concurrency:
+      group: ${{ github.workflow }}-${{ github.ref }}-test
+      cancel-in-progress: true
+
+    steps:
+      - name: Checkout Source
+        uses: actions/checkout@v4
+
+      - name: Use Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20.x'
+
+      - name: npm install
+        run: npm ci
+
+      - run: |
+          npm run clean:grammar
+          cp ./src/grammar/MoocodeLexer.g4 ./
+          cp ./src/grammar/MoocodeParser.g4 ./
+          java -jar ./bin/antlr-4.13.1-complete.jar -Dlanguage=TypeScript ./MoocodeLexer.g4
+          java -jar ./bin/antlr-4.13.1-complete.jar -Dlanguage=TypeScript -listener -visitor ./MoocodeParser.g4
+          mkdir ./src/grammar/generated
+          mv ./Moocode*.ts ./src/grammar/generated
+
+      - name: Run tests
+        run: npm run test:mocha
+  
+  ensure-new-version:
+    runs-on: ubuntu-latest
+
+    concurrency:
+      group: ${{ github.workflow }}-${{ github.ref }}-version
+      cancel-in-progress: true
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.PERSONAL_TOKEN }}
+
+      - name: Ensure newer version than last release
+        shell: pwsh
+        run: .\version-check.ps1
+        env:
+          GH_TOKEN: ${{ secrets.PERSONAL_TOKEN }}
