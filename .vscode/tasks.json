@@ -14,6 +14,7 @@
 			"problemMatcher": [],
 			"label": "npm: test",
 			"detail": "npm run test:mocha"
+<<<<<<< HEAD
 		},
 		{
 			"presentation": {
@@ -28,6 +29,8 @@
 			"problemMatcher": [],
 			"label": "npm: test:single",
 			"detail": "mocha -g <test-name>"
+=======
+>>>>>>> fca33da (big workflow rework)
 		}
 	]
 }
