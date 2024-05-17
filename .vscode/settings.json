@@ -3,15 +3,9 @@
         "dist": true,
         ".nyc_output": true,
         "src/grammar/.antlr": true,
-        "src/grammar/*.interp": true,
-        "src/grammar/*.java": true,
-        "src/grammar/*.tokens": true,
-        "src/grammar/generated": true,
-        "other-files/.antlr": true,
-        "other-files/*.interp": true,
-        "other-files/*.java": true,
-        "other-files/*.tokens": true
+        "package-lock.json": true
     },
+    "editor.folding": false,
     "editor.codeActionsOnSave": {
         "source.fixAll": "explicit"
     },

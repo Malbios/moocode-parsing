@@ -12,24 +12,13 @@
   "author": "Malbios",
   "license": "MIT",
   "bugs": "https://github.com/Malbios/moocode-parsing/issues",
-  "repository": "https://github.com/Malbios/moocode-parsing",
-  "scripts": {
-    "test": "npm run rebuild:grammar && npm run test:mocha",
-    "rebuild:grammar": "npm run clean:grammar && npm run build:grammar",
-    "clean:grammar": "rimraf ./src/grammar/generated",
-    "clean:out": "rimraf ./dist",
-    "build:grammar": "java -jar ./bin/antlr-4.13.1-complete.jar -Dlanguage=TypeScript -listener -visitor -o ./src/grammar/generated -lib ./src/grammar ./src/grammar/moocodeParser.g4 ./src/grammar/moocodeLexer.g4",
-    "rebuild": "npm run clean:out && npm run build",
-    "build": "npx tsc",
-    "test-with-coverage": "npx nyc mocha",
-    "test:mocha": "npx mocha",
-    "lint": "npm run lint:fix",
-    "lint:check": "npx eslint .",
-    "lint:fix": "npx eslint --fix ."
+  "repository": {
+    "url": "https://github.com/Malbios/moocode-parsing"
   },
+  "main": "./lib/index.js",
+  "types": "./lib/index.d.ts",
   "dependencies": {
-    "antlr4": "^4.13.1-patch-1",
-    "antlr4-c3": "^3.4.1"
+    "antlr4": "^4.13.1-patch-1"
   },
   "devDependencies": {
     "@eslint/js": "^9.2.0",
@@ -48,5 +37,21 @@
     "ts-node": "^10.9.2",
     "typescript": "^5.4.5",
     "typescript-eslint": "^7.8.0"
+  },
+  "scripts": {
+    "test": "npm run test:mocha",
+    "clean:grammar": "rimraf ./src/grammar/generated",
+    "clean:out": "rimraf ./dist",
+    "rebuild:release": "npm run clean:out && npm run build:release",
+    "build:release": "npx tsc --p ./tsconfig.release.json",
+    "test-with-coverage": "npx nyc mocha",
+    "test:mocha": "npx mocha",
+    "lint": "npm run lint:fix",
+    "lint:check": "npx eslint .",
+    "lint:fix": "npx eslint --fix .",
+    "push:version": "git push --tags origin HEAD:dev",
+    "version:major": "npm version major && npm run push:version",
+    "version:minor": "npm version minor && npm run push:version",
+    "version:patch": "npm version patch && npm run push:version"
   }
 }

@@ -1,12 +1,8 @@
 node_modules/
 dist/
+out/
 .nyc_output/
 reports/
+.vscode-test/
+*.tgz
 src/grammar/.antlr
-src/grammar/*.interp
-src/grammar/*.java
-src/grammar/*.tokens
-other-files/.antlr
-other-files/*.interp
-other-files/*.java
-other-files/*.tokens
