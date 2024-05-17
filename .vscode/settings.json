@@ -3,6 +3,7 @@
         "dist": true,
         ".nyc_output": true,
         "src/grammar/.antlr": true,
+<<<<<<< HEAD
         "src/grammar/*.interp": true,
         "src/grammar/*.java": true,
         "src/grammar/*.tokens": true,
@@ -12,6 +13,11 @@
         "other-files/*.java": true,
         "other-files/*.tokens": true
     },
+=======
+        "package-lock.json": true
+    },
+    "editor.folding": false,
+>>>>>>> fca33da (big workflow rework)
     "editor.codeActionsOnSave": {
         "source.fixAll": "explicit"
     },
