@@ -50,10 +50,25 @@ jobs:
     steps:
       - uses: actions/checkout@v4
         with:
+          submodules: true
           token: ${{ secrets.PERSONAL_TOKEN }}
 
-      - name: Ensure newer version than last release
+      - name: Trust PSGallery
         shell: pwsh
-        run: .\version-check.ps1
+        run: Set-PSRepository -Name PSGallery -InstallationPolicy Trusted
+
+      - name: Ensure newer version than last release
         env:
           GH_TOKEN: ${{ secrets.PERSONAL_TOKEN }}
+        shell: pwsh
+        run: |
+          Import-Module -Force './scripts/common.psm1'
+          EnsureNewVersion
+
+      - name: Ensure latest version tag points to latest commit
+        env:
+          GH_TOKEN: ${{ secrets.PERSONAL_TOKEN }}
+        shell: pwsh
+        run: |
+          Import-Module -Force './scripts/common.psm1'
+          EnsureLatestVersionTagPointsToLatestCommit
