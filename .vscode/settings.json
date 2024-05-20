@@ -9,6 +9,15 @@
     "editor.codeActionsOnSave": {
         "source.fixAll": "explicit"
     },
+    "[typescript]": {
+        "editor.codeActionsOnSave": {
+            "source.organizeImports": "explicit"
+        }
+    },
+    "editor.insertSpaces": false,
+    "typescript.tsc.autoDetect": "off",
+    "typescript.preferences.quoteStyle": "single",
+    "typescript.updateImportsOnFileMove.enabled": "always",
     "editor.formatOnSave": true,
     "editor.formatOnPaste": true,
     "eslint.validate": [
@@ -21,7 +30,6 @@
     "eslint.options": {
         "overrideConfigFile": "eslint.config.mjs"
     },
-    "typescript.updateImportsOnFileMove.enabled": "always",
     "[github-actions-workflow]": {
         "editor.tabSize": 2
     },

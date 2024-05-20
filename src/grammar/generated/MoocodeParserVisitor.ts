@@ -1,4 +1,4 @@
-// Generated from c://dev//moocode-parsing//src//grammar//MoocodeParser.g4 by ANTLR 4.13.1
+// Generated from c://dev//moocode-utils//moocode-parsing//src//grammar//MoocodeParser.g4 by ANTLR 4.13.1
 
 import {ParseTreeVisitor} from 'antlr4';
 
@@ -8,8 +8,9 @@ import { StatementContext } from "./MoocodeParser";
 import { StatementsContext } from "./MoocodeParser";
 import { Empty_statementContext } from "./MoocodeParser";
 import { If_statementContext } from "./MoocodeParser";
-import { ElseifContext } from "./MoocodeParser";
-import { ElseContext } from "./MoocodeParser";
+import { If_expressionContext } from "./MoocodeParser";
+import { Elseif_expressionContext } from "./MoocodeParser";
+import { Else_expressionContext } from "./MoocodeParser";
 import { Return_statementContext } from "./MoocodeParser";
 import { Non_empty_returnContext } from "./MoocodeParser";
 import { Empty_returnContext } from "./MoocodeParser";
@@ -66,6 +67,7 @@ import { Bool_literalContext } from "./MoocodeParser";
 import { String_literalContext } from "./MoocodeParser";
 import { Integer_literalContext } from "./MoocodeParser";
 import { Float_literalContext } from "./MoocodeParser";
+import { Dollar_literalContext } from "./MoocodeParser";
 import { Error_codeContext } from "./MoocodeParser";
 import { IdentifierContext } from "./MoocodeParser";
 
@@ -109,17 +111,23 @@ export default class MoocodeParserVisitor<Result> extends ParseTreeVisitor<Resul
 	 */
 	visitIf_statement?: (ctx: If_statementContext) => Result;
 	/**
-	 * Visit a parse tree produced by `MoocodeParser.elseif`.
+	 * Visit a parse tree produced by `MoocodeParser.if_expression`.
 	 * @param ctx the parse tree
 	 * @return the visitor result
 	 */
-	visitElseif?: (ctx: ElseifContext) => Result;
+	visitIf_expression?: (ctx: If_expressionContext) => Result;
 	/**
-	 * Visit a parse tree produced by `MoocodeParser.else`.
+	 * Visit a parse tree produced by `MoocodeParser.elseif_expression`.
 	 * @param ctx the parse tree
 	 * @return the visitor result
 	 */
-	visitElse?: (ctx: ElseContext) => Result;
+	visitElseif_expression?: (ctx: Elseif_expressionContext) => Result;
+	/**
+	 * Visit a parse tree produced by `MoocodeParser.else_expression`.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	visitElse_expression?: (ctx: Else_expressionContext) => Result;
 	/**
 	 * Visit a parse tree produced by `MoocodeParser.return_statement`.
 	 * @param ctx the parse tree
@@ -456,6 +464,12 @@ export default class MoocodeParserVisitor<Result> extends ParseTreeVisitor<Resul
 	 * @return the visitor result
 	 */
 	visitFloat_literal?: (ctx: Float_literalContext) => Result;
+	/**
+	 * Visit a parse tree produced by `MoocodeParser.dollar_literal`.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	visitDollar_literal?: (ctx: Dollar_literalContext) => Result;
 	/**
 	 * Visit a parse tree produced by `MoocodeParser.error_code`.
 	 * @param ctx the parse tree

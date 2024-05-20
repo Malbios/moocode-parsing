@@ -15,6 +15,26 @@
 		],
 		"description": "New snippet for VSCode snippets file"
 	},
+	"New AST node": {
+		"scope": "typescript",
+		"prefix": "node",
+		"body": [
+			"export class $1 extends BaseNode {",
+			"\tprivate _$2: $3;",
+			"",
+			"\tpublic get $2(): $3 {",
+			"\t\treturn this._$2;",
+			"\t}",
+			"",
+			"\tpublic constructor(context: ParserRuleContext, $2: $3) {",
+			"\t\tsuper(DocumentPosition.fromContext(context));",
+			"",
+			"\t\tthis._$2 = $2;$0",
+			"\t}",
+			"}"
+		],
+		"description": "AST node template"
+	},
 	"new unit test file (simple)": {
 		"scope": "typescript",
 		"prefix": "ut",

@@ -1,4 +1,4 @@
-// Generated from c://dev//moocode-parsing//src//grammar//MoocodeLexer.g4 by ANTLR 4.13.1
+// Generated from c://dev//moocode-utils//moocode-parsing//src//grammar//MoocodeLexer.g4 by ANTLR 4.13.1
 // noinspection ES6UnusedImports,JSUnusedGlobalSymbols,JSUnusedLocalSymbols
 import {
 	ATN,

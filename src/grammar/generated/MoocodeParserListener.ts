@@ -1,4 +1,4 @@
-// Generated from c://dev//moocode-parsing//src//grammar//MoocodeParser.g4 by ANTLR 4.13.1
+// Generated from c://dev//moocode-utils//moocode-parsing//src//grammar//MoocodeParser.g4 by ANTLR 4.13.1
 
 import {ParseTreeListener} from "antlr4";
 
@@ -8,8 +8,9 @@ import { StatementContext } from "./MoocodeParser";
 import { StatementsContext } from "./MoocodeParser";
 import { Empty_statementContext } from "./MoocodeParser";
 import { If_statementContext } from "./MoocodeParser";
-import { ElseifContext } from "./MoocodeParser";
-import { ElseContext } from "./MoocodeParser";
+import { If_expressionContext } from "./MoocodeParser";
+import { Elseif_expressionContext } from "./MoocodeParser";
+import { Else_expressionContext } from "./MoocodeParser";
 import { Return_statementContext } from "./MoocodeParser";
 import { Non_empty_returnContext } from "./MoocodeParser";
 import { Empty_returnContext } from "./MoocodeParser";
@@ -66,6 +67,7 @@ import { Bool_literalContext } from "./MoocodeParser";
 import { String_literalContext } from "./MoocodeParser";
 import { Integer_literalContext } from "./MoocodeParser";
 import { Float_literalContext } from "./MoocodeParser";
+import { Dollar_literalContext } from "./MoocodeParser";
 import { Error_codeContext } from "./MoocodeParser";
 import { IdentifierContext } from "./MoocodeParser";
 
@@ -126,25 +128,35 @@ export default class MoocodeParserListener extends ParseTreeListener {
 	 */
 	exitIf_statement?: (ctx: If_statementContext) => void;
 	/**
-	 * Enter a parse tree produced by `MoocodeParser.elseif`.
+	 * Enter a parse tree produced by `MoocodeParser.if_expression`.
 	 * @param ctx the parse tree
 	 */
-	enterElseif?: (ctx: ElseifContext) => void;
+	enterIf_expression?: (ctx: If_expressionContext) => void;
 	/**
-	 * Exit a parse tree produced by `MoocodeParser.elseif`.
+	 * Exit a parse tree produced by `MoocodeParser.if_expression`.
 	 * @param ctx the parse tree
 	 */
-	exitElseif?: (ctx: ElseifContext) => void;
+	exitIf_expression?: (ctx: If_expressionContext) => void;
 	/**
-	 * Enter a parse tree produced by `MoocodeParser.else`.
+	 * Enter a parse tree produced by `MoocodeParser.elseif_expression`.
 	 * @param ctx the parse tree
 	 */
-	enterElse?: (ctx: ElseContext) => void;
+	enterElseif_expression?: (ctx: Elseif_expressionContext) => void;
 	/**
-	 * Exit a parse tree produced by `MoocodeParser.else`.
+	 * Exit a parse tree produced by `MoocodeParser.elseif_expression`.
 	 * @param ctx the parse tree
 	 */
-	exitElse?: (ctx: ElseContext) => void;
+	exitElseif_expression?: (ctx: Elseif_expressionContext) => void;
+	/**
+	 * Enter a parse tree produced by `MoocodeParser.else_expression`.
+	 * @param ctx the parse tree
+	 */
+	enterElse_expression?: (ctx: Else_expressionContext) => void;
+	/**
+	 * Exit a parse tree produced by `MoocodeParser.else_expression`.
+	 * @param ctx the parse tree
+	 */
+	exitElse_expression?: (ctx: Else_expressionContext) => void;
 	/**
 	 * Enter a parse tree produced by `MoocodeParser.return_statement`.
 	 * @param ctx the parse tree
@@ -705,6 +717,16 @@ export default class MoocodeParserListener extends ParseTreeListener {
 	 * @param ctx the parse tree
 	 */
 	exitFloat_literal?: (ctx: Float_literalContext) => void;
+	/**
+	 * Enter a parse tree produced by `MoocodeParser.dollar_literal`.
+	 * @param ctx the parse tree
+	 */
+	enterDollar_literal?: (ctx: Dollar_literalContext) => void;
+	/**
+	 * Exit a parse tree produced by `MoocodeParser.dollar_literal`.
+	 * @param ctx the parse tree
+	 */
+	exitDollar_literal?: (ctx: Dollar_literalContext) => void;
 	/**
 	 * Enter a parse tree produced by `MoocodeParser.error_code`.
 	 * @param ctx the parse tree
