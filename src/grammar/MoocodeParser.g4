@@ -24,12 +24,15 @@ statements: statement*;
 empty_statement: SEMICOLON;
 
 if_statement:
-	IF OPEN_PARENS conditions = expression CLOSE_PARENS body = statements elseif* else? ENDIF;
+	if_expression elseif_expression* else_expression? ENDIF;
 
-elseif:
+if_expression:
+	IF OPEN_PARENS conditions = expression CLOSE_PARENS body = statements;
+
+elseif_expression:
 	ELSEIF OPEN_PARENS conditions = expression CLOSE_PARENS body = statements;
 
-else: ELSE body = statements;
+else_expression: ELSE body = statements;
 
 return_statement: (non_empty_return | empty_return) SEMICOLON;
 
@@ -206,7 +209,8 @@ literal:
 	bool_literal
 	| string_literal
 	| integer_literal
-	| float_literal;
+	| float_literal
+	| dollar_literal;
 
 bool_literal: TRUE | FALSE;
 
@@ -215,6 +219,8 @@ string_literal: STRING_LITERAL;
 integer_literal: INTEGER_LITERAL;
 
 float_literal: FLOAT_LITERAL;
+
+dollar_literal: DOLLAR;
 
 error_code:
 	E_NONE
@@ -237,4 +243,4 @@ error_code:
 	| E_EXEC
 	| E_INTRPT;
 
-identifier: IDENTIFIER | DOLLAR;
+identifier: IDENTIFIER;

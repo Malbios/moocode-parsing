@@ -1,18 +1,22 @@
-import { expect } from 'chai';
 import { ParserRuleContext } from 'antlr4';
+import { expect } from 'chai';
 
 import moocodeParser, {
     Bool_literalContext,
     Corified_objectContext,
+    Dollar_literalContext,
     Error_codeContext,
+    Float_literalContext,
     IdentifierContext,
     Integer_literalContext,
     Object_idContext,
     Object_referenceContext,
-    Float_literalContext,
     String_literalContext
 } from '../../src/grammar/generated/MoocodeParser';
 
+import { fail } from 'assert';
+import { ParsingError } from '../../src/error';
+import { Action } from '../../src/interfaces';
 import ParsingHelpers from './parsing';
 
 // eslint-disable-next-line @typescript-eslint/no-extraneous-class
@@ -41,6 +45,10 @@ export default class ExpectHelpers {
 
     public static expectString(context: ParserRuleContext | undefined, expectedValue: string) {
         this.expectValue<String_literalContext>(context, String_literalContext, expectedValue);
+    }
+
+    public static expectDollar(context: ParserRuleContext | undefined, expectedValue: string) {
+        this.expectValue<Dollar_literalContext>(context, Dollar_literalContext, expectedValue);
     }
 
     public static expectIdentifier(context: ParserRuleContext | undefined, expectedValue: string) {
@@ -91,5 +99,19 @@ export default class ExpectHelpers {
     public static expectNonEmptyContinue(context: ParserRuleContext | undefined) {
         const foundContext = ParsingHelpers.getNonEmptyContinue(context);
         expect(foundContext).to.exist;
+    }
+}
+
+export function expectParsingError(action: Action<void>) {
+    try {
+        action();
+        fail();
+    } catch (error: unknown) {
+        const parsingError = error as ParsingError;
+        if (!parsingError) {
+            fail();
+        }
+
+        console.log(parsingError.message);
     }
 }

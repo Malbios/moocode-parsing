@@ -31,6 +31,7 @@ import {
 } from '../../src/grammar/generated/MoocodeParser';
 
 import moocodeParserVisitor from '../../src/grammar/generated/MoocodeParserVisitor';
+import { getContextAsText } from '../../src/common';
 
 class FirstContextVisitor<T extends ParserRuleContext> extends moocodeParserVisitor<T | undefined> {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -272,12 +273,6 @@ export default class ParsingHelpers {
             return undefined;
         }
 
-        const input = foundContext.start.getInputStream();
-
-        if (!foundContext.stop) {
-            return input.getText(foundContext.start.start, input.size);
-        }
-
-        return input.getText(foundContext.start.start, foundContext.stop.stop);
+        return getContextAsText(foundContext);
     }
 }

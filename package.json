@@ -46,6 +46,7 @@
     "build:release": "npx tsc --p ./tsconfig.release.json",
     "test-with-coverage": "npx nyc mocha",
     "test:mocha": "npx mocha",
+    "test:partial": "npx mocha -g \"AST tests for\"",
     "lint": "npm run lint:fix",
     "lint:check": "npx eslint .",
     "lint:fix": "npx eslint --fix .",
