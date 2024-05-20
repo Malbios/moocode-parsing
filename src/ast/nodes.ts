@@ -67,7 +67,7 @@ export class IfNode extends BaseNode {
 export class ElseNode extends BaseNode {
     private _body: Statement[];
 
-    public get body() {
+    public get body(): Statement[] {
         return this._body;
     }
 

@@ -1,11 +1,23 @@
 import { ErrorListener, RecognitionException, Recognizer, Token } from 'antlr4';
 
-export interface SyntaxError {
-	offendingSymbol: Token;
-	line: number;
-	column: number;
-	message: string;
-	error: RecognitionException | undefined;
+export class SyntaxError {
+	private _offendingSymbol: Token;
+	private _line: number;
+	private _column: number;
+	private _message: string;
+	private _error: RecognitionException | undefined;
+
+	public constructor(offendingSymbol: Token, line: number, column: number, message: string, error?: RecognitionException) {
+		this._offendingSymbol = offendingSymbol;
+		this._line = line;
+		this._column = column;
+		this._message = message;
+		this._error = error;
+	}
+
+	public toString(): string {
+		return `${this._line}:${this._column} ${this._message}`;
+	}
 }
 
 export class SyntaxErrorListener extends ErrorListener<Token> {
@@ -16,6 +28,6 @@ export class SyntaxErrorListener extends ErrorListener<Token> {
 	}
 
 	public syntaxError(recognizer: Recognizer<Token>, offendingSymbol: Token, line: number, column: number, msg: string, e: RecognitionException | undefined): void {
-		this._errors.push({ offendingSymbol: offendingSymbol, line: line, column: column, message: msg, error: e });
+		this._errors.push(new SyntaxError(offendingSymbol, line, column, msg, e));
 	}
 }

@@ -23,10 +23,6 @@ export class InvalidOperationError extends Error {
 	}
 }
 
-function syntaxErrorToString(error: SyntaxError): string {
-	return `${error.line}:${error.column} ${error.message}`;
-}
-
 function codeToString(code: string): string {
 	const lines = code.split('\n');
 	const result = new Array<string>();
@@ -40,12 +36,12 @@ function codeToString(code: string): string {
 
 export class ParsingError extends Error {
 	public constructor(code: string, errors: SyntaxError[]) {
-		super(`= ParsingError ====\n${codeToString(code)}\n\n${errors.map(x => syntaxErrorToString(x)).join('\n')}\n===================`);
+		super(`${codeToString(code)}\n\n${errors.map(x => x.toString()).join('\n')}`);
 	}
 }
 
 export class NodeGenerationError extends Error {
-	public constructor() {
-		super('could not generate expected node');
+	public constructor(nodeKind: string, position: DocumentPosition) {
+		super(`could not generate '${nodeKind}' node at '${position.range}'`);
 	}
 }

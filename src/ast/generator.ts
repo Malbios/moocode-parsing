@@ -30,9 +30,18 @@ import {
     VariableNode
 } from './nodes';
 
+import { DocumentPosition } from '../common';
 import { NodeGenerationError, ParsingError } from '../error';
 import { SingleValueVisitor } from './abstract';
 import { SyntaxErrorListener } from './listeners';
+
+function nodeGenerationError(nodeKind: string, context: ParserRuleContext): NodeGenerationError {
+    return new NodeGenerationError(nodeKind, DocumentPosition.fromContext(context));
+}
+
+function nameOf(object: object): string {
+    return object.constructor.name;
+}
 
 function generateStatements(contexts: ParserRuleContext[]): Statement[] {
     const statementNodes = new Array<Statement>();
@@ -50,7 +59,7 @@ function generateStatement(context: ParserRuleContext): Statement {
     const result = visitor.visit(context);
 
     if (!result) {
-        throw new NodeGenerationError();
+        throw nodeGenerationError('Statement', context);
     }
 
     return result;
@@ -61,7 +70,7 @@ function generateNode<T>(context: ParserRuleContext): T {
     const result = visitor.visit(context) as T;
 
     if (!result) {
-        throw new NodeGenerationError();
+        throw nodeGenerationError(nameOf(result as object), context);
     }
 
     return result;
