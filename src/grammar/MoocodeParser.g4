@@ -9,6 +9,7 @@ moocode: statement* EOF;
 
 statement:
 	empty_statement
+	| comment
 	| expression SEMICOLON
 	| return_statement
 	| continue_statement
@@ -22,6 +23,8 @@ statement:
 statements: statement*;
 
 empty_statement: SEMICOLON;
+
+comment: STRING_LITERAL SEMICOLON;
 
 if_statement:
 	if_expression elseif_expression* else_expression? ENDIF;

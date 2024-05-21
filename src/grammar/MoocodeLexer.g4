@@ -4,13 +4,6 @@ options {
 	caseInsensitive = true;
 }
 
-channels {
-	COMMENT
-}
-
-SINGLE_LINE_COMMENT:
-	'"' STRING_LITERAL '"' SEMICOLON -> channel(COMMENT);
-
 WHITESPACES: (Whitespace | NewLine)+ -> channel(HIDDEN);
 
 // keywords

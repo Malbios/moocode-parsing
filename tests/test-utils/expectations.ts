@@ -15,7 +15,7 @@ import moocodeParser, {
 } from '../../src/grammar/generated/MoocodeParser';
 
 import { fail } from 'assert';
-import { ParsingError } from '../../src/error';
+import { ParsingError } from '../../src/ast/error';
 import { Action } from '../../src/interfaces';
 import ParsingHelpers from './parsing';
 
@@ -111,7 +111,5 @@ export function expectParsingError(action: Action<void>) {
         if (!parsingError) {
             fail();
         }
-
-        console.log(parsingError.message);
     }
 }

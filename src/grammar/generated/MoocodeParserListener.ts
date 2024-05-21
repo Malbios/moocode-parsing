@@ -7,6 +7,7 @@ import { MoocodeContext } from "./MoocodeParser";
 import { StatementContext } from "./MoocodeParser";
 import { StatementsContext } from "./MoocodeParser";
 import { Empty_statementContext } from "./MoocodeParser";
+import { CommentContext } from "./MoocodeParser";
 import { If_statementContext } from "./MoocodeParser";
 import { If_expressionContext } from "./MoocodeParser";
 import { Elseif_expressionContext } from "./MoocodeParser";
@@ -117,6 +118,16 @@ export default class MoocodeParserListener extends ParseTreeListener {
 	 * @param ctx the parse tree
 	 */
 	exitEmpty_statement?: (ctx: Empty_statementContext) => void;
+	/**
+	 * Enter a parse tree produced by `MoocodeParser.comment`.
+	 * @param ctx the parse tree
+	 */
+	enterComment?: (ctx: CommentContext) => void;
+	/**
+	 * Exit a parse tree produced by `MoocodeParser.comment`.
+	 * @param ctx the parse tree
+	 */
+	exitComment?: (ctx: CommentContext) => void;
 	/**
 	 * Enter a parse tree produced by `MoocodeParser.if_statement`.
 	 * @param ctx the parse tree

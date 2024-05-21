@@ -1,12 +1,12 @@
-import { ParseTree } from 'antlr4';
+import { ParseTree, ParserRuleContext } from 'antlr4';
 
 import MoocodeParserVisitor from '../grammar/generated/MoocodeParserVisitor';
 
-import { ArgumentError } from '../error';
-import { DocumentPosition } from './../common';
+import { DocumentPosition } from './common';
+import { ArgumentError } from './error';
 
 export abstract class BaseNode {
-	private _position: DocumentPosition;
+	protected _position: DocumentPosition;
 
 	public get position(): DocumentPosition {
 		return this._position;
@@ -19,10 +19,14 @@ export abstract class BaseNode {
 
 		this._position = position;
 	}
+
+	public toString(): string {
+		return this.position.range;
+	}
 }
 
 export abstract class LiteralNode<T> extends BaseNode {
-	private _value: T;
+	protected _value: T;
 
 	public get value(): T {
 		return this._value;
@@ -35,12 +39,12 @@ export abstract class LiteralNode<T> extends BaseNode {
 	}
 
 	public toString(): string {
-		return JSON.stringify(this._value);
+		return `${JSON.stringify(this._value)}`;
 	}
 }
 
 export abstract class ReferenceNode extends BaseNode {
-	private _name: string;
+	protected _name: string;
 
 	public get name(): string {
 		return this._name;
@@ -55,9 +59,25 @@ export abstract class ReferenceNode extends BaseNode {
 
 		this._name = name;
 	}
+}
 
-	public toString(): string {
-		return this._name.toString();
+export abstract class TwoPartNode extends BaseNode {
+	protected _left: BaseNode;
+	protected _right: BaseNode;
+
+	public left(): BaseNode {
+		return this._left;
+	}
+
+	public right(): BaseNode {
+		return this._right;
+	}
+
+	public constructor(context: ParserRuleContext, left: BaseNode, right: BaseNode) {
+		super(DocumentPosition.fromContext(context));
+
+		this._left = left;
+		this._right = right;
 	}
 }
 

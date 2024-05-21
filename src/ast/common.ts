@@ -31,6 +31,10 @@ export class DocumentPosition {
 		this._stop = stop;
 	}
 
+	public toString(): string {
+		return this.range;
+	}
+
 	public static fromContext(context: ParserRuleContext): DocumentPosition {
 		const start = context.start;
 		const stop = context.stop;
