@@ -28,6 +28,19 @@
 			"problemMatcher": [],
 			"label": "npm: test:partial",
 			"detail": "mocha -g <test-name(s)>"
+		},
+		{
+			"presentation": {
+				"clear": true,
+				"showReuseMessage": false,
+				"reveal": "silent",
+				"revealProblems": "onProblem"
+			},
+			"type": "npm",
+			"script": "test:debugging",
+			"group": "test",
+			"problemMatcher": [],
+			"label": "npm: test:debugging"
 		}
 	]
 }

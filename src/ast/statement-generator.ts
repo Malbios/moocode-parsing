@@ -1,5 +1,5 @@
 import { ParserRuleContext } from 'antlr4';
-import { AssignmentContext, CommentContext, Elseif_expressionContext, Empty_returnContext, Empty_statementContext, If_expressionContext, If_statementContext, Non_empty_returnContext } from '../grammar/generated/MoocodeParser';
+import { AssignmentContext, CommentContext, Elseif_expressionContext, Empty_returnContext, Empty_statementContext, If_expressionContext, If_statementContext, Non_empty_returnContext, Primary_expressionContext } from '../grammar/generated/MoocodeParser';
 import { Action } from '../interfaces';
 import { SingleValueVisitor } from './abstract';
 import { NodeGenerationError } from './error';
@@ -59,6 +59,10 @@ export class StatementGenerator extends SingleValueVisitor<Statement> {
 
 	public override visitEmpty_statement = (context: Empty_statementContext): Statement => {
 		return new EmptyStatementNode(context);
+	}
+
+	public override visitPrimary_expression = (context: Primary_expressionContext): Statement => {
+		return ExpressionGenerator.generateExpression(context);
 	}
 
 	private constructor() {

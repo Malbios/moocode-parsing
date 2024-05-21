@@ -4,7 +4,7 @@ import { BaseNode, LiteralNode, ReferenceNode, TwoPartNode } from './abstract';
 import { DocumentPosition, getContextAsText } from './common';
 
 export type Statement = (IfStatementNode | Assignment | ReturnNode | CommentNode | EmptyStatementNode);
-export type Expression = (Assignment | Computation | Value);
+export type Expression = (Assignment | Computation | Value | ErrorNode);
 export type Computation = (Bitwise | Logical | Equality | Relational | Shift | Arithmetic | Invocation);
 export type Assignment = (VariableAssignmentNode | ListAssignmentNode);
 export type Logical = (ConditionalAndNode | ConditionalOrNode | NegatedNode);
@@ -669,5 +669,15 @@ export class CorifiedObjectNode extends ReferenceNode {
 
 	public toString(): string {
 		return `\$${this._name}`;
+	}
+}
+
+export class ErrorNode extends BaseNode {
+	private constructor(position: DocumentPosition) {
+		super(position);
+	}
+
+	public static fromContext(context: ParserRuleContext): ErrorNode {
+		return new ErrorNode(DocumentPosition.fromContext(context));
 	}
 }

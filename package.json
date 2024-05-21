@@ -49,6 +49,7 @@
     "test:partial": "npm run test:ast:files",
     "test:ast": "npx mocha -g \"AST tests for\"",
     "test:ast:files": "npx mocha -g \"AST tests for moo files\"",
+    "test:debugging": "npx mocha --config .mocharc.debugging.json",
     "lint": "npm run lint:fix",
     "lint:check": "npx eslint .",
     "lint:fix": "npx eslint --fix .",

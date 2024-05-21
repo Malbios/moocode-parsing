@@ -27,7 +27,7 @@ export function inspectAll(data: unknown): string {
 }
 
 function getInnerContextName(context: ParserRuleContext, depth = 0): string[] {
-    let strings = [getDepthIndent(depth) + context.constructor.name];
+    let strings = [getDepthIndent(depth) + context.constructor.name + ': ' + context.getText()];
 
     for (let i = 0; i < context.getChildCount(); i++) {
         const childStrings = getInnerContextName(context.getChild(i) as ParserRuleContext, depth + 1);
@@ -35,6 +35,13 @@ function getInnerContextName(context: ParserRuleContext, depth = 0): string[] {
     }
 
     return strings;
+}
+
+function getDepthIndent(depth: number): string {
+    let indent = `${depth} - `;
+    indent = indent.padStart(depth * 2);
+
+    return indent;
 }
 
 export function getContextNames(contexts: ParserRuleContext[]): string {
@@ -45,12 +52,6 @@ export function getContextName(context: ParserRuleContext): string {
     return getContextNames([context]);
 }
 
-function getDepthIndent(depth: number): string {
-    let indent = '';
-
-    for (let i = 0; i < depth; i++) {
-        indent += '|-';
-    }
-
-    return indent;
+export function logContext(context: ParserRuleContext) {
+    console.log(getContextName(context));
 }
