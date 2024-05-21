@@ -1,8 +1,9 @@
 import { ParserRuleContext } from 'antlr4';
+import { logContext } from '../../tests/test-utils/common';
 import { AssignmentContext, Bool_literalContext, Corified_objectContext, Float_literalContext, IdentifierContext, Integer_literalContext, ListContext, MapContext, Map_entryContext, Object_idContext, Primary_expressionContext, String_literalContext } from '../grammar/generated/MoocodeParser';
 import { SingleValueVisitor } from './abstract';
 import { NodeGenerationError, NotImplementedError } from './error';
-import { BooleanNode, CorifiedObjectNode, Expression, FloatNode, IntegerNode, ListAssignmentNode, ListNode, MapEntryNode, MapNode, ObjectIdNode, StringNode, VariableAssignmentNode, VariableNode } from './nodes';
+import { BooleanNode, CorifiedObjectNode, ErrorNode, Expression, FloatNode, IntegerNode, ListAssignmentNode, ListNode, MapEntryNode, MapNode, ObjectIdNode, StringNode, VariableAssignmentNode, VariableNode } from './nodes';
 
 export class ExpressionGenerator extends SingleValueVisitor<Expression> {
 	public override visitPrimary_expression = (context: Primary_expressionContext): Expression => {
@@ -15,7 +16,11 @@ export class ExpressionGenerator extends SingleValueVisitor<Expression> {
 			return this.visit(context._pe);
 		}
 
-		throw new NotImplementedError('primary expression');
+		// TODO: probably needs some iteration over all children to preserve order of items
+
+		logContext(context);
+
+		return ErrorNode.fromContext(context);
 	}
 
 	public override visitAssignment = (context: AssignmentContext): Expression => {
