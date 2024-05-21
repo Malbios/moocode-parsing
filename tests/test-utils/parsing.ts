@@ -30,8 +30,8 @@ import {
     While_loop_statementContext
 } from '../../src/grammar/generated/MoocodeParser';
 
+import { getContextAsText } from '../../src/ast/common';
 import moocodeParserVisitor from '../../src/grammar/generated/MoocodeParserVisitor';
-import { getContextAsText } from '../../src/common';
 
 class FirstContextVisitor<T extends ParserRuleContext> extends moocodeParserVisitor<T | undefined> {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any

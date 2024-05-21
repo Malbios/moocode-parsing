@@ -1,3 +1,4 @@
+"#0:do_login_command   this none this rxd";
 "...This code should only be run as a server task...";
 if (callers())
   return E_PERM;
