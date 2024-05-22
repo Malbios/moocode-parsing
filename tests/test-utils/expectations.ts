@@ -3,7 +3,7 @@ import { expect } from 'chai';
 
 import moocodeParser, {
     Bool_literalContext,
-    Corified_objectContext,
+    Corified_valueContext,
     Dollar_literalContext,
     Error_codeContext,
     Float_literalContext,
@@ -64,7 +64,7 @@ export default class ExpectHelpers {
     }
 
     public static expectCorifiedObject(context: ParserRuleContext | undefined, expectedValue: string) {
-        this.expectValue<Corified_objectContext>(context, Corified_objectContext, expectedValue);
+        this.expectValue<Corified_valueContext>(context, Corified_valueContext, expectedValue);
     }
 
     public static expectError(context: ParserRuleContext | undefined, expectedValue: string) {

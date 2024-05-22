@@ -2,23 +2,22 @@ import { BaseNode, LiteralNode, ReferenceNode, TwoPartNode } from './abstract';
 import { ContextPosition, ErrorCode } from './common';
 
 export type Statement = (CommentStatementNode | EmptyStatementNode | IfStatementNode | Assignment | ReturnStatementNode | Invocation);
-export type Expression = (Assignment | ConditionalNode | Computation | Value);
-export type Computation = (Bitwise | Logical | Equality | Relational | Shift | Arithmetic | Invocation);
-export type Assignment = (VariableAssignmentNode | ListAssignmentNode);
-export type Logical = (ConditionalAndNode | ConditionalOrNode | NegatedNode);
+export type Expression = (Assignment | ConditionalNode | Computation | Invocation | Value | InfoNode);
+export type Computation = (Bitwise | Logical | Equality | Relational | Shift | Arithmetic);
+export type Assignment = (VariableAssignmentNode | PropertyAssignmentNode | ListAssignmentNode);
+export type Logical = (ConditionalInNode | ConditionalAndNode | ConditionalOrNode | NegatedNode);
 export type Bitwise = (BitwiseAndNode | BitwiseInclusiveOrNode | BitwiseExclusiveOrNode | ComplementNode);
 export type Equality = (EqualNode | UnequalNode);
 export type Relational = (GreaterThanNode | LessThanNode | GreaterOrEqualNode | LessOrEqualNode);
 export type Shift = (ShiftLeftNode | ShiftRightNode);
 export type Arithmetic = (AdditionNode | SubtractionNode | MultiplicationNode | DivisionNode | ModulationNode | NegativeNode);
-export type Invocation = (VerbCall | CorifiedVerbCallNode | BuiltInFunctionCallNode);
-export type VerbCall = (VerbCallNode | ComputedVerbCallNode);
-export type Value = (Literal | ObjectReference | ListNode | Map | PropertyAccessor | Indexer | ListSlicerNode | ErrorCatcherNode);
+export type Invocation = (VerbInvocationNode | ComputedVerbInvocationNode | CorifiedVerbInvocationNode | BuiltInFunctionInvocationNode);
+export type Value = (Literal | ObjectReference | ListNode | MapNode | MapEntryNode | ListSlicerNode | ErrorCatcherNode | PropertyAccessor | Indexer);
 export type PropertyAccessor = (PropertyAccessorNode | ComputedPropertyAccessorNode);
 export type Indexer = (ArgumentIndexerNode | RangeIndexerNode);
-export type Map = (MapNode | MapEntryNode);
 export type ObjectReference = (VariableNode | ObjectIdNode | CorifiedValueNode);
 export type Literal = (BooleanNode | IntegerNode | FloatNode | StringNode | ErrorNode);
+export type InfoNode = (ArgumentIndexerNodeInfo | RangeIndexerNodeInfo | PropertyAccessorNodeInfo | ComputedPropertyAccessorNodeInfo | VerbInvocationNodeInfo | ComputedVerbInvocationNodeInfo | CallInfo);
 
 export type Int64 = number;
 export type Float = number;
@@ -182,6 +181,30 @@ export class VariableAssignmentNode extends BaseNode {
 	}
 }
 
+export class PropertyAssignmentNode extends BaseNode {
+	private _property: PropertyAccessorNode;
+	private _value: Expression;
+
+	public get property(): PropertyAccessorNode {
+		return this._property;
+	}
+
+	public get value(): Expression {
+		return this._value;
+	}
+
+	public constructor(position: ContextPosition, property: PropertyAccessorNode, value: Expression) {
+		super(position);
+
+		this._property = property;
+		this._value = value;
+	}
+
+	public toString(): string {
+		return `${this._property.toString()} = ${this._value.toString()}`;
+	}
+}
+
 export class ListAssignmentNode extends BaseNode {
 	private _variables: Expression[];
 	private _value: Expression;
@@ -206,9 +229,15 @@ export class ListAssignmentNode extends BaseNode {
 	}
 }
 
+export class ConditionalInNode extends TwoPartNode {
+	public toString(): string {
+		return `${this._left.toString()} in ${this._right.toString()}`;
+	}
+}
+
 export class ConditionalAndNode extends TwoPartNode {
 	public toString(): string {
-		return `${this._left.toString()} && ${this._right.toString()}`
+		return `${this._left.toString()} && ${this._right.toString()}`;
 	}
 }
 
@@ -470,7 +499,7 @@ export class ComputedPropertyAccessorNode extends BaseNode {
 	}
 }
 
-export class VerbCallNode extends BaseNode {
+export class VerbInvocationNode extends BaseNode {
 	private _object: Expression;
 	private _name: string;
 	private _arguments: Expression[];
@@ -500,7 +529,7 @@ export class VerbCallNode extends BaseNode {
 	}
 }
 
-export class ComputedVerbCallNode extends BaseNode {
+export class ComputedVerbInvocationNode extends BaseNode {
 	private _object: Expression;
 	private _name: Expression;
 	private _arguments: Expression[];
@@ -530,7 +559,7 @@ export class ComputedVerbCallNode extends BaseNode {
 	}
 }
 
-export class CorifiedVerbCallNode extends BaseNode {
+export class CorifiedVerbInvocationNode extends BaseNode {
 	private _verbReference: Expression;
 	private _arguments: Expression[];
 
@@ -554,7 +583,7 @@ export class CorifiedVerbCallNode extends BaseNode {
 	}
 }
 
-export class BuiltInFunctionCallNode extends BaseNode {
+export class BuiltInFunctionInvocationNode extends BaseNode {
 	private _name: string;
 	private _arguments: Expression[];
 
@@ -596,12 +625,66 @@ export class ListSlicerNode extends BaseNode {
 	}
 }
 
+// if_conditions = conditional_in_expression QUESTION_MARK true_ex = expression PIPE false_ex = expression
 export class ConditionalNode extends BaseNode {
 	// TODO: implement ConditionalNode
+	private _conditions: Expression;
+	private _true: Expression;
+	private _false: Expression;
+
+	public get conditions(): Expression {
+		return this._conditions;
+	}
+
+	public get true(): Expression {
+		return this._true;
+	}
+
+	public get false(): Expression {
+		return this._false;
+	}
+
+	public constructor(position: ContextPosition, conditions: Expression, trueExpression: Expression, falseExpression: Expression) {
+		super(position);
+
+		this._conditions = conditions;
+		this._true = trueExpression;
+		this._false = falseExpression;
+	}
+
+	public toString(): string {
+		return `${this._conditions.toString()} ? ${this._true.toString()} | ${this._false.toString()}`;
+	}
 }
 
 export class ErrorCatcherNode extends BaseNode {
-	// TODO: implement ConditionalNode
+	private _try: Expression;
+	private _errorCodes: Expression[];
+	private _onError: Expression;
+
+	public get try(): Expression {
+		return this._try;
+	}
+
+	public get errorCodes(): Expression[] {
+		return this._errorCodes;
+	}
+
+	public get onError(): Expression {
+		return this._onError;
+	}
+
+	public constructor(position: ContextPosition, tryExpression: Expression, errorCodes: Expression[], onError: Expression) {
+		super(position);
+
+		this._try = tryExpression;
+		this._errorCodes = errorCodes;
+		this._onError = onError;
+	}
+
+	public toString(): string {
+		return `\`${this._try.toString()} ! ${this._errorCodes.toString()} => ${this._onError.toString()}'`;
+	}
 }
 
 export class BooleanNode extends LiteralNode<boolean> { }
@@ -701,5 +784,121 @@ export class ErrorNode extends BaseNode {
 		super(position);
 
 		this._errorCode = errorCode;
+	}
+}
+
+export class ArgumentIndexerNodeInfo extends BaseNode {
+	private _argument: Expression;
+
+	public get argument(): Expression {
+		return this._argument;
+	}
+
+	public constructor(position: ContextPosition, argument: Expression) {
+		super(position);
+
+		this._argument = argument;
+	}
+}
+
+export class RangeIndexerNodeInfo extends BaseNode {
+	private _start: Expression;
+	private _end: Expression;
+
+	public get start(): Expression {
+		return this._start
+	}
+
+	public get end(): Expression {
+		return this._end
+	}
+
+	public constructor(position: ContextPosition, start: Expression, end: Expression) {
+		super(position);
+
+		this._start = start;
+		this._end = end;
+	}
+}
+
+export class PropertyAccessorNodeInfo extends BaseNode {
+	private _name: string;
+
+	public get name(): string {
+		return this._name
+	}
+
+	public constructor(position: ContextPosition, name: string) {
+		super(position);
+
+		this._name = name;
+	}
+}
+
+export class ComputedPropertyAccessorNodeInfo extends BaseNode {
+	private _name: Expression;
+
+	public get name(): Expression {
+		return this._name
+	}
+
+	public constructor(position: ContextPosition, name: Expression) {
+		super(position);
+
+		this._name = name;
+	}
+}
+
+export class VerbInvocationNodeInfo extends BaseNode {
+	private _name: string;
+	private _arguments: Expression[];
+
+	public get name(): string {
+		return this._name
+	}
+
+	public get arguments(): Expression[] {
+		return this._arguments;
+	}
+
+	public constructor(position: ContextPosition, name: string, functionArguments: Expression[]) {
+		super(position);
+
+		this._name = name;
+		this._arguments = functionArguments;
+	}
+}
+
+export class ComputedVerbInvocationNodeInfo extends BaseNode {
+	private _name: Expression;
+	private _arguments: Expression[];
+
+	public get name(): Expression {
+		return this._name
+	}
+
+	public get arguments(): Expression[] {
+		return this._arguments;
+	}
+
+	public constructor(position: ContextPosition, name: Expression, functionArguments: Expression[]) {
+		super(position);
+
+		this._name = name;
+		this._arguments = functionArguments;
+	}
+}
+
+export class CallInfo extends BaseNode {
+	private _arguments: Expression[];
+
+	public get arguments(): Expression[] {
+		return this._arguments;
+	}
+
+	public constructor(position: ContextPosition, functionArguments: Expression[]) {
+		super(position);
+
+		this._arguments = functionArguments;
 	}
 }

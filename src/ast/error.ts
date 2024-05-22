@@ -1,9 +1,21 @@
 import { ErrorListener, ParserRuleContext, RecognitionException, Recognizer, Token } from 'antlr4';
-import { ContextPosition } from './common';
+import { ContextPosition, getContextAsText } from './common';
 
 export class NotImplementedError extends Error {
-	public constructor(description: string) {
-		super(`This has not (yet) been implemented: ${description}`);
+	private constructor(context: ParserRuleContext, description: string) {
+		if (description === '') {
+			super(`This has not (yet) been implemented!\n${getContextAsText(context)}`);
+		} else {
+			super(`This has not (yet) been implemented: ${description}\n${getContextAsText(context)}`);
+		}
+	}
+
+	public static new(context: ParserRuleContext): NotImplementedError {
+		return new NotImplementedError(context, '');
+	}
+
+	public static withMessage(context: ParserRuleContext, message: string): NotImplementedError {
+		return new NotImplementedError(context, message);
 	}
 }
 
