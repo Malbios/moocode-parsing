@@ -49,7 +49,7 @@ import { Negative_unary_expressionContext } from "./MoocodeParser";
 import { Negated_unary_expressionContext } from "./MoocodeParser";
 import { Complement_unary_expressionContext } from "./MoocodeParser";
 import { Primary_expressionContext } from "./MoocodeParser";
-import { Property_accessContext } from "./MoocodeParser";
+import { Property_accessorContext } from "./MoocodeParser";
 import { Verb_invocationContext } from "./MoocodeParser";
 import { ExpressionsContext } from "./MoocodeParser";
 import { Bf_invocationContext } from "./MoocodeParser";
@@ -541,15 +541,15 @@ export default class MoocodeParserListener extends ParseTreeListener {
 	 */
 	exitPrimary_expression?: (ctx: Primary_expressionContext) => void;
 	/**
-	 * Enter a parse tree produced by `MoocodeParser.property_access`.
+	 * Enter a parse tree produced by `MoocodeParser.property_accessor`.
 	 * @param ctx the parse tree
 	 */
-	enterProperty_access?: (ctx: Property_accessContext) => void;
+	enterProperty_accessor?: (ctx: Property_accessorContext) => void;
 	/**
-	 * Exit a parse tree produced by `MoocodeParser.property_access`.
+	 * Exit a parse tree produced by `MoocodeParser.property_accessor`.
 	 * @param ctx the parse tree
 	 */
-	exitProperty_access?: (ctx: Property_accessContext) => void;
+	exitProperty_accessor?: (ctx: Property_accessorContext) => void;
 	/**
 	 * Enter a parse tree produced by `MoocodeParser.verb_invocation`.
 	 * @param ctx the parse tree

@@ -154,7 +154,7 @@ export default class MoocodeParser extends Parser {
 	public static readonly RULE_negated_unary_expression = 43;
 	public static readonly RULE_complement_unary_expression = 44;
 	public static readonly RULE_primary_expression = 45;
-	public static readonly RULE_property_access = 46;
+	public static readonly RULE_property_accessor = 46;
 	public static readonly RULE_verb_invocation = 47;
 	public static readonly RULE_expressions = 48;
 	public static readonly RULE_bf_invocation = 49;
@@ -307,7 +307,7 @@ export default class MoocodeParser extends Parser {
 		"exclusive_or_expression", "and_expression", "equality_expression", "relational_expression", 
 		"shift_expression", "additive_expression", "multiplicative_expression", 
 		"unary_expression", "negative_unary_expression", "negated_unary_expression", 
-		"complement_unary_expression", "primary_expression", "property_access", 
+		"complement_unary_expression", "primary_expression", "property_accessor", 
 		"verb_invocation", "expressions", "bf_invocation", "primary_expression_start", 
 		"parented_expression", "error_catcher", "list", "map", "map_entry", "indexer", 
 		"list_slicer", "object_reference", "object_id", "corified_value", "literal", 
@@ -2227,7 +2227,7 @@ export default class MoocodeParser extends Parser {
 				case 59:
 					{
 					this.state = 443;
-					this.property_access();
+					this.property_accessor();
 					}
 					break;
 				case 55:
@@ -2267,9 +2267,9 @@ export default class MoocodeParser extends Parser {
 		return localctx;
 	}
 	// @RuleVersion(0)
-	public property_access(): Property_accessContext {
-		let localctx: Property_accessContext = new Property_accessContext(this, this._ctx, this.state);
-		this.enterRule(localctx, 92, MoocodeParser.RULE_property_access);
+	public property_accessor(): Property_accessorContext {
+		let localctx: Property_accessorContext = new Property_accessorContext(this, this._ctx, this.state);
+		this.enterRule(localctx, 92, MoocodeParser.RULE_property_accessor);
 		try {
 			this.enterOuterAlt(localctx, 1);
 			{
@@ -5298,11 +5298,11 @@ export class Primary_expressionContext extends ParserRuleContext {
 	public indexer(i: number): IndexerContext {
 		return this.getTypedRuleContext(IndexerContext, i) as IndexerContext;
 	}
-	public property_access_list(): Property_accessContext[] {
-		return this.getTypedRuleContexts(Property_accessContext) as Property_accessContext[];
+	public property_accessor_list(): Property_accessorContext[] {
+		return this.getTypedRuleContexts(Property_accessorContext) as Property_accessorContext[];
 	}
-	public property_access(i: number): Property_accessContext {
-		return this.getTypedRuleContext(Property_accessContext, i) as Property_accessContext;
+	public property_accessor(i: number): Property_accessorContext {
+		return this.getTypedRuleContext(Property_accessorContext, i) as Property_accessorContext;
 	}
 	public verb_invocation_list(): Verb_invocationContext[] {
 		return this.getTypedRuleContexts(Verb_invocationContext) as Verb_invocationContext[];
@@ -5340,7 +5340,7 @@ export class Primary_expressionContext extends ParserRuleContext {
 }
 
 
-export class Property_accessContext extends ParserRuleContext {
+export class Property_accessorContext extends ParserRuleContext {
 	public _computed_prop_arguments!: ExpressionContext;
 	constructor(parser?: MoocodeParser, parent?: ParserRuleContext, invokingState?: number) {
 		super(parent, invokingState);
@@ -5362,22 +5362,22 @@ export class Property_accessContext extends ParserRuleContext {
 		return this.getTypedRuleContext(ExpressionContext, 0) as ExpressionContext;
 	}
     public get ruleIndex(): number {
-    	return MoocodeParser.RULE_property_access;
+    	return MoocodeParser.RULE_property_accessor;
 	}
 	public enterRule(listener: MoocodeParserListener): void {
-	    if(listener.enterProperty_access) {
-	 		listener.enterProperty_access(this);
+	    if(listener.enterProperty_accessor) {
+	 		listener.enterProperty_accessor(this);
 		}
 	}
 	public exitRule(listener: MoocodeParserListener): void {
-	    if(listener.exitProperty_access) {
-	 		listener.exitProperty_access(this);
+	    if(listener.exitProperty_accessor) {
+	 		listener.exitProperty_accessor(this);
 		}
 	}
 	// @Override
 	public accept<Result>(visitor: MoocodeParserVisitor<Result>): Result {
-		if (visitor.visitProperty_access) {
-			return visitor.visitProperty_access(this);
+		if (visitor.visitProperty_accessor) {
+			return visitor.visitProperty_accessor(this);
 		} else {
 			return visitor.visitChildren(this);
 		}

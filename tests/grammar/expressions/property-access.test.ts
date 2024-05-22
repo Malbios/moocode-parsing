@@ -1,5 +1,5 @@
-import { suite, test } from 'mocha';
 import { expect } from 'chai';
+import { suite, test } from 'mocha';
 
 import CommonHelpers from '../../test-utils/common';
 import ExpectHelpers from '../../test-utils/expectations';
@@ -16,13 +16,13 @@ suite('property access tests', () => {
 
         ExpectHelpers.expectIdentifier(primaryExpression?._pe, 'obj');
 
-        expect(primaryExpression?.property_access_list()).to.have.length(1);
+        expect(primaryExpression?.property_accessor_list()).to.have.length(1);
 
-        const propertyAccess = primaryExpression?.property_access(0);
+        const propertyAccess = primaryExpression?.property_accessor(0);
 
         expect(propertyAccess?._computed_prop_arguments).not.to.exist;
 
-        ExpectHelpers.expectIdentifier(primaryExpression?.property_access(0), 'prop');
+        ExpectHelpers.expectIdentifier(primaryExpression?.property_accessor(0), 'prop');
     });
 
     test('should parse a property access with computed property name', () => {
@@ -35,9 +35,9 @@ suite('property access tests', () => {
 
         ExpectHelpers.expectIdentifier(primaryExpression?._pe, 'obj');
 
-        expect(primaryExpression?.property_access_list()).to.have.length(1);
+        expect(primaryExpression?.property_accessor_list()).to.have.length(1);
 
-        const propertyAccess = primaryExpression?.property_access(0);
+        const propertyAccess = primaryExpression?.property_accessor(0);
 
         expect(propertyAccess?.identifier()).not.to.exist;
 

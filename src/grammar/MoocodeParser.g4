@@ -152,12 +152,12 @@ complement_unary_expression: WAVE unary_expression;
 primary_expression:
 	pe = primary_expression_start (
 		indexer
-		| property_access
+		| property_accessor
 		| verb_invocation
 		| bf_invocation
 	)*;
 
-property_access:
+property_accessor:
 	DOT (
 		identifier
 		| OPEN_PARENS computed_prop_arguments = expression CLOSE_PARENS
