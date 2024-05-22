@@ -54,6 +54,7 @@ import { Verb_invocationContext } from "./MoocodeParser";
 import { ExpressionsContext } from "./MoocodeParser";
 import { Bf_invocationContext } from "./MoocodeParser";
 import { Primary_expression_startContext } from "./MoocodeParser";
+import { Parented_expressionContext } from "./MoocodeParser";
 import { Error_catcherContext } from "./MoocodeParser";
 import { ListContext } from "./MoocodeParser";
 import { MapContext } from "./MoocodeParser";
@@ -62,13 +63,14 @@ import { IndexerContext } from "./MoocodeParser";
 import { List_slicerContext } from "./MoocodeParser";
 import { Object_referenceContext } from "./MoocodeParser";
 import { Object_idContext } from "./MoocodeParser";
-import { Corified_objectContext } from "./MoocodeParser";
+import { Corified_valueContext } from "./MoocodeParser";
 import { LiteralContext } from "./MoocodeParser";
 import { Bool_literalContext } from "./MoocodeParser";
 import { String_literalContext } from "./MoocodeParser";
 import { Integer_literalContext } from "./MoocodeParser";
 import { Float_literalContext } from "./MoocodeParser";
 import { Dollar_literalContext } from "./MoocodeParser";
+import { Circumflex_literalContext } from "./MoocodeParser";
 import { Error_codeContext } from "./MoocodeParser";
 import { IdentifierContext } from "./MoocodeParser";
 
@@ -388,6 +390,12 @@ export default class MoocodeParserVisitor<Result> extends ParseTreeVisitor<Resul
 	 */
 	visitPrimary_expression_start?: (ctx: Primary_expression_startContext) => Result;
 	/**
+	 * Visit a parse tree produced by `MoocodeParser.parented_expression`.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	visitParented_expression?: (ctx: Parented_expressionContext) => Result;
+	/**
 	 * Visit a parse tree produced by `MoocodeParser.error_catcher`.
 	 * @param ctx the parse tree
 	 * @return the visitor result
@@ -436,11 +444,11 @@ export default class MoocodeParserVisitor<Result> extends ParseTreeVisitor<Resul
 	 */
 	visitObject_id?: (ctx: Object_idContext) => Result;
 	/**
-	 * Visit a parse tree produced by `MoocodeParser.corified_object`.
+	 * Visit a parse tree produced by `MoocodeParser.corified_value`.
 	 * @param ctx the parse tree
 	 * @return the visitor result
 	 */
-	visitCorified_object?: (ctx: Corified_objectContext) => Result;
+	visitCorified_value?: (ctx: Corified_valueContext) => Result;
 	/**
 	 * Visit a parse tree produced by `MoocodeParser.literal`.
 	 * @param ctx the parse tree
@@ -477,6 +485,12 @@ export default class MoocodeParserVisitor<Result> extends ParseTreeVisitor<Resul
 	 * @return the visitor result
 	 */
 	visitDollar_literal?: (ctx: Dollar_literalContext) => Result;
+	/**
+	 * Visit a parse tree produced by `MoocodeParser.circumflex_literal`.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	visitCircumflex_literal?: (ctx: Circumflex_literalContext) => Result;
 	/**
 	 * Visit a parse tree produced by `MoocodeParser.error_code`.
 	 * @param ctx the parse tree

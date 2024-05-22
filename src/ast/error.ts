@@ -1,5 +1,5 @@
 import { ErrorListener, ParserRuleContext, RecognitionException, Recognizer, Token } from 'antlr4';
-import { DocumentPosition } from './common';
+import { ContextPosition } from './common';
 
 export class NotImplementedError extends Error {
 	public constructor(description: string) {
@@ -8,7 +8,7 @@ export class NotImplementedError extends Error {
 }
 
 export class ArgumentError extends Error {
-	public constructor(argumentName: string, position?: DocumentPosition) {
+	public constructor(argumentName: string, position?: ContextPosition) {
 		if (!position) {
 			super(`invalid argument: '${argumentName}'`);
 		} else {
@@ -46,7 +46,7 @@ export class NodeGenerationError extends Error {
 	}
 
 	public static fromContext(context: ParserRuleContext) {
-		const position = DocumentPosition.fromContext(context);
+		const position = ContextPosition.fromContext(context);
 		const code = context.start.getInputStream().getText(position.start, position.stop);
 
 		return new NodeGenerationError(`could not generate a node from '${nameOf(context)}':\n${position.range}: ${code}`);

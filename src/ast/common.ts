@@ -2,7 +2,29 @@ import { ParserRuleContext, Token } from 'antlr4';
 
 import { InvalidOperationError } from './error';
 
-export class DocumentPosition {
+export enum ErrorCode {
+	E_NONE,
+	E_TYPE,
+	E_DIV,
+	E_PERM,
+	E_PROPNF,
+	E_VERBNF,
+	E_VARNF,
+	E_INVIND,
+	E_RECMOVE,
+	E_MAXREC,
+	E_RANGE,
+	E_ARGS,
+	E_NACC,
+	E_INVARG,
+	E_QUOTA,
+	E_FLOAT,
+	E_FILE,
+	E_EXEC,
+	E_INTRPT
+};
+
+export class ContextPosition {
 	private _start: Token;
 	private _stop: Token | undefined;
 
@@ -35,7 +57,7 @@ export class DocumentPosition {
 		return this.range;
 	}
 
-	public static fromContext(context: ParserRuleContext): DocumentPosition {
+	public static fromContext(context: ParserRuleContext): ContextPosition {
 		const start = context.start;
 		const stop = context.stop;
 
@@ -43,10 +65,10 @@ export class DocumentPosition {
 			throw new InvalidOperationError('stop cannot be before start');
 		}
 
-		return new DocumentPosition(start, stop);
+		return new ContextPosition(start, stop);
 	}
 
-	public static fromValues(start: Token, stop: Token | undefined): DocumentPosition {
+	public static fromValues(start: Token, stop: Token | undefined): ContextPosition {
 		if (start.start < 0) {
 			throw new InvalidOperationError('start cannot be negative');
 		}
@@ -59,7 +81,7 @@ export class DocumentPosition {
 			throw new InvalidOperationError('stop cannot be before start');
 		}
 
-		return new DocumentPosition(start, stop);
+		return new ContextPosition(start, stop);
 	}
 }
 

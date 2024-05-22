@@ -70,6 +70,7 @@ AT: '@';
 BIT_AND: '&.';
 BIT_OR: '|.';
 BIT_XOR: '^.';
+CIRCUMFLEX: '^';
 CLOSE_BRACE: '}';
 CLOSE_BRACKET: ']';
 CLOSE_PARENS: ')';

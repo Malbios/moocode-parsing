@@ -1,23 +1,24 @@
-import { ParserRuleContext } from 'antlr4';
-import { Additive_expressionContext, And_expressionContext, Bf_invocationContext, Bool_literalContext, CommentContext, Complement_unary_expressionContext, Conditional_and_expressionContext, Conditional_or_expressionContext, Corified_objectContext, Empty_statementContext, Equality_expressionContext, Exclusive_or_expressionContext, Float_literalContext, IdentifierContext, Inclusive_or_expressionContext, Integer_literalContext, ListContext, MapContext, Map_entryContext, Multiplicative_expressionContext, Negated_unary_expressionContext, Negative_unary_expressionContext, Object_idContext, Relational_expressionContext, Shift_expressionContext, String_literalContext } from '../grammar/generated/MoocodeParser';
 import { BaseNode, LiteralNode, ReferenceNode, TwoPartNode } from './abstract';
-import { DocumentPosition, getContextAsText } from './common';
+import { ContextPosition, ErrorCode } from './common';
 
-export type Statement = (IfStatementNode | Assignment | ReturnNode | CommentNode | EmptyStatementNode);
-export type Expression = (Assignment | Computation | Value | ErrorNode);
+export type Statement = (CommentStatementNode | EmptyStatementNode | IfStatementNode | Assignment | ReturnStatementNode | Invocation);
+export type Expression = (Assignment | ConditionalNode | Computation | Value);
 export type Computation = (Bitwise | Logical | Equality | Relational | Shift | Arithmetic | Invocation);
 export type Assignment = (VariableAssignmentNode | ListAssignmentNode);
 export type Logical = (ConditionalAndNode | ConditionalOrNode | NegatedNode);
-export type Bitwise = (BitwiseAndNode | BitwiseInclusiveOrNode | BitwiseExclusiveOrNode);
+export type Bitwise = (BitwiseAndNode | BitwiseInclusiveOrNode | BitwiseExclusiveOrNode | ComplementNode);
 export type Equality = (EqualNode | UnequalNode);
 export type Relational = (GreaterThanNode | LessThanNode | GreaterOrEqualNode | LessOrEqualNode);
 export type Shift = (ShiftLeftNode | ShiftRightNode);
 export type Arithmetic = (AdditionNode | SubtractionNode | MultiplicationNode | DivisionNode | ModulationNode | NegativeNode);
-export type Invocation = (VerbCallNode | BuiltInFunctionCallNode);
-export type Value = (Literal | ObjectReference | ListNode | Map | PropertyAccessNode);
+export type Invocation = (VerbCall | CorifiedVerbCallNode | BuiltInFunctionCallNode);
+export type VerbCall = (VerbCallNode | ComputedVerbCallNode);
+export type Value = (Literal | ObjectReference | ListNode | Map | PropertyAccessor | Indexer | ListSlicerNode | ErrorCatcherNode);
+export type PropertyAccessor = (PropertyAccessorNode | ComputedPropertyAccessorNode);
+export type Indexer = (ArgumentIndexerNode | RangeIndexerNode);
 export type Map = (MapNode | MapEntryNode);
-export type ObjectReference = (VariableNode | ObjectIdNode | CorifiedObjectNode);
-export type Literal = (BooleanNode | IntegerNode | FloatNode | StringNode);
+export type ObjectReference = (VariableNode | ObjectIdNode | CorifiedValueNode);
+export type Literal = (BooleanNode | IntegerNode | FloatNode | StringNode | ErrorNode);
 
 export type Int64 = number;
 export type Float = number;
@@ -39,8 +40,8 @@ export class IfStatementNode extends BaseNode {
 		return this._else;
 	}
 
-	public constructor(context: ParserRuleContext, ifNode: IfNode, elseIfNodes?: IfNode[], elseNode?: ElseNode) {
-		super(DocumentPosition.fromContext(context));
+	public constructor(position: ContextPosition, ifNode: IfNode, elseIfNodes?: IfNode[], elseNode?: ElseNode) {
+		super(position);
 
 		this._if = ifNode;
 		this._elseIfs = elseIfNodes ?? [];
@@ -49,6 +50,59 @@ export class IfStatementNode extends BaseNode {
 
 	public toString(): string {
 		return `${this._if.toString()}${this._elseIfs.map(x => `else${x.toString()}`)}${this._else?.toString()}\nendif\n`;
+	}
+}
+
+export class ReturnStatementNode extends BaseNode {
+	private _expression: Expression | undefined;
+
+	public get expression(): Expression | undefined {
+		return this._expression;
+	}
+
+	public constructor(position: ContextPosition, expression?: Expression) {
+		super(position);
+
+		this._expression = expression;
+	}
+
+	public toString(): string {
+		const base = super.toString();
+
+		let expression = '';
+		if (this._expression) {
+			expression = ` ${this._expression.toString()}`;
+		}
+
+		return `return${expression}; (${base})`;
+	}
+}
+
+export class CommentStatementNode extends BaseNode {
+	private _text: string;
+
+	public get text(): string {
+		return this._text;
+	}
+
+	public constructor(position: ContextPosition, text: string) {
+		super(position);
+
+		this._text = text;
+	}
+
+	public toString(): string {
+		const base = super.toString();
+
+		return `"${this._text}"; (${base})`;
+	}
+}
+
+export class EmptyStatementNode extends BaseNode {
+	public toString(): string {
+		const base = super.toString();
+
+		return `<empty>; (${base})`;
 	}
 }
 
@@ -64,8 +118,8 @@ export class IfNode extends BaseNode {
 		return this._body;
 	}
 
-	public constructor(context: ParserRuleContext, conditions: Expression, body?: Statement[]) {
-		super(getPositionForIfNode(context, conditions, body));
+	public constructor(position: ContextPosition, conditions: Expression, body?: Statement[]) {
+		super(position);
 
 		this._conditions = conditions;
 		this._body = body ?? [];
@@ -82,15 +136,6 @@ export class IfNode extends BaseNode {
 	}
 }
 
-function getPositionForIfNode(context: ParserRuleContext, conditions: Expression, body?: Statement[]): DocumentPosition {
-	if (!body || body.length < 1) {
-		return DocumentPosition.fromValues(context.start, conditions.position.stopToken);
-	}
-
-	const lastBodyStatement = body.at(body.length - 1);
-	return DocumentPosition.fromValues(context.start, lastBodyStatement?.position.stopToken);
-}
-
 export class ElseNode extends BaseNode {
 	private _body: Statement[];
 
@@ -98,8 +143,8 @@ export class ElseNode extends BaseNode {
 		return this._body;
 	}
 
-	public constructor(context: ParserRuleContext, body?: Statement[]) {
-		super(DocumentPosition.fromContext(context));
+	public constructor(position: ContextPosition, body?: Statement[]) {
+		super(position);
 
 		this._body = body ?? [];
 	}
@@ -125,8 +170,8 @@ export class VariableAssignmentNode extends BaseNode {
 		return this._value;
 	}
 
-	public constructor(context: ParserRuleContext, variable: VariableNode, value: Expression) {
-		super(DocumentPosition.fromContext(context));
+	public constructor(position: ContextPosition, variable: VariableNode, value: Expression) {
+		super(position);
 
 		this._variable = variable;
 		this._value = value;
@@ -149,8 +194,8 @@ export class ListAssignmentNode extends BaseNode {
 		return this._value;
 	}
 
-	public constructor(context: ParserRuleContext, variables: ListNode, value: Expression) {
-		super(DocumentPosition.fromContext(context));
+	public constructor(position: ContextPosition, variables: ListNode, value: Expression) {
+		super(position);
 
 		this._variables = variables.entries;
 		this._value = value;
@@ -161,238 +206,109 @@ export class ListAssignmentNode extends BaseNode {
 	}
 }
 
-export class ReturnNode extends BaseNode {
-	private _expression: Expression | undefined;
-
-	public get expression(): Expression | undefined {
-		return this._expression;
-	}
-
-	public constructor(context: ParserRuleContext, expression?: Expression) {
-		super(DocumentPosition.fromContext(context));
-
-		this._expression = expression;
-	}
-
-	public toString(): string {
-		const base = super.toString();
-
-		let expression = '';
-		if (this._expression) {
-			expression = ` ${this._expression.toString()}`;
-		}
-
-		return `return${expression}; (${base})`;
-	}
-}
-
-export class CommentNode extends BaseNode {
-	private _text: string;
-
-	public get text(): string {
-		return this._text;
-	}
-
-	public constructor(context: CommentContext) {
-		super(DocumentPosition.fromContext(context));
-
-		this._text = JSON.parse(context.STRING_LITERAL().getText());
-	}
-
-	public toString(): string {
-		const base = super.toString();
-
-		return `"${this._text}"; (${base})`;
-	}
-}
-
-export class EmptyStatementNode extends BaseNode {
-	public constructor(context: Empty_statementContext) {
-		super(DocumentPosition.fromContext(context));
-	}
-
-	public toString(): string {
-		const base = super.toString();
-
-		return `<empty>; (${base})`;
-	}
-}
-
 export class ConditionalAndNode extends TwoPartNode {
-	public constructor(context: Conditional_and_expressionContext, left: Expression, right: Expression) {
-		super(context, left, right);
-	}
-
 	public toString(): string {
 		return `${this._left.toString()} && ${this._right.toString()}`
 	}
 }
 
 export class ConditionalOrNode extends TwoPartNode {
-	public constructor(context: Conditional_or_expressionContext, left: Expression, right: Expression) {
-		super(context, left, right);
-	}
-
 	public toString(): string {
 		return `${this._left.toString()} || ${this._right.toString()}`;
 	}
 }
 
 export class BitwiseAndNode extends TwoPartNode {
-	public constructor(context: And_expressionContext, left: Expression, right: Expression) {
-		super(context, left, right);
-	}
-
 	public toString(): string {
 		return `${this._left.toString()} &. ${this._right.toString()}`;
 	}
 }
 
 export class BitwiseInclusiveOrNode extends TwoPartNode {
-	public constructor(context: Inclusive_or_expressionContext, left: Expression, right: Expression) {
-		super(context, left, right);
-	}
-
 	public toString(): string {
 		return `${this._left.toString()} |. ${this._right.toString()}`;
 	}
 }
 
 export class BitwiseExclusiveOrNode extends TwoPartNode {
-	public constructor(context: Exclusive_or_expressionContext, left: Expression, right: Expression) {
-		super(context, left, right);
-	}
-
 	public toString(): string {
 		return `${this._left.toString()} ^. ${this._right.toString()}`;
 	}
 }
 
 export class EqualNode extends TwoPartNode {
-	public constructor(context: Equality_expressionContext, left: Expression, right: Expression) {
-		super(context, left, right);
-	}
-
 	public toString(): string {
 		return `${this._left.toString()} == ${this._right.toString()}`;
 	}
 }
 
 export class UnequalNode extends TwoPartNode {
-	public constructor(context: Equality_expressionContext, left: Expression, right: Expression) {
-		super(context, left, right);
-	}
-
 	public toString(): string {
 		return `${this._left.toString()} != ${this._right.toString()}`;
 	}
 }
 
 export class GreaterThanNode extends TwoPartNode {
-	public constructor(context: Relational_expressionContext, left: Expression, right: Expression) {
-		super(context, left, right);
-	}
-
 	public toString(): string {
 		return `${this._left.toString()} > ${this._right.toString()}`;
 	}
 }
 
 export class LessThanNode extends TwoPartNode {
-	public constructor(context: Relational_expressionContext, left: Expression, right: Expression) {
-		super(context, left, right);
-	}
-
 	public toString(): string {
 		return `${this._left.toString()} < ${this._right.toString()}`;
 	}
 }
 
 export class GreaterOrEqualNode extends TwoPartNode {
-	public constructor(context: Relational_expressionContext, left: Expression, right: Expression) {
-		super(context, left, right);
-	}
-
 	public toString(): string {
 		return `${this._left.toString()} >= ${this._right.toString()}`;
 	}
 }
 
 export class LessOrEqualNode extends TwoPartNode {
-	public constructor(context: Relational_expressionContext, left: Expression, right: Expression) {
-		super(context, left, right);
-	}
-
 	public toString(): string {
 		return `${this._left.toString()} <= ${this._right.toString()}`;
 	}
 }
 
 export class ShiftLeftNode extends TwoPartNode {
-	public constructor(context: Shift_expressionContext, left: Expression, right: Expression) {
-		super(context, left, right);
-	}
-
 	public toString(): string {
 		return `${this._left.toString()} << ${this._right.toString()}`;
 	}
 }
 
 export class ShiftRightNode extends TwoPartNode {
-	public constructor(context: Shift_expressionContext, left: Expression, right: Expression) {
-		super(context, left, right);
-	}
-
 	public toString(): string {
 		return `${this._left.toString()} >> ${this._right.toString()}`;
 	}
 }
 
 export class AdditionNode extends TwoPartNode {
-	public constructor(context: Additive_expressionContext, left: Expression, right: Expression) {
-		super(context, left, right);
-	}
-
 	public toString(): string {
 		return `${this._left.toString()} + ${this._right.toString()}`;
 	}
 }
 
 export class SubtractionNode extends TwoPartNode {
-	public constructor(context: Additive_expressionContext, left: Expression, right: Expression) {
-		super(context, left, right);
-	}
-
 	public toString(): string {
 		return `${this._left.toString()} - ${this._right.toString()}`;
 	}
 }
 
 export class MultiplicationNode extends TwoPartNode {
-	public constructor(context: Multiplicative_expressionContext, left: Expression, right: Expression) {
-		super(context, left, right);
-	}
-
 	public toString(): string {
 		return `${this._left.toString()} * ${this._right.toString()}`;
 	}
 }
 
 export class DivisionNode extends TwoPartNode {
-	public constructor(context: Multiplicative_expressionContext, left: Expression, right: Expression) {
-		super(context, left, right);
-	}
-
 	public toString(): string {
 		return `${this._left.toString()} / ${this._right.toString()}`;
 	}
 }
 
 export class ModulationNode extends TwoPartNode {
-	public constructor(context: Multiplicative_expressionContext, left: Expression, right: Expression) {
-		super(context, left, right);
-	}
-
 	public toString(): string {
 		return `${this._left.toString()} % ${this._right.toString()}`;
 	}
@@ -405,8 +321,8 @@ export class NegativeNode extends BaseNode {
 		return this._innerNode;
 	}
 
-	public constructor(context: Negative_unary_expressionContext, innerNode: Expression) {
-		super(DocumentPosition.fromContext(context));
+	public constructor(position: ContextPosition, innerNode: Expression) {
+		super(position);
 
 		this._innerNode = innerNode;
 	}
@@ -423,8 +339,8 @@ export class NegatedNode extends BaseNode {
 		return this._innerNode;
 	}
 
-	public constructor(context: Negated_unary_expressionContext, innerNode: Expression) {
-		super(DocumentPosition.fromContext(context));
+	public constructor(position: ContextPosition, innerNode: Expression) {
+		super(position);
 
 		this._innerNode = innerNode;
 	}
@@ -441,8 +357,8 @@ export class ComplementNode extends BaseNode {
 		return this._innerNode;
 	}
 
-	public constructor(context: Complement_unary_expressionContext, innerNode: Expression) {
-		super(DocumentPosition.fromContext(context));
+	public constructor(position: ContextPosition, innerNode: Expression) {
+		super(position);
 
 		this._innerNode = innerNode;
 	}
@@ -452,12 +368,114 @@ export class ComplementNode extends BaseNode {
 	}
 }
 
+export class ArgumentIndexerNode extends BaseNode {
+	private _object: Expression;
+	private _argument: Expression;
+
+	public get object(): Expression {
+		return this._object;
+	}
+
+	public get argument(): Expression {
+		return this._argument;
+	}
+
+	public constructor(position: ContextPosition, object: Expression, argument: Expression) {
+		super(position);
+
+		this._object = object;
+		this._argument = argument;
+	}
+
+	public toString(): string {
+		return `${this._object.toString()}[${this._argument.toString()}]`;
+	}
+}
+
+export class RangeIndexerNode extends BaseNode {
+	private _object: Expression;
+	private _start: Expression;
+	private _end: Expression;
+
+	public get object(): Expression {
+		return this._object;
+	}
+
+	public get start(): Expression {
+		return this._start
+	}
+
+	public get end(): Expression {
+		return this._end
+	}
+
+	public constructor(position: ContextPosition, object: Expression, start: Expression, end: Expression) {
+		super(position);
+
+		this._object = object;
+		this._start = start;
+		this._end = end;
+	}
+
+	public toString(): string {
+		return `${this._object.toString()}[${this._start.toString()}..${this._end.toString()}]`;
+	}
+}
+
+export class PropertyAccessorNode extends BaseNode {
+	private _object: Expression;
+	private _name: string;
+
+	public get object(): Expression {
+		return this._object;
+	}
+
+	public get name(): string {
+		return this._name
+	}
+
+	public constructor(position: ContextPosition, object: Expression, name: string) {
+		super(position);
+
+		this._object = object;
+		this._name = name;
+	}
+
+	public toString(): string {
+		return `${this._object.toString()}.${this._name}`;
+	}
+}
+
+export class ComputedPropertyAccessorNode extends BaseNode {
+	private _object: Expression;
+	private _name: Expression;
+
+	public get object(): Expression {
+		return this._object;
+	}
+
+	public get name(): Expression {
+		return this._name
+	}
+
+	public constructor(position: ContextPosition, object: Expression, name: Expression) {
+		super(position);
+
+		this._object = object;
+		this._name = name;
+	}
+
+	public toString(): string {
+		return `${this._object.toString()}.(${this._name.toString()})`;
+	}
+}
+
 export class VerbCallNode extends BaseNode {
-	private _object: ObjectReference;
+	private _object: Expression;
 	private _name: string;
 	private _arguments: Expression[];
 
-	public get object(): ObjectReference {
+	public get object(): Expression {
 		return this._object;
 	}
 
@@ -469,8 +487,8 @@ export class VerbCallNode extends BaseNode {
 		return this._arguments;
 	}
 
-	public constructor(context: Bf_invocationContext, object: ObjectReference, name: string, functionArguments: Expression[]) {
-		super(DocumentPosition.fromContext(context));
+	public constructor(position: ContextPosition, object: Expression, name: string, functionArguments: Expression[]) {
+		super(position);
 
 		this._object = object;
 		this._name = name;
@@ -479,6 +497,60 @@ export class VerbCallNode extends BaseNode {
 
 	public toString(): string {
 		return `${this._object.toString()}:${this._name}(${this._arguments.map(x => x.toString()).join(', ')})`;
+	}
+}
+
+export class ComputedVerbCallNode extends BaseNode {
+	private _object: Expression;
+	private _name: Expression;
+	private _arguments: Expression[];
+
+	public get object(): Expression {
+		return this._object;
+	}
+
+	public get name(): Expression {
+		return this._name
+	}
+
+	public get arguments(): Expression[] {
+		return this._arguments;
+	}
+
+	public constructor(position: ContextPosition, object: Expression, name: Expression, functionArguments: Expression[]) {
+		super(position);
+
+		this._object = object;
+		this._name = name;
+		this._arguments = functionArguments;
+	}
+
+	public toString(): string {
+		return `${this._object.toString()}:(${this._name.toString()})(${this._arguments.map(x => x.toString()).join(', ')})`;
+	}
+}
+
+export class CorifiedVerbCallNode extends BaseNode {
+	private _verbReference: Expression;
+	private _arguments: Expression[];
+
+	public get verbReference(): Expression {
+		return this._verbReference;
+	}
+
+	public get arguments(): Expression[] {
+		return this._arguments;
+	}
+
+	public constructor(position: ContextPosition, verbReference: Expression, functionArguments: Expression[]) {
+		super(position);
+
+		this._verbReference = verbReference;
+		this._arguments = functionArguments;
+	}
+
+	public toString(): string {
+		return `${this._verbReference.toString()}(${this._arguments.map(x => x.toString()).join(', ')})`;
 	}
 }
 
@@ -494,8 +566,8 @@ export class BuiltInFunctionCallNode extends BaseNode {
 		return this._arguments;
 	}
 
-	public constructor(context: Bf_invocationContext, name: string, functionArguments: Expression[]) {
-		super(DocumentPosition.fromContext(context));
+	public constructor(position: ContextPosition, name: string, functionArguments: Expression[]) {
+		super(position);
 
 		this._name = name;
 		this._arguments = functionArguments;
@@ -506,69 +578,39 @@ export class BuiltInFunctionCallNode extends BaseNode {
 	}
 }
 
-export class PropertyAccessNode extends BaseNode {
-	private _object: ObjectReference;
-	private _name: string;
+export class ListSlicerNode extends BaseNode {
+	private _value: Expression;
 
-	public get object(): ObjectReference {
-		return this._object;
+	public get value(): Expression {
+		return this._value;
 	}
 
-	public get name(): string {
-		return this._name
-	}
+	public constructor(contextPosition: ContextPosition, value: Expression) {
+		super(contextPosition);
 
-	public constructor(context: Bf_invocationContext, object: ObjectReference, name: string) {
-		super(DocumentPosition.fromContext(context));
-
-		this._object = object;
-		this._name = name;
+		this._value = value;
 	}
 
 	public toString(): string {
-		return `${this._object.toString()}.${this._name}`;
+		return `@${this._value.toString()}`;
 	}
 }
 
-export class BooleanNode extends LiteralNode<boolean> {
-	private constructor(position: DocumentPosition, value: boolean) {
-		super(position, value);
-	}
-
-	public static fromContext(context: Bool_literalContext): BooleanNode {
-		return new BooleanNode(DocumentPosition.fromContext(context), JSON.parse(getContextAsText(context)));
-	}
+export class ConditionalNode extends BaseNode {
+	// TODO: implement ConditionalNode
 }
 
-export class IntegerNode extends LiteralNode<Int64> {
-	private constructor(position: DocumentPosition, value: Int64) {
-		super(position, value);
-	}
-
-	public static fromContext(context: Integer_literalContext): IntegerNode {
-		return new IntegerNode(DocumentPosition.fromContext(context), JSON.parse(getContextAsText(context)));
-	}
+export class ErrorCatcherNode extends BaseNode {
+	// TODO: implement ConditionalNode
 }
 
-export class FloatNode extends LiteralNode<Float> {
-	private constructor(position: DocumentPosition, value: Float) {
-		super(position, value);
-	}
+export class BooleanNode extends LiteralNode<boolean> { }
 
-	public static fromContext(context: Float_literalContext): FloatNode {
-		return new FloatNode(DocumentPosition.fromContext(context), JSON.parse(getContextAsText(context)));
-	}
-}
+export class IntegerNode extends LiteralNode<Int64> { }
 
-export class StringNode extends LiteralNode<string> {
-	private constructor(position: DocumentPosition, value: string) {
-		super(position, value);
-	}
+export class FloatNode extends LiteralNode<Float> { }
 
-	public static fromContext(context: String_literalContext): StringNode {
-		return new StringNode(DocumentPosition.fromContext(context), JSON.parse(getContextAsText(context)));
-	}
-}
+export class StringNode extends LiteralNode<string> { }
 
 export class ListNode extends BaseNode {
 	private _entries: Expression[];
@@ -581,8 +623,8 @@ export class ListNode extends BaseNode {
 		return this._entries.at(index);
 	}
 
-	public constructor(context: ListContext, entries: Expression[]) {
-		super(DocumentPosition.fromContext(context));
+	public constructor(contextPosition: ContextPosition, entries: Expression[]) {
+		super(contextPosition);
 
 		this._entries = entries;
 	}
@@ -604,8 +646,8 @@ export class MapEntryNode extends BaseNode {
 		return this._value;
 	}
 
-	public constructor(context: Map_entryContext, key: Expression, value: Expression) {
-		super(DocumentPosition.fromContext(context));
+	public constructor(position: ContextPosition, key: Expression, value: Expression) {
+		super(position);
 
 		this._key = key;
 		this._value = value;
@@ -623,61 +665,41 @@ export class MapNode extends BaseNode {
 		return this._entries;
 	}
 
-	public constructor(context: MapContext, entries: MapEntryNode[]) {
-		super(DocumentPosition.fromContext(context));
+	public constructor(position: ContextPosition, entries: MapEntryNode[]) {
+		super(position);
 
 		this._entries = entries;
 	}
 }
 
 export class VariableNode extends ReferenceNode {
-	private constructor(position: DocumentPosition, name: string) {
-		super(position, name);
-	}
-
-	public static fromContext(context: IdentifierContext): VariableNode {
-		return new VariableNode(DocumentPosition.fromContext(context), getContextAsText(context));
-	}
-
 	public toString(): string {
 		return `${this._name}`;
 	}
 }
 
 export class ObjectIdNode extends ReferenceNode {
-	private constructor(position: DocumentPosition, name: string) {
-		super(position, name);
-	}
-
-	public static fromContext(context: Object_idContext): ObjectIdNode {
-		return new ObjectIdNode(DocumentPosition.fromContext(context), getContextAsText(context));
-	}
-
 	public toString(): string {
 		return `#${this._name}`;
 	}
 }
 
-export class CorifiedObjectNode extends ReferenceNode {
-	private constructor(position: DocumentPosition, name: string) {
-		super(position, name);
-	}
-
-	public static fromContext(context: Corified_objectContext): CorifiedObjectNode {
-		return new CorifiedObjectNode(DocumentPosition.fromContext(context), getContextAsText(context));
-	}
-
+export class CorifiedValueNode extends ReferenceNode {
 	public toString(): string {
 		return `\$${this._name}`;
 	}
 }
 
 export class ErrorNode extends BaseNode {
-	private constructor(position: DocumentPosition) {
-		super(position);
+	private _errorCode: ErrorCode;
+
+	public get errorCode(): ErrorCode {
+		return this._errorCode;
 	}
 
-	public static fromContext(context: ParserRuleContext): ErrorNode {
-		return new ErrorNode(DocumentPosition.fromContext(context));
+	public constructor(position: ContextPosition, errorCode: ErrorCode) {
+		super(position);
+
+		this._errorCode = errorCode;
 	}
 }
