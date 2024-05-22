@@ -84,7 +84,7 @@ suite('indexer tests', () => {
     });
 
     test('should parse a ranged indexer', () => {
-        const parser = CommonHelpers.getParser('blob[1..$]');
+        const parser = CommonHelpers.getParser('blob[^..$]');
         const result = parser.expression();
 
         ExpectHelpers.expectSyntaxErrors(parser, 0);
@@ -99,7 +99,7 @@ suite('indexer tests', () => {
 
         expect(indexer?._argument).not.to.exist;
 
-        ExpectHelpers.expectInteger(indexer?._start, '1');
+        ExpectHelpers.expectInteger(indexer?._start, '^');
         ExpectHelpers.expectDollar(indexer?._end, '$');
     });
 

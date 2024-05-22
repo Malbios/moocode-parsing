@@ -1,7 +1,7 @@
 import { expect } from 'chai';
 import { suite, test } from 'mocha';
 import { generateAst } from '../../../src';
-import { BooleanNode, FloatNode, IntegerNode, ListAssignmentNode, StringNode, VariableAssignmentNode, VariableNode } from '../../../src/ast/nodes';
+import { BooleanNode, FloatNode, IntegerNode, ListAssignmentStatementNode, StringNode, VariableAssignmentNode, VariableNode } from '../../../src/ast/nodes';
 import { expectParsingError } from '../../test-utils/expectations';
 
 suite('AST tests for assignments', () => {
@@ -72,7 +72,7 @@ suite('AST tests for assignments', () => {
 		const result = generateAst('{a, b, c} = args;');
 		expect(result).to.have.length(1);
 
-		const listAssignmentNode = result.at(0) as ListAssignmentNode;
+		const listAssignmentNode = result.at(0) as ListAssignmentStatementNode;
 		expect(listAssignmentNode.variables).to.have.length(3);
 
 		const variableNodeA = listAssignmentNode.variables.at(0) as VariableNode;
