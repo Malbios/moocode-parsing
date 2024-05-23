@@ -4,8 +4,9 @@ import { Action } from '../interfaces';
 import { SingleValueVisitor } from './abstract';
 import { ContextPosition } from './common';
 import { NodeGenerationError } from './error';
-import { ExpressionGenerator, ValueGenerator } from './expression-generator';
+import { ExpressionGenerator } from './expression-generator';
 import { BreakStatementNode, CommentStatementNode, ContinueStatementNode, ElseNode, EmptyStatementNode, Expression, ExpressionStatementNode, ForStatementNode, IfNode, IfStatementNode, RangedForStatementNode, ReturnStatementNode, Statement, VariableNode, WhileStatementNode } from './nodes';
+import { ValueGenerator } from './value-generator';
 
 function handleErrors(action: Action<void>) {
 	try {
