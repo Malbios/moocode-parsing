@@ -123,7 +123,7 @@ export class ElseNode extends BaseNode {
 export class ForStatementNode extends BaseNode {
 	private _value: VariableNode;
 	private _keyOrIndex: VariableNode | undefined;
-	private _expression: Expression;
+	private _rangeExpression: Expression;
 	private _statements: Statement[];
 
 	public get value(): VariableNode {
@@ -134,29 +134,29 @@ export class ForStatementNode extends BaseNode {
 		return this._keyOrIndex;
 	}
 
-	public get expression(): Expression {
-		return this._expression;
+	public get rangeExpression(): Expression {
+		return this._rangeExpression;
 	}
 
 	public get statements(): Statement[] {
 		return this._statements;
 	}
 
-	private constructor(position: ContextPosition, value: VariableNode, expression: Expression, statements: Statement[], keyOrIndex?: VariableNode) {
+	private constructor(position: ContextPosition, value: VariableNode, rangeExpression: Expression, statements: Statement[], keyOrIndex?: VariableNode) {
 		super(position);
 
 		this._value = value;
 		this._keyOrIndex = keyOrIndex;
-		this._expression = expression;
+		this._rangeExpression = rangeExpression;
 		this._statements = statements;
 	}
 
-	public static new(position: ContextPosition, value: VariableNode, expression: Expression, statements: Statement[]): ForStatementNode {
-		return new ForStatementNode(position, value, expression, statements);
+	public static new(position: ContextPosition, value: VariableNode, rangeExpression: Expression, statements: Statement[]): ForStatementNode {
+		return new ForStatementNode(position, value, rangeExpression, statements);
 	}
 
-	public static withKeyOrIndex(position: ContextPosition, value: VariableNode, keyOrIndex: VariableNode, expression: Expression, statements: Statement[]): ForStatementNode {
-		return new ForStatementNode(position, value, expression, statements, keyOrIndex);
+	public static withKeyOrIndex(position: ContextPosition, value: VariableNode, keyOrIndex: VariableNode, rangeExpression: Expression, statements: Statement[]): ForStatementNode {
+		return new ForStatementNode(position, value, rangeExpression, statements, keyOrIndex);
 	}
 
 	public toString(lineInfo = true): string {
@@ -164,7 +164,7 @@ export class ForStatementNode extends BaseNode {
 
 		const keyOrIndex = this._keyOrIndex ? `, ${this._keyOrIndex.toString(lineInfo)}` : '';
 
-		return `for ${this._value.toString(lineInfo)}${keyOrIndex} in (${this._expression.toString(lineInfo)})\n${this._statements.map(x => x.toString(lineInfo)).join('\n')}\nendfor${base}`;
+		return `for ${this._value.toString(lineInfo)}${keyOrIndex} in (${this._rangeExpression.toString(lineInfo)})\n${this._statements.map(x => x.toString(lineInfo)).join('\n')}\nendfor${base}`;
 	}
 }
 

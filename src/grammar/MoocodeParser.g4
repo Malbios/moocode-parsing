@@ -44,10 +44,13 @@ non_empty_return: RETURN expression;
 empty_return: RETURN;
 
 for_loop_statement:
-	FOR value = identifier (COMMA key = identifier)? IN (
-		OPEN_PARENS range = expression CLOSE_PARENS
-		| OPEN_BRACKET start = expression OP_RANGE end = expression CLOSE_BRACKET
-	) body = statements ENDFOR;
+	FOR (for_expression | ranged_for_expression) body = statements ENDFOR;
+
+for_expression:
+	value = identifier (COMMA key = identifier)? IN OPEN_PARENS range = expression CLOSE_PARENS;
+
+ranged_for_expression:
+	value = identifier IN OPEN_BRACKET start = expression OP_RANGE end = expression CLOSE_BRACKET;
 
 continue_statement: (empty_continue | non_empty_continue) SEMICOLON;
 

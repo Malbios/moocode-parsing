@@ -16,6 +16,8 @@ import { Return_statementContext } from "./MoocodeParser";
 import { Non_empty_returnContext } from "./MoocodeParser";
 import { Empty_returnContext } from "./MoocodeParser";
 import { For_loop_statementContext } from "./MoocodeParser";
+import { For_expressionContext } from "./MoocodeParser";
+import { Ranged_for_expressionContext } from "./MoocodeParser";
 import { Continue_statementContext } from "./MoocodeParser";
 import { Empty_continueContext } from "./MoocodeParser";
 import { Non_empty_continueContext } from "./MoocodeParser";
@@ -209,6 +211,26 @@ export default class MoocodeParserListener extends ParseTreeListener {
 	 * @param ctx the parse tree
 	 */
 	exitFor_loop_statement?: (ctx: For_loop_statementContext) => void;
+	/**
+	 * Enter a parse tree produced by `MoocodeParser.for_expression`.
+	 * @param ctx the parse tree
+	 */
+	enterFor_expression?: (ctx: For_expressionContext) => void;
+	/**
+	 * Exit a parse tree produced by `MoocodeParser.for_expression`.
+	 * @param ctx the parse tree
+	 */
+	exitFor_expression?: (ctx: For_expressionContext) => void;
+	/**
+	 * Enter a parse tree produced by `MoocodeParser.ranged_for_expression`.
+	 * @param ctx the parse tree
+	 */
+	enterRanged_for_expression?: (ctx: Ranged_for_expressionContext) => void;
+	/**
+	 * Exit a parse tree produced by `MoocodeParser.ranged_for_expression`.
+	 * @param ctx the parse tree
+	 */
+	exitRanged_for_expression?: (ctx: Ranged_for_expressionContext) => void;
 	/**
 	 * Enter a parse tree produced by `MoocodeParser.continue_statement`.
 	 * @param ctx the parse tree
