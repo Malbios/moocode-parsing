@@ -5,7 +5,7 @@ import { SingleValueVisitor } from './abstract';
 import { ContextPosition } from './common';
 import { NodeGenerationError } from './error';
 import { ExpressionGenerator, ValueGenerator } from './expression-generator';
-import { BreakStatementNode, CommentStatementNode, ContinueStatementNode, ElseNode, EmptyStatementNode, Expression, IfNode, IfStatementNode, ReturnStatementNode, Statement, StatementNode } from './nodes';
+import { BreakStatementNode, CommentStatementNode, ContinueStatementNode, ElseNode, EmptyStatementNode, Expression, ExpressionStatementNode, IfNode, IfStatementNode, ReturnStatementNode, Statement } from './nodes';
 
 function handleErrors(action: Action<void>) {
 	try {
@@ -30,7 +30,7 @@ export class StatementGenerator extends SingleValueVisitor<Statement> {
 	public override visitStatement = (context: StatementContext): Statement => {
 		if (context.expression()) {
 			const expression = ExpressionGenerator.generateExpression(context.expression());
-			return new StatementNode(ContextPosition.fromContext(context), expression);
+			return new ExpressionStatementNode(ContextPosition.fromContext(context), expression);
 		}
 
 		return this.visit(context.getChild(0));

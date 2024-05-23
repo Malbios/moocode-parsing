@@ -4,11 +4,11 @@ import { expect } from 'chai';
 import moocodeParser, {
     Bool_literalContext,
     Corified_valueContext,
-    Dollar_literalContext,
     Error_codeContext,
     Float_literalContext,
     IdentifierContext,
     Integer_literalContext,
+    LiteralContext,
     Object_idContext,
     Object_referenceContext,
     String_literalContext
@@ -47,8 +47,12 @@ export default class ExpectHelpers {
         this.expectValue<String_literalContext>(context, String_literalContext, expectedValue);
     }
 
-    public static expectDollar(context: ParserRuleContext | undefined, expectedValue: string) {
-        this.expectValue<Dollar_literalContext>(context, Dollar_literalContext, expectedValue);
+    public static expectDollar(context: ParserRuleContext | undefined) {
+        this.expectValue<LiteralContext>(context, LiteralContext, '$');
+    }
+
+    public static expectCaret(context: ParserRuleContext | undefined) {
+        this.expectValue<LiteralContext>(context, LiteralContext, '^');
     }
 
     public static expectIdentifier(context: ParserRuleContext | undefined, expectedValue: string) {

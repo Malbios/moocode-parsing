@@ -197,8 +197,8 @@ endtry
     const except = tryStatement?.try_except(0);
 
     ExpectHelpers.expectIdentifier(except?.identifier(), 'ex');
-    expect(except?.error_codes()).not.to.exist;
     expect(except?.error_codes().any_error()).to.exist;
+    expect(except?.error_codes().expression_list()).to.have.length(0);
 
     const exceptPrimaryExpression = ParsingHelpers.getPrimaryExpression(except?.statements().statement(0));
     ExpectHelpers.expectIdentifier(exceptPrimaryExpression?._pe, 'y');

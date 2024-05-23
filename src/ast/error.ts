@@ -2,20 +2,34 @@ import { ErrorListener, ParserRuleContext, RecognitionException, Recognizer, Tok
 import { ContextPosition, getContextAsText } from './common';
 
 export class NotImplementedError extends Error {
-	private constructor(context: ParserRuleContext, description: string) {
-		if (description === '') {
-			super(`This has not (yet) been implemented!\n${getContextAsText(context)}`);
-		} else {
-			super(`This has not (yet) been implemented: ${description}\n${getContextAsText(context)}`);
+	private constructor(context?: ParserRuleContext, description?: string) {
+		let message = 'This has not (yet) been implemented!';
+
+		if (description) {
+			message = `${message}\n${description}`;
 		}
+
+		if (context) {
+			message = `${message}\n${getContextAsText(context)}`;
+		}
+
+		super(message);
 	}
 
-	public static new(context: ParserRuleContext): NotImplementedError {
-		return new NotImplementedError(context, '');
+	public static new(): NotImplementedError {
+		return new NotImplementedError();
 	}
 
-	public static withMessage(context: ParserRuleContext, message: string): NotImplementedError {
-		return new NotImplementedError(context, message);
+	public static withContext(context: ParserRuleContext): NotImplementedError {
+		return new NotImplementedError(context);
+	}
+
+	public static withDescription(description: string): NotImplementedError {
+		return new NotImplementedError(undefined, description);
+	}
+
+	public static withContextAndDescription(context: ParserRuleContext, description: string): NotImplementedError {
+		return new NotImplementedError(context, description);
 	}
 }
 

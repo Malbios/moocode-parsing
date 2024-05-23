@@ -184,12 +184,14 @@ primary_expression_start:
 	| list
 	| map
 	| error_catcher
-	| parented_expression;
+	| parenthesis_expression;
 
-parented_expression: OPEN_PARENS expression CLOSE_PARENS;
+parenthesis_expression: OPEN_PARENS expression CLOSE_PARENS;
 
 error_catcher:
-	TICK try = expression OP_NOT error_codes ARROW on_error = expression SINGLE_QUOTE;
+	TICK try = expression OP_NOT error_codes (
+		ARROW on_error = expression
+	)? SINGLE_QUOTE;
 
 list: OPEN_BRACE expression? (COMMA expression)* CLOSE_BRACE;
 
@@ -217,8 +219,8 @@ literal:
 	| string_literal
 	| integer_literal
 	| float_literal
-	| circumflex_literal
-	| dollar_literal;
+	| CARET
+	| DOLLAR;
 
 bool_literal: TRUE | FALSE;
 
@@ -227,10 +229,6 @@ string_literal: STRING_LITERAL;
 integer_literal: INTEGER_LITERAL;
 
 float_literal: FLOAT_LITERAL;
-
-dollar_literal: DOLLAR;
-
-circumflex_literal: CIRCUMFLEX;
 
 error_code:
 	E_NONE
