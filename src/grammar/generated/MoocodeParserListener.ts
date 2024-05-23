@@ -28,6 +28,7 @@ import { Try_exceptContext } from "./MoocodeParser";
 import { Try_finallyContext } from "./MoocodeParser";
 import { Fork_statementContext } from "./MoocodeParser";
 import { Error_codesContext } from "./MoocodeParser";
+import { Any_errorContext } from "./MoocodeParser";
 import { ExpressionContext } from "./MoocodeParser";
 import { AssignmentContext } from "./MoocodeParser";
 import { Assignment_operatorContext } from "./MoocodeParser";
@@ -330,6 +331,16 @@ export default class MoocodeParserListener extends ParseTreeListener {
 	 * @param ctx the parse tree
 	 */
 	exitError_codes?: (ctx: Error_codesContext) => void;
+	/**
+	 * Enter a parse tree produced by `MoocodeParser.any_error`.
+	 * @param ctx the parse tree
+	 */
+	enterAny_error?: (ctx: Any_errorContext) => void;
+	/**
+	 * Exit a parse tree produced by `MoocodeParser.any_error`.
+	 * @param ctx the parse tree
+	 */
+	exitAny_error?: (ctx: Any_errorContext) => void;
 	/**
 	 * Enter a parse tree produced by `MoocodeParser.expression`.
 	 * @param ctx the parse tree

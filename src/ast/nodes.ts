@@ -1,7 +1,8 @@
-import { BaseNode, LiteralNode, ReferenceNode, TwoPartNode } from './abstract';
+import { BaseNode, FlowControlStatementNode, LiteralNode, ReferenceNode, TwoPartNode, WrappedNode } from './abstract';
 import { ContextPosition, ErrorCode } from './common';
 
-export type Statement = (CommentStatementNode | EmptyStatementNode | IfStatementNode | Assignment | ReturnStatementNode | Invocation);
+export type Statement = (CommentStatementNode | EmptyStatementNode | IfStatementNode | FlowControlStatement | StatementNode);
+export type FlowControlStatement = (ReturnStatementNode | ContinueStatementNode | BreakStatementNode);
 export type Expression = (Assignment | ConditionalNode | Computation | Invocation | Value | InfoNode);
 export type Computation = (Bitwise | Logical | Equality | Relational | Shift | Arithmetic);
 export type Assignment = (VariableAssignmentNode | PropertyAssignmentNode | ListAssignmentNode);
@@ -12,11 +13,11 @@ export type Relational = (GreaterThanNode | LessThanNode | GreaterOrEqualNode | 
 export type Shift = (ShiftLeftNode | ShiftRightNode);
 export type Arithmetic = (AdditionNode | SubtractionNode | MultiplicationNode | DivisionNode | ModulationNode | NegativeNode);
 export type Invocation = (VerbInvocationNode | ComputedVerbInvocationNode | CorifiedVerbInvocationNode | BuiltInFunctionInvocationNode);
-export type Value = (Literal | ObjectReference | ListNode | MapNode | MapEntryNode | ListSlicerNode | ErrorCatcherNode | PropertyAccessor | Indexer);
+export type Value = (Literal | ObjectReference | ListNode | MapNode | MapEntryNode | ListSlicerNode | ErrorCatcherNode | PropertyAccessor | Indexer | ParenthesesNode);
 export type PropertyAccessor = (PropertyAccessorNode | ComputedPropertyAccessorNode);
 export type Indexer = (ArgumentIndexerNode | RangeIndexerNode);
 export type ObjectReference = (VariableNode | ObjectIdNode | CorifiedValueNode);
-export type Literal = (BooleanNode | IntegerNode | FloatNode | StringNode | ErrorNode);
+export type Literal = (BooleanNode | IntegerNode | FloatNode | StringNode | ErrorCodeNode);
 export type InfoNode = (ArgumentIndexerNodeInfo | RangeIndexerNodeInfo | PropertyAccessorNodeInfo | ComputedPropertyAccessorNodeInfo | VerbInvocationNodeInfo | ComputedVerbInvocationNodeInfo | CallInfo);
 
 export type Int64 = number;
@@ -48,32 +49,97 @@ export class IfStatementNode extends BaseNode {
 	}
 
 	public toString(): string {
-		return `${this._if.toString()}${this._elseIfs.map(x => `else${x.toString()}`)}${this._else?.toString()}\nendif\n`;
+		const base = super.toString();
+
+		const ifPart = `${this._if.toString()}\n`;
+		let elseIfParts = '';
+		let elsePart = '';
+
+		if (this._elseIfs.length > 0) {
+			elseIfParts = `${this._elseIfs.map(x => `else${x.toString()}`).join('\n')}\n`;
+		}
+
+		if (this._else) {
+			elsePart = `${this._else.toString()}\n`;
+		}
+
+		return `${ifPart}${elseIfParts}${elsePart}endif (${base})`;
 	}
 }
 
-export class ReturnStatementNode extends BaseNode {
-	private _expression: Expression | undefined;
+export class IfNode extends BaseNode {
+	private _conditions: Expression;
+	private _body: Statement[];
 
-	public get expression(): Expression | undefined {
-		return this._expression;
+	public get conditions() {
+		return this._conditions;
 	}
 
-	public constructor(position: ContextPosition, expression?: Expression) {
+	public get body() {
+		return this._body;
+	}
+
+	public constructor(position: ContextPosition, conditions: Expression, body?: Statement[]) {
 		super(position);
 
-		this._expression = expression;
+		this._conditions = conditions;
+		this._body = body ?? [];
 	}
 
 	public toString(): string {
-		const base = super.toString();
+		const start = `if (${this._conditions.toString()})`;
 
-		let expression = '';
-		if (this._expression) {
-			expression = ` ${this._expression.toString()}`;
+		if (this._body.length === 0) {
+			return start;
 		}
 
-		return `return${expression}; (${base})`;
+		return `${start}\n  ${this._body.map(x => x.toString()).join('\n  ')}`;
+	}
+}
+
+export class ElseNode extends BaseNode {
+	private _body: Statement[];
+
+	public get body(): Statement[] {
+		return this._body;
+	}
+
+	public constructor(position: ContextPosition, body?: Statement[]) {
+		super(position);
+
+		this._body = body ?? [];
+	}
+
+	public toString(): string {
+		if (this._body.length === 0) {
+			return 'else\n';
+		}
+
+		return `else\n  ${this._body.map(x => x.toString()).join('\n  ')}\n`;
+	}
+}
+
+export class ReturnStatementNode extends FlowControlStatementNode<Expression> {
+	public toString(): string {
+		const base = super.toString();
+
+		return `return${base}`;
+	}
+}
+
+export class ContinueStatementNode extends FlowControlStatementNode<Expression> {
+	public toString(): string {
+		const base = super.toString();
+
+		return `continue${base}`;
+	}
+}
+
+export class BreakStatementNode extends FlowControlStatementNode<Expression> {
+	public toString(): string {
+		const base = super.toString();
+
+		return `break${base}`;
 	}
 }
 
@@ -105,55 +171,22 @@ export class EmptyStatementNode extends BaseNode {
 	}
 }
 
-export class IfNode extends BaseNode {
-	private _conditions: Expression;
-	private _body: Statement[];
+export class StatementNode extends BaseNode {
+	private _expression: Expression;
 
-	public get conditions() {
-		return this._conditions;
+	public get expression(): Expression {
+		return this._expression;
 	}
 
-	public get body() {
-		return this._body;
-	}
-
-	public constructor(position: ContextPosition, conditions: Expression, body?: Statement[]) {
+	public constructor(position: ContextPosition, expression: Expression) {
 		super(position);
 
-		this._conditions = conditions;
-		this._body = body ?? [];
+		this._expression = expression;
 	}
 
 	public toString(): string {
-		const start = `if (${this._conditions.toString()})\n`;
-
-		if (this._body.length === 0) {
-			return start;
-		}
-
-		return `${start}\t${this._body.map(x => x.toString()).join('\n\t')}\n`;
-	}
-}
-
-export class ElseNode extends BaseNode {
-	private _body: Statement[];
-
-	public get body(): Statement[] {
-		return this._body;
-	}
-
-	public constructor(position: ContextPosition, body?: Statement[]) {
-		super(position);
-
-		this._body = body ?? [];
-	}
-
-	public toString(): string {
-		if (this._body.length === 0) {
-			return 'else\n';
-		}
-
-		return `else\n\t${this._body.map(x => x.toString()).join('\n\t')}\n`;
+		const base = super.toString();
+		return `${this._expression.toString()}; (${base})`;
 	}
 }
 
@@ -182,10 +215,10 @@ export class VariableAssignmentNode extends BaseNode {
 }
 
 export class PropertyAssignmentNode extends BaseNode {
-	private _property: PropertyAccessorNode;
+	private _property: PropertyAccessor;
 	private _value: Expression;
 
-	public get property(): PropertyAccessorNode {
+	public get property(): PropertyAccessor {
 		return this._property;
 	}
 
@@ -193,7 +226,7 @@ export class PropertyAssignmentNode extends BaseNode {
 		return this._value;
 	}
 
-	public constructor(position: ContextPosition, property: PropertyAccessorNode, value: Expression) {
+	public constructor(position: ContextPosition, property: PropertyAccessor, value: Expression) {
 		super(position);
 
 		this._property = property;
@@ -206,10 +239,10 @@ export class PropertyAssignmentNode extends BaseNode {
 }
 
 export class ListAssignmentNode extends BaseNode {
-	private _variables: Expression[];
+	private _variables: ListNode;
 	private _value: Expression;
 
-	public get variables(): Expression[] {
+	public get variables(): ListNode {
 		return this._variables;
 	}
 
@@ -220,7 +253,7 @@ export class ListAssignmentNode extends BaseNode {
 	public constructor(position: ContextPosition, variables: ListNode, value: Expression) {
 		super(position);
 
-		this._variables = variables.entries;
+		this._variables = variables;
 		this._value = value;
 	}
 
@@ -229,171 +262,141 @@ export class ListAssignmentNode extends BaseNode {
 	}
 }
 
-export class ConditionalInNode extends TwoPartNode {
+export class ConditionalInNode extends TwoPartNode<Expression, Expression> {
 	public toString(): string {
 		return `${this._left.toString()} in ${this._right.toString()}`;
 	}
 }
 
-export class ConditionalAndNode extends TwoPartNode {
+export class ConditionalAndNode extends TwoPartNode<Expression, Expression> {
 	public toString(): string {
 		return `${this._left.toString()} && ${this._right.toString()}`;
 	}
 }
 
-export class ConditionalOrNode extends TwoPartNode {
+export class ConditionalOrNode extends TwoPartNode<Expression, Expression> {
 	public toString(): string {
 		return `${this._left.toString()} || ${this._right.toString()}`;
 	}
 }
 
-export class BitwiseAndNode extends TwoPartNode {
+export class BitwiseAndNode extends TwoPartNode<Expression, Expression> {
 	public toString(): string {
 		return `${this._left.toString()} &. ${this._right.toString()}`;
 	}
 }
 
-export class BitwiseInclusiveOrNode extends TwoPartNode {
+export class BitwiseInclusiveOrNode extends TwoPartNode<Expression, Expression> {
 	public toString(): string {
 		return `${this._left.toString()} |. ${this._right.toString()}`;
 	}
 }
 
-export class BitwiseExclusiveOrNode extends TwoPartNode {
+export class BitwiseExclusiveOrNode extends TwoPartNode<Expression, Expression> {
 	public toString(): string {
 		return `${this._left.toString()} ^. ${this._right.toString()}`;
 	}
 }
 
-export class EqualNode extends TwoPartNode {
+export class EqualNode extends TwoPartNode<Expression, Expression> {
 	public toString(): string {
 		return `${this._left.toString()} == ${this._right.toString()}`;
 	}
 }
 
-export class UnequalNode extends TwoPartNode {
+export class UnequalNode extends TwoPartNode<Expression, Expression> {
 	public toString(): string {
 		return `${this._left.toString()} != ${this._right.toString()}`;
 	}
 }
 
-export class GreaterThanNode extends TwoPartNode {
+export class GreaterThanNode extends TwoPartNode<Expression, Expression> {
 	public toString(): string {
 		return `${this._left.toString()} > ${this._right.toString()}`;
 	}
 }
 
-export class LessThanNode extends TwoPartNode {
+export class LessThanNode extends TwoPartNode<Expression, Expression> {
 	public toString(): string {
 		return `${this._left.toString()} < ${this._right.toString()}`;
 	}
 }
 
-export class GreaterOrEqualNode extends TwoPartNode {
+export class GreaterOrEqualNode extends TwoPartNode<Expression, Expression> {
 	public toString(): string {
 		return `${this._left.toString()} >= ${this._right.toString()}`;
 	}
 }
 
-export class LessOrEqualNode extends TwoPartNode {
+export class LessOrEqualNode extends TwoPartNode<Expression, Expression> {
 	public toString(): string {
 		return `${this._left.toString()} <= ${this._right.toString()}`;
 	}
 }
 
-export class ShiftLeftNode extends TwoPartNode {
+export class ShiftLeftNode extends TwoPartNode<Expression, Expression> {
 	public toString(): string {
 		return `${this._left.toString()} << ${this._right.toString()}`;
 	}
 }
 
-export class ShiftRightNode extends TwoPartNode {
+export class ShiftRightNode extends TwoPartNode<Expression, Expression> {
 	public toString(): string {
 		return `${this._left.toString()} >> ${this._right.toString()}`;
 	}
 }
 
-export class AdditionNode extends TwoPartNode {
+export class AdditionNode extends TwoPartNode<Expression, Expression> {
 	public toString(): string {
 		return `${this._left.toString()} + ${this._right.toString()}`;
 	}
 }
 
-export class SubtractionNode extends TwoPartNode {
+export class SubtractionNode extends TwoPartNode<Expression, Expression> {
 	public toString(): string {
 		return `${this._left.toString()} - ${this._right.toString()}`;
 	}
 }
 
-export class MultiplicationNode extends TwoPartNode {
+export class MultiplicationNode extends TwoPartNode<Expression, Expression> {
 	public toString(): string {
 		return `${this._left.toString()} * ${this._right.toString()}`;
 	}
 }
 
-export class DivisionNode extends TwoPartNode {
+export class DivisionNode extends TwoPartNode<Expression, Expression> {
 	public toString(): string {
 		return `${this._left.toString()} / ${this._right.toString()}`;
 	}
 }
 
-export class ModulationNode extends TwoPartNode {
+export class ModulationNode extends TwoPartNode<Expression, Expression> {
 	public toString(): string {
 		return `${this._left.toString()} % ${this._right.toString()}`;
 	}
 }
 
-export class NegativeNode extends BaseNode {
-	private _innerNode: Expression;
-
-	public get innerNode(): Expression {
-		return this._innerNode;
-	}
-
-	public constructor(position: ContextPosition, innerNode: Expression) {
-		super(position);
-
-		this._innerNode = innerNode;
-	}
-
+export class NegativeNode extends WrappedNode<Expression> {
 	public toString(): string {
-		return `-${this._innerNode.toString()}`;
+		return `-${this._value.toString()}`;
 	}
 }
 
-export class NegatedNode extends BaseNode {
-	private _innerNode: Expression;
-
-	public get innerNode(): Expression {
-		return this._innerNode;
-	}
-
-	public constructor(position: ContextPosition, innerNode: Expression) {
-		super(position);
-
-		this._innerNode = innerNode;
-	}
-
+export class NegatedNode extends WrappedNode<Expression> {
 	public toString(): string {
-		return `!${this._innerNode.toString()}`;
+		return `!${this._value.toString()}`;
 	}
 }
 
-export class ComplementNode extends BaseNode {
-	private _innerNode: Expression;
-
-	public get innerNode(): Expression {
-		return this._innerNode;
-	}
-
-	public constructor(position: ContextPosition, innerNode: Expression) {
-		super(position);
-
-		this._innerNode = innerNode;
-	}
-
+export class ComplementNode extends WrappedNode<Expression> {
 	public toString(): string {
-		return `~${this._innerNode.toString()}`;
+		return `~${this._value.toString()}`;
+	}
+}
+
+export class ParenthesesNode extends WrappedNode<Expression> {
+	public toString(): string {
+		return `(${this._value.toString()})`;
 	}
 }
 
@@ -625,9 +628,7 @@ export class ListSlicerNode extends BaseNode {
 	}
 }
 
-// if_conditions = conditional_in_expression QUESTION_MARK true_ex = expression PIPE false_ex = expression
 export class ConditionalNode extends BaseNode {
-	// TODO: implement ConditionalNode
 	private _conditions: Expression;
 	private _true: Expression;
 	private _false: Expression;
@@ -773,17 +774,21 @@ export class CorifiedValueNode extends ReferenceNode {
 	}
 }
 
-export class ErrorNode extends BaseNode {
-	private _errorCode: ErrorCode;
+export class ErrorCodeNode extends BaseNode {
+	private _value: ErrorCode;
 
-	public get errorCode(): ErrorCode {
-		return this._errorCode;
+	public get value(): ErrorCode {
+		return this._value;
 	}
 
-	public constructor(position: ContextPosition, errorCode: ErrorCode) {
+	public constructor(position: ContextPosition, value: ErrorCode) {
 		super(position);
 
-		this._errorCode = errorCode;
+		this._value = value;
+	}
+
+	public toString(): string {
+		return ErrorCode[this._value];
 	}
 }
 

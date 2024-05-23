@@ -1,7 +1,7 @@
 import { expect } from 'chai';
 import { suite, test } from 'mocha';
 import { generateAst } from '../../../src';
-import { BooleanNode, FloatNode, IntegerNode, ListAssignmentNode, StringNode, VariableAssignmentNode, VariableNode } from '../../../src/ast/nodes';
+import { BooleanNode, FloatNode, IntegerNode, ListAssignmentNode, PropertyAccessor, PropertyAccessorNode, PropertyAssignmentNode, StatementNode, StringNode, VariableAssignmentNode, VariableNode } from '../../../src/ast/nodes';
 import { expectParsingError } from '../../test-utils/expectations';
 
 suite('AST tests for assignments', () => {
@@ -17,7 +17,8 @@ suite('AST tests for assignments', () => {
 		const result = generateAst('x = "abc";');
 		expect(result).to.have.length(1);
 
-		const variableAssignmentNode = result.at(0) as VariableAssignmentNode;
+		const statementNode = result.at(0) as StatementNode;
+		const variableAssignmentNode = statementNode.expression as VariableAssignmentNode;
 		expect(variableAssignmentNode.variable.name).to.equal('x');
 
 		const valueNode = variableAssignmentNode.value as StringNode
@@ -28,7 +29,8 @@ suite('AST tests for assignments', () => {
 		const result = generateAst('x = 1.2;');
 		expect(result).to.have.length(1);
 
-		const variableAssignmentNode = result.at(0) as VariableAssignmentNode;
+		const statementNode = result.at(0) as StatementNode;
+		const variableAssignmentNode = statementNode.expression as VariableAssignmentNode;
 		expect(variableAssignmentNode.variable.name).to.equal('x');
 
 		const valueNode = variableAssignmentNode.value as FloatNode
@@ -39,7 +41,8 @@ suite('AST tests for assignments', () => {
 		const result = generateAst('x = 1438;');
 		expect(result).to.have.length(1);
 
-		const variableAssignmentNode = result.at(0) as VariableAssignmentNode;
+		const statementNode = result.at(0) as StatementNode;
+		const variableAssignmentNode = statementNode.expression as VariableAssignmentNode;
 		expect(variableAssignmentNode.variable.name).to.equal('x');
 
 		const valueNode = variableAssignmentNode.value as IntegerNode
@@ -50,7 +53,8 @@ suite('AST tests for assignments', () => {
 		const result = generateAst('x = true;');
 		expect(result).to.have.length(1);
 
-		const variableAssignmentNode = result.at(0) as VariableAssignmentNode;
+		const statementNode = result.at(0) as StatementNode;
+		const variableAssignmentNode = statementNode.expression as VariableAssignmentNode;
 		expect(variableAssignmentNode.variable.name).to.equal('x');
 
 		const valueNode = variableAssignmentNode.value as BooleanNode
@@ -61,7 +65,8 @@ suite('AST tests for assignments', () => {
 		const result = generateAst('x = tree;');
 		expect(result).to.have.length(1);
 
-		const variableAssignmentNode = result.at(0) as VariableAssignmentNode;
+		const statementNode = result.at(0) as StatementNode;
+		const variableAssignmentNode = statementNode.expression as VariableAssignmentNode;
 		expect(variableAssignmentNode.variable.name).to.equal('x');
 
 		const valueNode = variableAssignmentNode.value as VariableNode
@@ -72,19 +77,40 @@ suite('AST tests for assignments', () => {
 		const result = generateAst('{a, b, c} = args;');
 		expect(result).to.have.length(1);
 
-		const listAssignmentNode = result.at(0) as ListAssignmentNode;
-		expect(listAssignmentNode.variables).to.have.length(3);
+		const statementNode = result.at(0) as StatementNode;
+		const listAssignmentNode = statementNode.expression as ListAssignmentNode;
+		expect(listAssignmentNode.variables.entries).to.have.length(3);
 
-		const variableNodeA = listAssignmentNode.variables.at(0) as VariableNode;
+		const variableNodeA = listAssignmentNode.variables.entries.at(0) as VariableNode;
 		expect(variableNodeA.name).to.equal('a');
 
-		const variableNodeB = listAssignmentNode.variables.at(1) as VariableNode;
+		const variableNodeB = listAssignmentNode.variables.entries.at(1) as VariableNode;
 		expect(variableNodeB.name).to.equal('b');
 
-		const variableNodeC = listAssignmentNode.variables.at(2) as VariableNode;
+		const variableNodeC = listAssignmentNode.variables.entries.at(2) as VariableNode;
 		expect(variableNodeC.name).to.equal('c');
 
 		const valueNode = listAssignmentNode.value as VariableNode
 		expect(valueNode.name).to.equal('args');
+	});
+
+	test('should generate PropertyAssignmentNode for property to property assignment', () => {
+		const result = generateAst('bob.name = smurf.surname;');
+		expect(result).to.have.length(1);
+
+		const statementNode = result.at(0) as StatementNode;
+		const propertyAssignmentNode = statementNode.expression as PropertyAssignmentNode;
+
+		const targetProperty = propertyAssignmentNode.property as PropertyAccessorNode;
+		expect(targetProperty.name).to.equal('name');
+
+		const targetPropertyObject = targetProperty.object as VariableNode;
+		expect(targetPropertyObject.name).to.equal('bob');
+
+		const valueProperty = propertyAssignmentNode.value as PropertyAccessor;
+		expect(valueProperty.name).to.equal('surname');
+
+		const valuePropertyObject = valueProperty.object as VariableNode;
+		expect(valuePropertyObject.name).to.equal('smurf');
 	});
 });

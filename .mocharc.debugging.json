@@ -4,9 +4,10 @@
         "ts"
     ],
     "spec": [
-        "tests/test-utils/*.test.ts"
+        "tests/**/*.test.ts"
     ],
     "ignore": [],
     "require": "ts-node/register",
-    "bail": false
+    "bail": false,
+    "reporter": "./tests/test-utils/custom-reporter.ts"
 }

@@ -61,19 +61,19 @@ export abstract class ReferenceNode extends BaseNode {
 	}
 }
 
-export abstract class TwoPartNode extends BaseNode {
-	protected _left: BaseNode;
-	protected _right: BaseNode;
+export abstract class TwoPartNode<T1 extends BaseNode, T2 extends BaseNode> extends BaseNode {
+	protected _left: T1;
+	protected _right: T2;
 
-	public left(): BaseNode {
+	public left(): T1 {
 		return this._left;
 	}
 
-	public right(): BaseNode {
+	public right(): T2 {
 		return this._right;
 	}
 
-	public constructor(position: ContextPosition, left: BaseNode, right: BaseNode) {
+	public constructor(position: ContextPosition, left: T1, right: T2) {
 		super(position);
 
 		this._left = left;
@@ -81,7 +81,46 @@ export abstract class TwoPartNode extends BaseNode {
 	}
 }
 
-export abstract class SingleValueVisitor<T> extends MoocodeParserVisitor<T> {
+export abstract class WrappedNode<T extends BaseNode> extends BaseNode {
+	protected _value: T;
+
+	public value(): T {
+		return this._value;
+	}
+
+	public constructor(position: ContextPosition, value: T) {
+		super(position);
+
+		this._value = value;
+	}
+}
+
+export class FlowControlStatementNode<T extends BaseNode> extends BaseNode {
+	private _value: T | undefined;
+
+	public get value(): T | undefined {
+		return this._value;
+	}
+
+	public constructor(position: ContextPosition, value?: T) {
+		super(position);
+
+		this._value = value;
+	}
+
+	public toString(): string {
+		const base = super.toString();
+
+		let value = '';
+		if (this._value) {
+			value = ` ${this._value.toString()}`;
+		}
+
+		return `${value}; (${base})`;
+	}
+}
+
+export abstract class SingleValueVisitor<T extends BaseNode> extends MoocodeParserVisitor<T> {
 	public override visit(tree: ParseTree): T {
 		const result = super.visit(tree);
 
