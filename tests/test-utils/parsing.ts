@@ -13,6 +13,7 @@ import {
     Equality_expressionContext,
     Error_catcherContext,
     Exclusive_or_expressionContext,
+    For_expressionContext,
     For_loop_statementContext,
     Fork_statementContext,
     If_statementContext,
@@ -24,6 +25,7 @@ import {
     Non_empty_continueContext,
     Non_empty_returnContext,
     Primary_expressionContext,
+    Ranged_for_expressionContext,
     Relational_expressionContext,
     Shift_expressionContext,
     Try_statementContext,
@@ -263,6 +265,16 @@ export default class ParsingHelpers {
     public static getForStatement(context: ParserRuleContext | undefined)
         : For_loop_statementContext | undefined {
         return this.getContext<For_loop_statementContext>(context, For_loop_statementContext);
+    }
+
+    public static getForExpression(context: ParserRuleContext | undefined)
+        : For_expressionContext | undefined {
+        return this.getContext<For_expressionContext>(context, For_expressionContext);
+    }
+
+    public static getRangedForExpression(context: ParserRuleContext | undefined)
+        : Ranged_for_expressionContext | undefined {
+        return this.getContext<Ranged_for_expressionContext>(context, Ranged_for_expressionContext);
     }
 
     // eslint-disable-next-line @typescript-eslint/no-explicit-any

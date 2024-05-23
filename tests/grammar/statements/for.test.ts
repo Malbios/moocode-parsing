@@ -18,15 +18,16 @@ endfor
     ExpectHelpers.expectSyntaxErrors(parser, 0);
 
     const forStatement = ParsingHelpers.getForStatement(result);
+    const forExpression = ParsingHelpers.getForExpression(forStatement);
 
-    ExpectHelpers.expectIdentifier(forStatement?._value, 'n');
+    const rangedForExpression = ParsingHelpers.getRangedForExpression(forStatement);
+    expect(rangedForExpression).not.to.exist;
 
-    expect(forStatement?._key).not.to.exist;
+    ExpectHelpers.expectIdentifier(forExpression?._value, 'n');
 
-    expect(forStatement?._start).not.to.exist;
-    expect(forStatement?._end).not.to.exist;
+    expect(forExpression?._key).not.to.exist;
 
-    const rangeList = ParsingHelpers.getList(forStatement?._range);
+    const rangeList = ParsingHelpers.getList(forExpression?._range);
 
     expect(rangeList?.expression_list()).to.have.length(3);
 
@@ -54,15 +55,15 @@ endfor
     ExpectHelpers.expectSyntaxErrors(parser, 0);
 
     const forStatement = ParsingHelpers.getForStatement(result);
+    const forExpression = ParsingHelpers.getForExpression(forStatement);
 
-    ExpectHelpers.expectIdentifier(forStatement?._value, 'n');
+    const rangedForExpression = ParsingHelpers.getRangedForExpression(forStatement);
+    expect(rangedForExpression).not.to.exist;
 
-    ExpectHelpers.expectIdentifier(forStatement?._key, 'k');
+    ExpectHelpers.expectIdentifier(forExpression?._value, 'n');
+    ExpectHelpers.expectIdentifier(forExpression?._key, 'k');
 
-    expect(forStatement?._start).not.to.exist;
-    expect(forStatement?._end).not.to.exist;
-
-    const rangeList = ParsingHelpers.getList(forStatement?._range);
+    const rangeList = ParsingHelpers.getList(forExpression?._range);
 
     expect(rangeList?.expression_list()).to.have.length(3);
 
@@ -90,16 +91,16 @@ endfor
     ExpectHelpers.expectSyntaxErrors(parser, 0);
 
     const forStatement = ParsingHelpers.getForStatement(result);
+    const rangedForExpression = ParsingHelpers.getRangedForExpression(forStatement);
 
-    ExpectHelpers.expectIdentifier(forStatement?._value, 'o');
+    const forExpression = ParsingHelpers.getForExpression(forStatement);
+    expect(forExpression).not.to.exist;
 
-    expect(forStatement?._key).not.to.exist;
+    ExpectHelpers.expectIdentifier(rangedForExpression?._value, 'o');
 
-    expect(forStatement?._range).not.to.exist;
+    ExpectHelpers.expectObjectId(rangedForExpression?._start, '#0');
 
-    ExpectHelpers.expectObjectId(forStatement?._start, '#0');
-
-    const primaryExpression = ParsingHelpers.getPrimaryExpression(forStatement?._end);
+    const primaryExpression = ParsingHelpers.getPrimaryExpression(rangedForExpression?._end);
 
     ExpectHelpers.expectIdentifier(primaryExpression?._pe, 'max_object');
     expect(primaryExpression?.bf_invocation_list()).to.have.length(1);
@@ -124,15 +125,16 @@ endfor
     ExpectHelpers.expectSyntaxErrors(parser, 0);
 
     const forStatement = ParsingHelpers.getForStatement(result);
+    const forExpression = ParsingHelpers.getForExpression(forStatement);
 
-    ExpectHelpers.expectIdentifier(forStatement?._value, 'n');
+    const rangedForExpression = ParsingHelpers.getRangedForExpression(forStatement);
+    expect(rangedForExpression).not.to.exist;
 
-    expect(forStatement?._key).not.to.exist;
+    ExpectHelpers.expectIdentifier(forExpression?._value, 'n');
 
-    expect(forStatement?._start).not.to.exist;
-    expect(forStatement?._end).not.to.exist;
+    expect(forExpression?._key).not.to.exist;
 
-    const rangeList = ParsingHelpers.getList(forStatement?._range);
+    const rangeList = ParsingHelpers.getList(forExpression?._range);
 
     expect(rangeList?.expression_list()).to.have.length(1);
 
@@ -141,15 +143,16 @@ endfor
     expect(forStatement?.statements().statement_list()).to.have.length(1);
 
     const innerForStatement = ParsingHelpers.getForStatement(forStatement?.statements().statement(0));
+    const innerForExpression = ParsingHelpers.getForExpression(innerForStatement);
 
-    ExpectHelpers.expectIdentifier(innerForStatement?._value, 'm');
+    const innerRangedForExpression = ParsingHelpers.getRangedForExpression(innerForStatement);
+    expect(innerRangedForExpression).not.to.exist;
 
-    expect(innerForStatement?._key).not.to.exist;
+    ExpectHelpers.expectIdentifier(innerForExpression?._value, 'm');
 
-    expect(innerForStatement?._start).not.to.exist;
-    expect(innerForStatement?._end).not.to.exist;
+    expect(innerForExpression?._key).not.to.exist;
 
-    const innerRangeList = ParsingHelpers.getList(innerForStatement?._range);
+    const innerRangeList = ParsingHelpers.getList(innerForExpression?._range);
 
     expect(innerRangeList?.expression_list()).to.have.length(1);
 

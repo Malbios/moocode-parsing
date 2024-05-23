@@ -1,11 +1,11 @@
 import { ParserRuleContext } from 'antlr4';
-import { CommentContext, Elseif_expressionContext, Empty_breakContext, Empty_continueContext, Empty_returnContext, Empty_statementContext, If_expressionContext, If_statementContext, Non_empty_breakContext, Non_empty_continueContext, Non_empty_returnContext, StatementContext } from '../grammar/generated/MoocodeParser';
+import { CommentContext, Elseif_expressionContext, Empty_breakContext, Empty_continueContext, Empty_returnContext, Empty_statementContext, For_loop_statementContext, If_expressionContext, If_statementContext, Non_empty_breakContext, Non_empty_continueContext, Non_empty_returnContext, StatementContext } from '../grammar/generated/MoocodeParser';
 import { Action } from '../interfaces';
 import { SingleValueVisitor } from './abstract';
 import { ContextPosition } from './common';
 import { NodeGenerationError } from './error';
 import { ExpressionGenerator, ValueGenerator } from './expression-generator';
-import { BreakStatementNode, CommentStatementNode, ContinueStatementNode, ElseNode, EmptyStatementNode, Expression, ExpressionStatementNode, IfNode, IfStatementNode, ReturnStatementNode, Statement } from './nodes';
+import { BreakStatementNode, CommentStatementNode, ContinueStatementNode, ElseNode, EmptyStatementNode, Expression, ExpressionStatementNode, ForStatementNode, IfNode, IfStatementNode, RangedForStatementNode, ReturnStatementNode, Statement, VariableNode } from './nodes';
 
 function handleErrors(action: Action<void>) {
 	try {
@@ -52,6 +52,34 @@ export class StatementGenerator extends SingleValueVisitor<Statement> {
 		}
 
 		return new IfStatementNode(ContextPosition.fromContext(context), ifNode, elseIfNodes, elseNode);
+	}
+
+	public override visitFor_loop_statement = (context: For_loop_statementContext): ForStatementNode | RangedForStatementNode => {
+		const position = ContextPosition.fromContext(context);
+		const statements = StatementGenerator.generateStatements(context.statements().statement_list());
+
+		const forExpression = context.for_expression();
+		const rangedForExpression = context.ranged_for_expression();
+
+		if (forExpression) {
+			const value = ValueGenerator.generate<VariableNode>(forExpression._value);
+			const rangeExpression = ExpressionGenerator.generateExpression(forExpression._range);
+
+			if (forExpression._key) {
+				const keyOrIndex = ValueGenerator.generate<VariableNode>(forExpression._key);
+				return ForStatementNode.withKeyOrIndex(position, value, keyOrIndex, rangeExpression, statements);
+			} else {
+				return ForStatementNode.new(position, value, rangeExpression, statements);
+			}
+		} else if (rangedForExpression) {
+			const value = ValueGenerator.generate<VariableNode>(rangedForExpression._value);
+			const rangeStart = ExpressionGenerator.generateExpression(rangedForExpression._start);
+			const rangeEnd = ExpressionGenerator.generateExpression(rangedForExpression._end);
+
+			return new RangedForStatementNode(position, value, rangeStart, rangeEnd, statements);
+		} else {
+			throw NodeGenerationError.fromContext(context);
+		}
 	}
 
 	public override visitEmpty_return = (context: Empty_returnContext): ReturnStatementNode => {
