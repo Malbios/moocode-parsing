@@ -45,7 +45,17 @@ export class ContextPosition {
 	}
 
 	public get range(): string {
-		return `${this._start.line}:${this._start.column} - ${this._stop?.line ?? 0}:${this._stop?.column ?? 0}`;
+		const start = `${this._start.line}:${this._start.column}`;
+		const stopLine = this._stop?.line ?? 0;
+
+		let stopColumn = this._stop?.column ?? 0;
+		if (this._stop) {
+			stopColumn += this._stop.getInputStream().getText(this._stop.start, this._stop.stop).length;
+		}
+
+		const stop = `${stopLine}:${stopColumn}`;
+
+		return `${start} - ${stop}`;
 	}
 
 	private constructor(start: Token, stop: Token | undefined) {

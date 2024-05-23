@@ -1,9 +1,9 @@
 import { ParserRuleContext } from 'antlr4';
-import { AssignmentContext, Bf_invocationContext, Bool_literalContext, Complement_unary_expressionContext, Corified_valueContext, Error_catcherContext, Error_codeContext, ExpressionsContext, Float_literalContext, IdentifierContext, IndexerContext, Integer_literalContext, ListContext, MapContext, Map_entryContext, Negated_unary_expressionContext, Negative_unary_expressionContext, Object_idContext, Parented_expressionContext, Primary_expressionContext, Primary_expression_startContext, Property_accessorContext, String_literalContext, Verb_invocationContext } from '../grammar/generated/MoocodeParser';
+import { AssignmentContext, Bf_invocationContext, Bool_literalContext, Complement_unary_expressionContext, Corified_valueContext, Error_catcherContext, Error_codeContext, ExpressionsContext, Float_literalContext, IdentifierContext, IndexerContext, Integer_literalContext, ListContext, List_slicerContext, MapContext, Map_entryContext, Negated_unary_expressionContext, Negative_unary_expressionContext, Object_idContext, Parented_expressionContext, Primary_expressionContext, Primary_expression_startContext, Property_accessorContext, String_literalContext, Verb_invocationContext } from '../grammar/generated/MoocodeParser';
 import { SingleValueVisitor } from './abstract';
 import { ContextPosition, ErrorCode, getContextAsText } from './common';
-import { NodeGenerationError, NotImplementedError } from './error';
-import { ArgumentIndexerNode, ArgumentIndexerNodeInfo, BooleanNode, BuiltInFunctionInvocationNode, CallInfo, ComplementNode, ComputedPropertyAccessorNode, ComputedPropertyAccessorNodeInfo, ComputedVerbInvocationNode, ComputedVerbInvocationNodeInfo, CorifiedValueNode, CorifiedVerbInvocationNode, ErrorCatcherNode, ErrorNode, Expression, FloatNode, Indexer, InfoNode, IntegerNode, Invocation, ListAssignmentNode, ListNode, MapEntryNode, MapNode, NegatedNode, NegativeNode, ObjectIdNode, PropertyAccessor, PropertyAccessorNode, PropertyAccessorNodeInfo, PropertyAssignmentNode, RangeIndexerNode, RangeIndexerNodeInfo, StringNode, Value, VariableAssignmentNode, VariableNode, VerbInvocationNode, VerbInvocationNodeInfo } from './nodes';
+import { NodeGenerationError } from './error';
+import { ArgumentIndexerNode, ArgumentIndexerNodeInfo, BooleanNode, BuiltInFunctionInvocationNode, CallInfo, ComplementNode, ComputedPropertyAccessorNode, ComputedPropertyAccessorNodeInfo, ComputedVerbInvocationNode, ComputedVerbInvocationNodeInfo, CorifiedValueNode, CorifiedVerbInvocationNode, ErrorCatcherNode, ErrorCodeNode, Expression, FloatNode, Indexer, InfoNode, IntegerNode, Invocation, ListAssignmentNode, ListNode, ListSlicerNode, MapEntryNode, MapNode, NegatedNode, NegativeNode, ObjectIdNode, ParenthesesNode, PropertyAccessor, PropertyAccessorNode, PropertyAccessorNodeInfo, PropertyAssignmentNode, RangeIndexerNode, RangeIndexerNodeInfo, StringNode, Value, VariableAssignmentNode, VariableNode, VerbInvocationNode, VerbInvocationNodeInfo } from './nodes';
 
 function hasNoIndexerAccessorOrInvocation(context: Primary_expressionContext): boolean {
 	return (context.indexer_list().length === 0 && context.property_accessor_list().length === 0 && context.verb_invocation_list().length === 0 && context.bf_invocation_list().length === 0);
@@ -35,20 +35,20 @@ function generateNodeFromInfo(context: ParserRuleContext, object: Expression, in
 	throw NodeGenerationError.fromContext(context);
 }
 
-class ValueGenerator extends SingleValueVisitor<Value> {
-	public override visitObject_id = (context: Object_idContext): Expression => {
+export class ValueGenerator extends SingleValueVisitor<Value> {
+	public override visitObject_id = (context: Object_idContext): ObjectIdNode => {
 		return new ObjectIdNode(ContextPosition.fromContext(context), getContextAsText(context));
 	}
 
-	public override visitCorified_value = (context: Corified_valueContext): Expression => {
+	public override visitCorified_value = (context: Corified_valueContext): CorifiedValueNode => {
 		return new CorifiedValueNode(ContextPosition.fromContext(context), getContextAsText(context.identifier()));
 	}
 
-	public override visitIdentifier = (context: IdentifierContext): Expression => {
+	public override visitIdentifier = (context: IdentifierContext): VariableNode => {
 		return new VariableNode(ContextPosition.fromContext(context), getContextAsText(context));
 	}
 
-	public override visitMap = (context: MapContext): Expression => {
+	public override visitMap = (context: MapContext): MapNode => {
 		const entries = Array<MapEntryNode>();
 
 		for (const x of context.map_entry_list()) {
@@ -58,14 +58,14 @@ class ValueGenerator extends SingleValueVisitor<Value> {
 		return new MapNode(ContextPosition.fromContext(context), entries);
 	}
 
-	public override visitMap_entry = (context: Map_entryContext): Expression => {
+	public override visitMap_entry = (context: Map_entryContext): MapEntryNode => {
 		const key = ExpressionGenerator.generateExpression(context._map_key);
 		const value = ExpressionGenerator.generateExpression(context._map_value);
 
 		return new MapEntryNode(ContextPosition.fromContext(context), key, value);
 	}
 
-	public override visitList = (context: ListContext): Expression => {
+	public override visitList = (context: ListContext): ListNode => {
 		const entries = Array<Expression>();
 
 		for (const x of context.expression_list()) {
@@ -75,32 +75,51 @@ class ValueGenerator extends SingleValueVisitor<Value> {
 		return new ListNode(ContextPosition.fromContext(context), entries);
 	}
 
-	public override visitString_literal = (context: String_literalContext): Expression => {
+	public override visitString_literal = (context: String_literalContext): StringNode => {
 		return new StringNode(ContextPosition.fromContext(context), JSON.parse(getContextAsText(context)));
 	}
 
-	public override visitInteger_literal = (context: Integer_literalContext): Expression => {
+	public override visitInteger_literal = (context: Integer_literalContext): IntegerNode => {
 		return new IntegerNode(ContextPosition.fromContext(context), JSON.parse(getContextAsText(context)));
 	}
 
-	public override visitFloat_literal = (context: Float_literalContext): Expression => {
+	public override visitFloat_literal = (context: Float_literalContext): FloatNode => {
 		return new FloatNode(ContextPosition.fromContext(context), JSON.parse(getContextAsText(context)));
 	}
 
-	public override visitBool_literal = (context: Bool_literalContext): Expression => {
+	public override visitBool_literal = (context: Bool_literalContext): BooleanNode => {
 		return new BooleanNode(ContextPosition.fromContext(context), JSON.parse(getContextAsText(context)));
 	}
 
-	public override visitError_code = (context: Error_codeContext): Expression => {
+	public override visitError_code = (context: Error_codeContext): ErrorCodeNode => {
 		const key = getContextAsText(context) as keyof typeof ErrorCode;
-		return new ErrorNode(ContextPosition.fromContext(context), ErrorCode[key]);
+		return new ErrorCodeNode(ContextPosition.fromContext(context), ErrorCode[key]);
+	}
+
+	public override visitError_catcher = (context: Error_catcherContext): ErrorCatcherNode => {
+		const tryExpression = ExpressionGenerator.generateExpression(context._try_);
+		const errorCodes = ExpressionGenerator.generateExpressions(context.error_codes());
+		const onErrorExpression = ExpressionGenerator.generateExpression(context._on_error);
+
+		return new ErrorCatcherNode(ContextPosition.fromContext(context), tryExpression, errorCodes, onErrorExpression);
+	}
+
+	public override visitList_slicer = (context: List_slicerContext): ListSlicerNode => {
+		const expression = ValueGenerator.generateValue(context.identifier());
+		return new ListSlicerNode(ContextPosition.fromContext(context), expression);
+	}
+
+	public override visitParented_expression = (context: Parented_expressionContext): ParenthesesNode => {
+		const innerExpression = ExpressionGenerator.generateExpression(context.expression());
+
+		return new ParenthesesNode(ContextPosition.fromContext(context), innerExpression);
 	}
 
 	private constructor() {
 		super();
 	}
 
-	public static generate<T extends Value>(context: Primary_expression_startContext): T {
+	public static generate<T extends Value>(context: ParserRuleContext): T {
 		const generator = new ValueGenerator();
 		const result = generator.visit(context) as T;
 
@@ -111,19 +130,20 @@ class ValueGenerator extends SingleValueVisitor<Value> {
 		return result;
 	}
 
-	public static generateValue(context: Primary_expression_startContext): Expression {
-		return ValueGenerator.generate<Expression>(context);
+	public static generateValue(context: ParserRuleContext): Value {
+		return ValueGenerator.generate<Value>(context);
 	}
 }
 
 export class ExpressionGenerator extends SingleValueVisitor<Expression> {
-	public override visitPrimary_expression = (context: Primary_expressionContext): Expression => {
+	public override visitPrimary_expression = (context: Primary_expressionContext): Value | Indexer | PropertyAccessor | Invocation => {
 		if (hasNoIndexerAccessorOrInvocation(context)) {
 			return ValueGenerator.generateValue(context._pe);
 		}
 
 		const children = context.children as ParserRuleContext[];
-		let expression = ValueGenerator.generateValue(context._pe);
+		let expression: Value | Indexer | PropertyAccessor | Invocation;
+		expression = ValueGenerator.generateValue(context._pe);
 
 		for (let i = 1; i < children.length; i++) {
 			const info = ExpressionGenerator.generate<InfoNode>(children[i] as ParserRuleContext);
@@ -133,15 +153,11 @@ export class ExpressionGenerator extends SingleValueVisitor<Expression> {
 		return expression;
 	}
 
-	public override visitPrimary_expression_start = (context: Primary_expression_startContext): Expression => {
+	public override visitPrimary_expression_start = (context: Primary_expression_startContext): Value => {
 		return ValueGenerator.generateValue(context);
 	}
 
-	public override visitParented_expression = (context: Parented_expressionContext): Expression => {
-		return this.visit(context.expression());
-	}
-
-	public override visitAssignment = (context: AssignmentContext): Expression => {
+	public override visitAssignment = (context: AssignmentContext): VariableAssignmentNode | ListAssignmentNode | PropertyAssignmentNode => {
 		const leftNode = ExpressionGenerator.generateExpression(context.unary_expression());
 		const rightNode = ExpressionGenerator.generateExpression(context.expression());
 
@@ -157,28 +173,20 @@ export class ExpressionGenerator extends SingleValueVisitor<Expression> {
 			return new PropertyAssignmentNode(ContextPosition.fromContext(context), leftNode, rightNode);
 		}
 
-		throw NotImplementedError.withMessage(context, 'assignment with left side not being a variable or list');
+		throw NodeGenerationError.fromContext(context);
 	}
 
-	public override visitError_catcher = (context: Error_catcherContext): Expression => {
-		const tryExpression = ExpressionGenerator.generateExpression(context._try_);
-		const errorCodes = ExpressionGenerator.generate(context.error_codes().error_code_list());
-		const onErrorExpression = ExpressionGenerator.generateExpression(context._on_error);
-
-		return new ErrorCatcherNode(ContextPosition.fromContext(context), tryExpression, errorCodes, onErrorExpression);
-	}
-
-	public override visitNegated_unary_expression = (context: Negated_unary_expressionContext): Expression => {
+	public override visitNegated_unary_expression = (context: Negated_unary_expressionContext): NegatedNode => {
 		const innerExpression = ExpressionGenerator.generateExpression(context.unary_expression());
 		return new NegatedNode(ContextPosition.fromContext(context), innerExpression);
 	}
 
-	public override visitNegative_unary_expression = (context: Negative_unary_expressionContext): Expression => {
+	public override visitNegative_unary_expression = (context: Negative_unary_expressionContext): NegativeNode => {
 		const innerExpression = ExpressionGenerator.generateExpression(context.unary_expression());
 		return new NegativeNode(ContextPosition.fromContext(context), innerExpression);
 	}
 
-	public override visitComplement_unary_expression = (context: Complement_unary_expressionContext): Expression => {
+	public override visitComplement_unary_expression = (context: Complement_unary_expressionContext): ComplementNode => {
 		const innerExpression = ExpressionGenerator.generateExpression(context.unary_expression());
 		return new ComplementNode(ContextPosition.fromContext(context), innerExpression);
 	}
@@ -224,6 +232,7 @@ export class ExpressionGenerator extends SingleValueVisitor<Expression> {
 	public override visitBf_invocation = (context: Bf_invocationContext): CallInfo => {
 		const position = ContextPosition.fromContext(context);
 		const argumentExpressions = ExpressionGenerator.generateExpressions(context._arguments);
+
 		return new CallInfo(position, argumentExpressions);
 	}
 

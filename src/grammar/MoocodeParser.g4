@@ -74,14 +74,16 @@ try_statement:
 	) ENDTRY;
 
 try_except:
-	EXCEPT identifier OPEN_PARENS (error_codes | ANY_ERROR) CLOSE_PARENS statements;
+	EXCEPT identifier OPEN_PARENS error_codes CLOSE_PARENS statements;
 
 try_finally: FINALLY statements;
 
 fork_statement:
 	FORK (name = identifier)? OPEN_PARENS schedule = expression CLOSE_PARENS statements ENDFORK;
 
-error_codes: error_code (COMMA error_code)*;
+error_codes: any_error | (expression (COMMA expression)*);
+
+any_error: ANY_ERROR;
 
 expression: assignment | non_assignment;
 

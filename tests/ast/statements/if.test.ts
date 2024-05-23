@@ -40,7 +40,7 @@ endif
 		expect(ifStatementNode.if.body).to.have.length(1);
 
 		const returnStatement = ifStatementNode.if.body.at(0) as ReturnStatementNode;
-		expect(returnStatement.expression).not.to.exist;
+		expect(returnStatement.value).not.to.exist;
 		expect(ifStatementNode.elseifs).to.have.length(0);
 		expect(ifStatementNode.else).not.to.exist;
 	});
@@ -89,7 +89,7 @@ endif
 		expect(elseNode.body).to.have.length(1);
 
 		const returnStatement = elseNode.body.at(0) as ReturnStatementNode;
-		const booleanValueNode = returnStatement.expression as BooleanNode;
+		const booleanValueNode = returnStatement.value as BooleanNode;
 		expect(booleanValueNode.value).to.equal(false);
 	});
 
@@ -131,7 +131,7 @@ endif
 		expect(elseIfNode?.body).to.have.length(1);
 
 		const returnNode = elseIfNode?.body.at(0) as ReturnStatementNode;
-		const returnValue = returnNode.expression as BooleanNode;
+		const returnValue = returnNode.value as BooleanNode;
 		expect(returnValue.value).to.equal(true);
 
 		expect(ifStatementNode.else).not.to.exist;
@@ -208,7 +208,7 @@ endif
 
 		const ifReturn = ifStatementNode.if.body.at(0) as ReturnStatementNode;
 		expect(ifReturn).to.exist;
-		expect(ifReturn.expression).to.not.exist;
+		expect(ifReturn.value).to.not.exist;
 
 		expect(ifStatementNode.elseifs).to.have.length(1);
 
@@ -218,7 +218,7 @@ endif
 
 		const elseifReturn = elseIfNode?.body.at(0) as ReturnStatementNode;
 		expect(elseifReturn).to.exist;
-		expect(elseifReturn.expression).to.not.exist;
+		expect(elseifReturn.value).to.not.exist;
 
 		expect(ifStatementNode.else?.body).to.have.length(1);
 
@@ -227,6 +227,6 @@ endif
 
 		const elseReturn = elseNode.body.at(0) as ReturnStatementNode;
 		expect(elseReturn).to.exist;
-		expect(elseReturn.expression).to.not.exist;
+		expect(elseReturn.value).to.not.exist;
 	});
 });

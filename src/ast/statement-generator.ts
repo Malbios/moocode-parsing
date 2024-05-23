@@ -1,11 +1,11 @@
 import { ParserRuleContext } from 'antlr4';
-import { AssignmentContext, CommentContext, Elseif_expressionContext, Empty_returnContext, Empty_statementContext, If_expressionContext, If_statementContext, Non_empty_returnContext, Primary_expressionContext } from '../grammar/generated/MoocodeParser';
+import { CommentContext, Elseif_expressionContext, Empty_breakContext, Empty_continueContext, Empty_returnContext, Empty_statementContext, If_expressionContext, If_statementContext, Non_empty_breakContext, Non_empty_continueContext, Non_empty_returnContext, StatementContext } from '../grammar/generated/MoocodeParser';
 import { Action } from '../interfaces';
 import { SingleValueVisitor } from './abstract';
 import { ContextPosition } from './common';
 import { NodeGenerationError } from './error';
-import { ExpressionGenerator } from './expression-generator';
-import { Assignment, CommentStatementNode, ElseNode, EmptyStatementNode, Expression, IfNode, IfStatementNode, ReturnStatementNode, Statement } from './nodes';
+import { ExpressionGenerator, ValueGenerator } from './expression-generator';
+import { BreakStatementNode, CommentStatementNode, ContinueStatementNode, ElseNode, EmptyStatementNode, Expression, IfNode, IfStatementNode, ReturnStatementNode, Statement, StatementNode } from './nodes';
 
 function handleErrors(action: Action<void>) {
 	try {
@@ -27,7 +27,16 @@ function generateIfNode(context: If_expressionContext | Elseif_expressionContext
 }
 
 export class StatementGenerator extends SingleValueVisitor<Statement> {
-	public override visitIf_statement = (context: If_statementContext): Statement => {
+	public override visitStatement = (context: StatementContext): Statement => {
+		if (context.expression()) {
+			const expression = ExpressionGenerator.generateExpression(context.expression());
+			return new StatementNode(ContextPosition.fromContext(context), expression);
+		}
+
+		return this.visit(context.getChild(0));
+	}
+
+	public override visitIf_statement = (context: If_statementContext): IfStatementNode => {
 		const ifNode = generateIfNode(context.if_expression());
 
 		const elseIfNodes = new Array<IfNode>();
@@ -45,29 +54,39 @@ export class StatementGenerator extends SingleValueVisitor<Statement> {
 		return new IfStatementNode(ContextPosition.fromContext(context), ifNode, elseIfNodes, elseNode);
 	}
 
-	public override visitAssignment = (context: AssignmentContext): Statement => {
-		return ExpressionGenerator.generate<Assignment>(context);
-	}
-
-	public override visitEmpty_return = (context: Empty_returnContext): Statement => {
+	public override visitEmpty_return = (context: Empty_returnContext): ReturnStatementNode => {
 		return new ReturnStatementNode(ContextPosition.fromContext(context));
 	}
 
-	public override visitNon_empty_return = (context: Non_empty_returnContext): Statement => {
-		const returnExpressionNode = ExpressionGenerator.generate<Expression>(context.expression());
-		return new ReturnStatementNode(ContextPosition.fromContext(context), returnExpressionNode);
+	public override visitNon_empty_return = (context: Non_empty_returnContext): ReturnStatementNode => {
+		const expression = ExpressionGenerator.generateExpression(context.expression());
+		return new ReturnStatementNode(ContextPosition.fromContext(context), expression);
 	}
 
-	public override visitComment = (context: CommentContext): Statement => {
+	public override visitEmpty_continue = (context: Empty_continueContext): ContinueStatementNode => {
+		return new ContinueStatementNode(ContextPosition.fromContext(context));
+	}
+
+	public override visitNon_empty_continue = (context: Non_empty_continueContext): ContinueStatementNode => {
+		const expression = ValueGenerator.generateValue(context.identifier());
+		return new ContinueStatementNode(ContextPosition.fromContext(context), expression);
+	}
+
+	public override visitEmpty_break = (context: Empty_breakContext): BreakStatementNode => {
+		return new BreakStatementNode(ContextPosition.fromContext(context));
+	}
+
+	public override visitNon_empty_break = (context: Non_empty_breakContext): BreakStatementNode => {
+		const expression = ValueGenerator.generateValue(context.identifier());
+		return new BreakStatementNode(ContextPosition.fromContext(context), expression);
+	}
+
+	public override visitComment = (context: CommentContext): CommentStatementNode => {
 		return new CommentStatementNode(ContextPosition.fromContext(context), JSON.parse(context.STRING_LITERAL().getText()));
 	}
 
-	public override visitEmpty_statement = (context: Empty_statementContext): Statement => {
+	public override visitEmpty_statement = (context: Empty_statementContext): EmptyStatementNode => {
 		return new EmptyStatementNode(ContextPosition.fromContext(context));
-	}
-
-	public override visitPrimary_expression = (context: Primary_expressionContext): Statement => {
-		return ExpressionGenerator.generateExpression(context);
 	}
 
 	private constructor() {

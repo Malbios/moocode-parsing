@@ -1,5 +1,5 @@
-import { suite, test } from 'mocha';
 import { expect } from 'chai';
+import { suite, test } from 'mocha';
 
 import CommonHelpers from '../../test-utils/common';
 import ExpectHelpers from '../../test-utils/expectations';
@@ -33,8 +33,8 @@ endtry
     const except = tryStatement?.try_except(0);
 
     ExpectHelpers.expectIdentifier(except?.identifier(), 'ex');
-    expect(except?.error_codes().error_code_list()).to.have.length(1);
-    ExpectHelpers.expectError(except?.error_codes().error_code(0), 'E_VARNF');
+    expect(except?.error_codes().expression_list()).to.have.length(1);
+    ExpectHelpers.expectError(except?.error_codes().expression(0), 'E_VARNF');
 
     expect(except?.statements().statement_list()).to.have.length(1);
 
@@ -109,8 +109,8 @@ endtry
     const except = tryStatement?.try_except(0);
 
     ExpectHelpers.expectIdentifier(except?.identifier(), 'ex');
-    expect(except?.error_codes().error_code_list()).to.have.length(1);
-    ExpectHelpers.expectError(except?.error_codes().error_code(0), 'E_VARNF');
+    expect(except?.error_codes().expression_list()).to.have.length(1);
+    ExpectHelpers.expectError(except?.error_codes().expression(0), 'E_VARNF');
 
     expect(except?.statements().statement_list()).to.have.length(1);
 
@@ -156,9 +156,9 @@ endtry
     const except = tryStatement?.try_except(0);
 
     ExpectHelpers.expectIdentifier(except?.identifier(), 'ex');
-    expect(except?.error_codes().error_code_list()).to.have.length(2);
-    ExpectHelpers.expectError(except?.error_codes().error_code(0), 'E_VARNF');
-    ExpectHelpers.expectError(except?.error_codes().error_code(1), 'E_PROPNF');
+    expect(except?.error_codes().expression_list()).to.have.length(2);
+    ExpectHelpers.expectError(except?.error_codes().expression(0), 'E_VARNF');
+    ExpectHelpers.expectError(except?.error_codes().expression(1), 'E_PROPNF');
 
     expect(except?.statements().statement_list()).to.have.length(1);
 
@@ -198,7 +198,7 @@ endtry
 
     ExpectHelpers.expectIdentifier(except?.identifier(), 'ex');
     expect(except?.error_codes()).not.to.exist;
-    expect(except?.ANY_ERROR()).to.exist;
+    expect(except?.error_codes().any_error()).to.exist;
 
     const exceptPrimaryExpression = ParsingHelpers.getPrimaryExpression(except?.statements().statement(0));
     ExpectHelpers.expectIdentifier(exceptPrimaryExpression?._pe, 'y');
@@ -229,8 +229,8 @@ endtry
     const except = tryStatement?.try_except(0);
 
     ExpectHelpers.expectIdentifier(except?.identifier(), 'ex');
-    expect(except?.error_codes().error_code_list()).to.have.length(1);
-    ExpectHelpers.expectError(except?.error_codes().error_code(0), 'E_ARGS');
+    expect(except?.error_codes().expression_list()).to.have.length(1);
+    ExpectHelpers.expectError(except?.error_codes().expression(0), 'E_ARGS');
 
     expect(except?.statements().statement_list()).to.have.length(0);
 
@@ -268,8 +268,8 @@ endtry
     const exceptA = tryStatement?.try_except(0);
 
     ExpectHelpers.expectIdentifier(exceptA?.identifier(), 'ex');
-    expect(exceptA?.error_codes().error_code_list()).to.have.length(1);
-    ExpectHelpers.expectError(exceptA?.error_codes().error_code(0), 'E_VARNF');
+    expect(exceptA?.error_codes().expression_list()).to.have.length(1);
+    ExpectHelpers.expectError(exceptA?.error_codes().expression(0), 'E_VARNF');
 
     expect(exceptA?.statements().statement_list()).to.have.length(1);
 
@@ -281,8 +281,8 @@ endtry
     const exceptB = tryStatement?.try_except(1);
 
     ExpectHelpers.expectIdentifier(exceptB?.identifier(), 'ex');
-    expect(exceptB?.error_codes().error_code_list()).to.have.length(1);
-    ExpectHelpers.expectError(exceptB?.error_codes().error_code(0), 'E_ARGS');
+    expect(exceptB?.error_codes().expression_list()).to.have.length(1);
+    ExpectHelpers.expectError(exceptB?.error_codes().expression(0), 'E_ARGS');
 
     expect(exceptB?.statements().statement_list()).to.have.length(1);
 
