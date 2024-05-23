@@ -208,35 +208,35 @@ export class RangedForStatementNode extends BaseNode {
 
 export class WhileStatementNode extends BaseNode {
 	private _name: VariableNode | undefined;
-	private _expression: Expression;
+	private _conditions: Expression;
 	private _statements: Statement[];
 
 	public get name(): VariableNode | undefined {
 		return this._name;
 	}
 
-	public get expression(): Expression {
-		return this._expression;
+	public get conditions(): Expression {
+		return this._conditions;
 	}
 
 	public get statements(): Statement[] {
 		return this._statements;
 	}
 
-	private constructor(position: ContextPosition, expression: Expression, statements: Statement[], name?: VariableNode) {
+	private constructor(position: ContextPosition, conditions: Expression, statements: Statement[], name?: VariableNode) {
 		super(position);
 
-		this._expression = expression;
+		this._conditions = conditions;
 		this._statements = statements;
 		this._name = name;
 	}
 
-	public static new(position: ContextPosition, expression: Expression, statements: Statement[]): WhileStatementNode {
-		return new WhileStatementNode(position, expression, statements);
+	public static new(position: ContextPosition, conditions: Expression, statements: Statement[]): WhileStatementNode {
+		return new WhileStatementNode(position, conditions, statements);
 	}
 
-	public static withName(position: ContextPosition, expression: Expression, statements: Statement[], name: VariableNode): WhileStatementNode {
-		return new WhileStatementNode(position, expression, statements, name);
+	public static withName(position: ContextPosition, conditions: Expression, statements: Statement[], name: VariableNode): WhileStatementNode {
+		return new WhileStatementNode(position, conditions, statements, name);
 	}
 
 	public toString(lineInfo = true): string {
@@ -244,7 +244,7 @@ export class WhileStatementNode extends BaseNode {
 
 		const name = this._name ? `${this._name.toString(lineInfo)} ` : '';
 
-		return `while ${name}(${this._expression.toString(lineInfo)})\n${this._statements.map(x => x.toString(lineInfo)).join('\n')}\nendwhile${base}`;
+		return `while ${name}(${this._conditions.toString(lineInfo)})\n${this._statements.map(x => x.toString(lineInfo)).join('\n')}\nendwhile${base}`;
 	}
 }
 
