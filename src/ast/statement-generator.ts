@@ -1,11 +1,11 @@
 import { ParserRuleContext } from 'antlr4';
-import { CommentContext, Elseif_expressionContext, Empty_breakContext, Empty_continueContext, Empty_returnContext, Empty_statementContext, For_loop_statementContext, If_expressionContext, If_statementContext, Non_empty_breakContext, Non_empty_continueContext, Non_empty_returnContext, StatementContext } from '../grammar/generated/MoocodeParser';
+import { CommentContext, Elseif_expressionContext, Empty_breakContext, Empty_continueContext, Empty_returnContext, Empty_statementContext, For_loop_statementContext, If_expressionContext, If_statementContext, Non_empty_breakContext, Non_empty_continueContext, Non_empty_returnContext, StatementContext, While_loop_statementContext } from '../grammar/generated/MoocodeParser';
 import { Action } from '../interfaces';
 import { SingleValueVisitor } from './abstract';
 import { ContextPosition } from './common';
 import { NodeGenerationError } from './error';
 import { ExpressionGenerator, ValueGenerator } from './expression-generator';
-import { BreakStatementNode, CommentStatementNode, ContinueStatementNode, ElseNode, EmptyStatementNode, Expression, ExpressionStatementNode, ForStatementNode, IfNode, IfStatementNode, RangedForStatementNode, ReturnStatementNode, Statement, VariableNode } from './nodes';
+import { BreakStatementNode, CommentStatementNode, ContinueStatementNode, ElseNode, EmptyStatementNode, Expression, ExpressionStatementNode, ForStatementNode, IfNode, IfStatementNode, RangedForStatementNode, ReturnStatementNode, Statement, VariableNode, WhileStatementNode } from './nodes';
 
 function handleErrors(action: Action<void>) {
 	try {
@@ -80,6 +80,26 @@ export class StatementGenerator extends SingleValueVisitor<Statement> {
 		} else {
 			throw NodeGenerationError.fromContext(context);
 		}
+	}
+
+	public override visitWhile_loop_statement = (context: While_loop_statementContext): WhileStatementNode => {
+		const position = ContextPosition.fromContext(context);
+		const conditions = ExpressionGenerator.generateExpression(context.expression());
+		const statements = StatementGenerator.generateStatements(context.statements().statement_list());
+
+		if (context._outer_name) {
+			const name = ValueGenerator.generate<VariableNode>(context._outer_name);
+
+			return WhileStatementNode.withName(position, conditions, statements, name);
+		}
+
+		if (context._inner_name) {
+			const name = ValueGenerator.generate<VariableNode>(context._inner_name);
+
+			return WhileStatementNode.withName(position, conditions, statements, name);
+		}
+
+		return WhileStatementNode.new(position, conditions, statements);
 	}
 
 	public override visitEmpty_return = (context: Empty_returnContext): ReturnStatementNode => {
