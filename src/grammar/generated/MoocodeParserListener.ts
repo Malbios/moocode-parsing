@@ -55,7 +55,7 @@ import { Verb_invocationContext } from "./MoocodeParser";
 import { ExpressionsContext } from "./MoocodeParser";
 import { Bf_invocationContext } from "./MoocodeParser";
 import { Primary_expression_startContext } from "./MoocodeParser";
-import { Parented_expressionContext } from "./MoocodeParser";
+import { Parenthesis_expressionContext } from "./MoocodeParser";
 import { Error_catcherContext } from "./MoocodeParser";
 import { ListContext } from "./MoocodeParser";
 import { MapContext } from "./MoocodeParser";
@@ -70,8 +70,6 @@ import { Bool_literalContext } from "./MoocodeParser";
 import { String_literalContext } from "./MoocodeParser";
 import { Integer_literalContext } from "./MoocodeParser";
 import { Float_literalContext } from "./MoocodeParser";
-import { Dollar_literalContext } from "./MoocodeParser";
-import { Circumflex_literalContext } from "./MoocodeParser";
 import { Error_codeContext } from "./MoocodeParser";
 import { IdentifierContext } from "./MoocodeParser";
 
@@ -602,15 +600,15 @@ export default class MoocodeParserListener extends ParseTreeListener {
 	 */
 	exitPrimary_expression_start?: (ctx: Primary_expression_startContext) => void;
 	/**
-	 * Enter a parse tree produced by `MoocodeParser.parented_expression`.
+	 * Enter a parse tree produced by `MoocodeParser.parenthesis_expression`.
 	 * @param ctx the parse tree
 	 */
-	enterParented_expression?: (ctx: Parented_expressionContext) => void;
+	enterParenthesis_expression?: (ctx: Parenthesis_expressionContext) => void;
 	/**
-	 * Exit a parse tree produced by `MoocodeParser.parented_expression`.
+	 * Exit a parse tree produced by `MoocodeParser.parenthesis_expression`.
 	 * @param ctx the parse tree
 	 */
-	exitParented_expression?: (ctx: Parented_expressionContext) => void;
+	exitParenthesis_expression?: (ctx: Parenthesis_expressionContext) => void;
 	/**
 	 * Enter a parse tree produced by `MoocodeParser.error_catcher`.
 	 * @param ctx the parse tree
@@ -751,26 +749,6 @@ export default class MoocodeParserListener extends ParseTreeListener {
 	 * @param ctx the parse tree
 	 */
 	exitFloat_literal?: (ctx: Float_literalContext) => void;
-	/**
-	 * Enter a parse tree produced by `MoocodeParser.dollar_literal`.
-	 * @param ctx the parse tree
-	 */
-	enterDollar_literal?: (ctx: Dollar_literalContext) => void;
-	/**
-	 * Exit a parse tree produced by `MoocodeParser.dollar_literal`.
-	 * @param ctx the parse tree
-	 */
-	exitDollar_literal?: (ctx: Dollar_literalContext) => void;
-	/**
-	 * Enter a parse tree produced by `MoocodeParser.circumflex_literal`.
-	 * @param ctx the parse tree
-	 */
-	enterCircumflex_literal?: (ctx: Circumflex_literalContext) => void;
-	/**
-	 * Exit a parse tree produced by `MoocodeParser.circumflex_literal`.
-	 * @param ctx the parse tree
-	 */
-	exitCircumflex_literal?: (ctx: Circumflex_literalContext) => void;
 	/**
 	 * Enter a parse tree produced by `MoocodeParser.error_code`.
 	 * @param ctx the parse tree

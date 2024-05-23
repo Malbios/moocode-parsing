@@ -3,7 +3,7 @@ import { ParseTree } from 'antlr4';
 import MoocodeParserVisitor from '../grammar/generated/MoocodeParserVisitor';
 
 import { ContextPosition } from './common';
-import { ArgumentError } from './error';
+import { ArgumentError, NotImplementedError } from './error';
 
 export abstract class BaseNode {
 	protected _position: ContextPosition;
@@ -20,7 +20,8 @@ export abstract class BaseNode {
 		this._position = position;
 	}
 
-	public toString(): string {
+	// eslint-disable-next-line @typescript-eslint/no-unused-vars
+	public toString(lineInfo = true): string {
 		return this.position.range;
 	}
 }
@@ -38,7 +39,8 @@ export abstract class LiteralNode<T> extends BaseNode {
 		this._value = value;
 	}
 
-	public toString(): string {
+	// eslint-disable-next-line @typescript-eslint/no-unused-vars
+	public toString(lineInfo = true): string {
 		return `${JSON.stringify(this._value)}`;
 	}
 }
@@ -58,6 +60,10 @@ export abstract class ReferenceNode extends BaseNode {
 		}
 
 		this._name = name;
+	}
+
+	public toString(): string {
+		throw NotImplementedError.new();
 	}
 }
 
@@ -79,6 +85,10 @@ export abstract class TwoPartNode<T1 extends BaseNode, T2 extends BaseNode> exte
 		this._left = left;
 		this._right = right;
 	}
+
+	public toString(): string {
+		throw NotImplementedError.new();
+	}
 }
 
 export abstract class WrappedNode<T extends BaseNode> extends BaseNode {
@@ -92,6 +102,10 @@ export abstract class WrappedNode<T extends BaseNode> extends BaseNode {
 		super(position);
 
 		this._value = value;
+	}
+
+	public toString(): string {
+		throw NotImplementedError.new();
 	}
 }
 
@@ -108,15 +122,15 @@ export class FlowControlStatementNode<T extends BaseNode> extends BaseNode {
 		this._value = value;
 	}
 
-	public toString(): string {
-		const base = super.toString();
+	public toString(lineInfo = true): string {
+		const base = lineInfo ? ` (${super.toString()})` : '';
 
 		let value = '';
 		if (this._value) {
 			value = ` ${this._value.toString()}`;
 		}
 
-		return `${value}; (${base})`;
+		return `${value};${base}`;
 	}
 }
 

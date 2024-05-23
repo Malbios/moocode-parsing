@@ -1,5 +1,5 @@
-import { suite, test } from 'mocha';
 import { expect } from 'chai';
+import { suite, test } from 'mocha';
 
 import CommonHelpers from '../../test-utils/common';
 import ExpectHelpers from '../../test-utils/expectations';
@@ -84,6 +84,66 @@ suite('indexer tests', () => {
     });
 
     test('should parse a ranged indexer', () => {
+        const parser = CommonHelpers.getParser('blob[1..2]');
+        const result = parser.expression();
+
+        ExpectHelpers.expectSyntaxErrors(parser, 0);
+
+        const primaryExpression = ParsingHelpers.getPrimaryExpression(result);
+
+        ExpectHelpers.expectIdentifier(primaryExpression?._pe, 'blob');
+
+        expect(primaryExpression?.indexer_list()).to.have.length(1);
+
+        const indexer = primaryExpression?.indexer(0);
+
+        expect(indexer?._argument).not.to.exist;
+
+        ExpectHelpers.expectInteger(indexer?._start, '1');
+        ExpectHelpers.expectInteger(indexer?._end, '2');
+    });
+
+    test('should parse a ranged indexer with circumflex start', () => {
+        const parser = CommonHelpers.getParser('blob[^..2]');
+        const result = parser.expression();
+
+        ExpectHelpers.expectSyntaxErrors(parser, 0);
+
+        const primaryExpression = ParsingHelpers.getPrimaryExpression(result);
+
+        ExpectHelpers.expectIdentifier(primaryExpression?._pe, 'blob');
+
+        expect(primaryExpression?.indexer_list()).to.have.length(1);
+
+        const indexer = primaryExpression?.indexer(0);
+
+        expect(indexer?._argument).not.to.exist;
+
+        ExpectHelpers.expectCaret(indexer?._start);
+        ExpectHelpers.expectInteger(indexer?._end, '2');
+    });
+
+    test('should parse a ranged indexer with dollar end', () => {
+        const parser = CommonHelpers.getParser('blob[1..$]');
+        const result = parser.expression();
+
+        ExpectHelpers.expectSyntaxErrors(parser, 0);
+
+        const primaryExpression = ParsingHelpers.getPrimaryExpression(result);
+
+        ExpectHelpers.expectIdentifier(primaryExpression?._pe, 'blob');
+
+        expect(primaryExpression?.indexer_list()).to.have.length(1);
+
+        const indexer = primaryExpression?.indexer(0);
+
+        expect(indexer?._argument).not.to.exist;
+
+        ExpectHelpers.expectInteger(indexer?._start, '1');
+        ExpectHelpers.expectDollar(indexer?._end);
+    });
+
+    test('should parse a ranged indexer with circumflex start and dollar end', () => {
         const parser = CommonHelpers.getParser('blob[^..$]');
         const result = parser.expression();
 
@@ -99,12 +159,12 @@ suite('indexer tests', () => {
 
         expect(indexer?._argument).not.to.exist;
 
-        ExpectHelpers.expectInteger(indexer?._start, '^');
-        ExpectHelpers.expectDollar(indexer?._end, '$');
+        ExpectHelpers.expectCaret(indexer?._start);
+        ExpectHelpers.expectDollar(indexer?._end);
     });
 
     test('should parse a calculated ranged indexer', () => {
-        const parser = CommonHelpers.getParser('bobby_x[start+1 .. 2*$]');
+        const parser = CommonHelpers.getParser('bobby_x[^+start+1 .. 2*$]');
         const result = parser.expression();
 
         ExpectHelpers.expectSyntaxErrors(parser, 0);
@@ -121,13 +181,14 @@ suite('indexer tests', () => {
 
         const additiveExpressionForStart = ParsingHelpers.getAdditive(indexer?._start);
 
-        expect(additiveExpressionForStart?.multiplicative_expression_list()).to.have.length(2);
+        expect(additiveExpressionForStart?.multiplicative_expression_list()).to.have.length(3);
 
-        expect(additiveExpressionForStart?.PLUS_list()).to.have.length(1);
+        expect(additiveExpressionForStart?.PLUS_list()).to.have.length(2);
         expect(additiveExpressionForStart?.MINUS_list()).to.have.length(0);
 
-        ExpectHelpers.expectIdentifier(additiveExpressionForStart?.multiplicative_expression(0), 'start');
-        ExpectHelpers.expectInteger(additiveExpressionForStart?.multiplicative_expression(1), '1');
+        ExpectHelpers.expectCaret(additiveExpressionForStart?.multiplicative_expression(0));
+        ExpectHelpers.expectIdentifier(additiveExpressionForStart?.multiplicative_expression(1), 'start');
+        ExpectHelpers.expectInteger(additiveExpressionForStart?.multiplicative_expression(2), '1');
 
         const multiplicativeExpressionForEnd = ParsingHelpers.getMultiplicative(indexer?._end);
 
@@ -138,6 +199,6 @@ suite('indexer tests', () => {
         expect(multiplicativeExpressionForEnd?.PERCENT_list()).to.have.length(0);
 
         ExpectHelpers.expectInteger(multiplicativeExpressionForEnd?.unary_expression(0), '2');
-        ExpectHelpers.expectDollar(multiplicativeExpressionForEnd?.unary_expression(1), '$');
+        ExpectHelpers.expectDollar(multiplicativeExpressionForEnd?.unary_expression(1));
     });
 });

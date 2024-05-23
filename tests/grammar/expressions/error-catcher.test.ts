@@ -64,4 +64,42 @@ suite('error catcher expression tests', () => {
 
         ExpectHelpers.expectString(errorCatcher?._on_error, '"yes"');
     });
+
+    test('should parse an error catcher with ANY as error code', () => {
+        const parser = CommonHelpers.getParser('`stuff(1) ! ANY => "yes"\'');
+        const result = parser.expression();
+
+        ExpectHelpers.expectSyntaxErrors(parser, 0);
+
+        const errorCatcher = ParsingHelpers.getErrorCatcher(result);
+        const primaryExpression = ParsingHelpers.getPrimaryExpression(errorCatcher?._try_);
+
+        ExpectHelpers.expectIdentifier(primaryExpression?._pe, 'stuff');
+        expect(primaryExpression?.bf_invocation_list()).to.have.length(1);
+        ExpectHelpers.expectInteger(primaryExpression?.bf_invocation(0), '1');
+
+        expect(errorCatcher?.error_codes().any_error()).to.exist;
+        expect(errorCatcher?.error_codes().expression_list()).to.have.length(0);
+
+        ExpectHelpers.expectString(errorCatcher?._on_error, '"yes"');
+    });
+
+    test('should parse an error catcher with no on error expression', () => {
+        const parser = CommonHelpers.getParser('`stuff(1) ! ANY\'');
+        const result = parser.expression();
+
+        ExpectHelpers.expectSyntaxErrors(parser, 0);
+
+        const errorCatcher = ParsingHelpers.getErrorCatcher(result);
+        const primaryExpression = ParsingHelpers.getPrimaryExpression(errorCatcher?._try_);
+
+        ExpectHelpers.expectIdentifier(primaryExpression?._pe, 'stuff');
+        expect(primaryExpression?.bf_invocation_list()).to.have.length(1);
+        ExpectHelpers.expectInteger(primaryExpression?.bf_invocation(0), '1');
+
+        expect(errorCatcher?.error_codes().any_error()).to.exist;
+        expect(errorCatcher?.error_codes().expression_list()).to.have.length(0);
+
+        expect(errorCatcher?._on_error).to.not.exist;
+    });
 });
