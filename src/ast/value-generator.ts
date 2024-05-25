@@ -1,10 +1,10 @@
 import { ParserRuleContext } from 'antlr4';
-import { Bool_literalContext, Corified_valueContext, Error_catcherContext, Error_codeContext, Float_literalContext, IdentifierContext, Integer_literalContext, ListContext, List_slicerContext, MapContext, Map_entryContext, Object_idContext, Parenthesis_expressionContext, String_literalContext } from '../grammar/generated/MoocodeParser';
+import { Bool_literalContext, CaretContext, Corified_valueContext, DollarContext, Error_catcherContext, Error_codeContext, Float_literalContext, IdentifierContext, Integer_literalContext, ListContext, List_slicerContext, MapContext, Map_entryContext, Object_idContext, Parenthesis_expressionContext, String_literalContext } from '../grammar/generated/MoocodeParser';
 import { SingleValueVisitor } from './abstract';
 import { ContextPosition, ErrorCode, getContextAsText } from './common';
 import { NodeGenerationError } from './error';
 import { ExpressionGenerator } from './expression-generator';
-import { BooleanNode, CorifiedValueNode, ErrorCatcherNode, ErrorCodeNode, Expression, FloatNode, IntegerNode, ListNode, ListSlicerNode, MapEntryNode, MapNode, ObjectIdNode, ParenthesisNode, StringNode, Value, VariableNode } from './nodes';
+import { BooleanNode, CorifiedValueNode, ErrorCatcherNode, ErrorCodeNode, Expression, FloatNode, IntegerNode, ListNode, ListSlicerNode, MapEntryNode, MapNode, ObjectIdNode, ParenthesisNode, RangeEndNode, RangeStartNode, StringNode, Value, VariableNode } from './nodes';
 
 export class ValueGenerator extends SingleValueVisitor<Value> {
 	public override visitObject_id = (context: Object_idContext): ObjectIdNode => {
@@ -18,6 +18,14 @@ export class ValueGenerator extends SingleValueVisitor<Value> {
 
 	public override visitIdentifier = (context: IdentifierContext): VariableNode => {
 		return new VariableNode(ContextPosition.fromContext(context), getContextAsText(context));
+	}
+
+	public override visitCaret = (context: CaretContext): RangeStartNode => {
+		return new RangeStartNode(ContextPosition.fromContext(context));
+	}
+
+	public override visitDollar = (context: DollarContext): RangeEndNode => {
+		return new RangeEndNode(ContextPosition.fromContext(context));
 	}
 
 	public override visitMap = (context: MapContext): MapNode => {
@@ -71,7 +79,11 @@ export class ValueGenerator extends SingleValueVisitor<Value> {
 	public override visitError_catcher = (context: Error_catcherContext): ErrorCatcherNode => {
 		const tryExpression = ExpressionGenerator.generateExpression(context._try_);
 		const errorCodes = ExpressionGenerator.generateExpressions(context.error_codes());
-		const onErrorExpression = ExpressionGenerator.generateExpression(context._on_error);
+
+		let onErrorExpression: Expression | undefined = undefined;
+		if (context._on_error) {
+			onErrorExpression = ExpressionGenerator.generateExpression(context._on_error);
+		}
 
 		return new ErrorCatcherNode(ContextPosition.fromContext(context), tryExpression, errorCodes, onErrorExpression);
 	}

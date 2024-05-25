@@ -70,7 +70,7 @@ export class ExpressionGenerator extends SingleValueVisitor<Expression> {
 			return new ListAssignmentNode(ContextPosition.fromContext(context), leftNode, rightNode);
 		}
 
-		if (leftNode instanceof PropertyAccessorNode) {
+		if (leftNode instanceof PropertyAccessorNode || leftNode instanceof ComputedPropertyAccessorNode) {
 			return new PropertyAssignmentNode(ContextPosition.fromContext(context), leftNode, rightNode);
 		}
 
@@ -85,6 +85,11 @@ export class ExpressionGenerator extends SingleValueVisitor<Expression> {
 	public override visitNegative_unary_expression = (context: Negative_unary_expressionContext): NegativeNode => {
 		const innerExpression = ExpressionGenerator.generateExpression(context.unary_expression());
 		return new NegativeNode(ContextPosition.fromContext(context), innerExpression);
+	}
+
+	public override visitComplement_unary_expression = (context: Complement_unary_expressionContext): ComplementNode => {
+		const innerExpression = ExpressionGenerator.generateExpression(context.unary_expression());
+		return new ComplementNode(ContextPosition.fromContext(context), innerExpression);
 	}
 
 	public override visitComplement_unary_expression = (context: Complement_unary_expressionContext): ComplementNode => {

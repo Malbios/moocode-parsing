@@ -6,7 +6,7 @@ function runTest(filePath: string) {
 	const fileContent = readFileSync(filePath, 'utf8');
 	const result = generateAst(fileContent);
 
-	// console.log(result.map(x => x.toString()).join('\n'));
+	console.log();
 	console.log(result.map(x => x.toString(false)).join('\n'));
 }
 

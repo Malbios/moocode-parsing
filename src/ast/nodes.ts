@@ -19,30 +19,38 @@ export type Value = (Literal | ObjectReference | ListNode | MapNode | MapEntryNo
 export type PropertyAccessor = (PropertyAccessorNode | ComputedPropertyAccessorNode);
 export type Indexer = (ArgumentIndexerNode | RangeIndexerNode);
 export type ObjectReference = (VariableNode | ObjectIdNode | CorifiedValueNode);
-export type Literal = (BooleanNode | IntegerNode | FloatNode | StringNode | ErrorCodeNode);
+export type Literal = (BooleanNode | IntegerNode | FloatNode | StringNode | ErrorCodeNode | RangeStartNode | RangeEndNode);
 
 export type Int64 = number;
 export type Float = number;
 
+function getDepthIndent(depth: number): string {
+	return ''.padStart(depth * 2, ' ');
+}
+
 export class IfStatementNode extends BaseNode {
+	private _depth: number;
+
 	private _if: IfNode;
-	private _elseIfs: IfNode[];
+	private _elseIfs: ElseIfNode[];
 	private _else: ElseNode | undefined;
 
-	public get if() {
+	public get if(): IfNode {
 		return this._if;
 	}
 
-	public get elseifs() {
+	public get elseifs(): ElseIfNode[] {
 		return this._elseIfs;
 	}
 
-	public get else() {
+	public get else(): ElseNode | undefined {
 		return this._else;
 	}
 
-	public constructor(position: ContextPosition, ifNode: IfNode, elseIfNodes?: IfNode[], elseNode?: ElseNode) {
+	public constructor(depth: number, position: ContextPosition, ifNode: IfNode, elseIfNodes?: ElseIfNode[], elseNode?: ElseNode) {
 		super(position);
+
+		this._depth = depth;
 
 		this._if = ifNode;
 		this._elseIfs = elseIfNodes ?? [];
@@ -57,18 +65,22 @@ export class IfStatementNode extends BaseNode {
 		let elsePart = '';
 
 		if (this._elseIfs.length > 0) {
-			elseIfParts = `${this._elseIfs.map(x => `else${x.toString(lineInfo)}`).join('\n')}\n`;
+			elseIfParts = `${this._elseIfs.map(x => `${x.toString(lineInfo)}`).join('\n')}\n`;
 		}
 
 		if (this._else) {
 			elsePart = `${this._else.toString(lineInfo)}\n`;
 		}
 
-		return `${ifPart}${elseIfParts}${elsePart}endif${base}`;
+		const endIf = `${getDepthIndent(this._depth)}endif`;
+
+		return `${ifPart}${elseIfParts}${elsePart}${endIf}${base}`;
 	}
 }
 
 export class IfNode extends BaseNode {
+	protected _depth: number;
+
 	private _conditions: Expression;
 	private _body: Statement[];
 
@@ -80,47 +92,63 @@ export class IfNode extends BaseNode {
 		return this._body;
 	}
 
-	public constructor(position: ContextPosition, conditions: Expression, body?: Statement[]) {
+	public constructor(depth: number, position: ContextPosition, conditions: Expression, body?: Statement[]) {
 		super(position);
+
+		this._depth = depth;
 
 		this._conditions = conditions;
 		this._body = body ?? [];
 	}
 
 	public toString(lineInfo = true): string {
-		const start = `if (${this._conditions.toString(lineInfo)})`;
+		const start = `${getDepthIndent(this._depth)}if (${this._conditions.toString(lineInfo)})`;
 
 		if (this._body.length === 0) {
 			return start;
 		}
 
-		return `${start}\n  ${this._body.map(x => x.toString(lineInfo)).join('\n  ')}`;
+		return `${start}\n${this._body.map(x => x.toString(lineInfo)).join('\n')}`;
+	}
+}
+
+export class ElseIfNode extends IfNode {
+	public toString(lineInfo?: boolean): string {
+		const base = super.toString(lineInfo).trimStart();
+
+		return `${getDepthIndent(this._depth)}else${base}`;
 	}
 }
 
 export class ElseNode extends BaseNode {
+	private _depth: number;
+
 	private _body: Statement[];
 
 	public get body(): Statement[] {
 		return this._body;
 	}
 
-	public constructor(position: ContextPosition, body?: Statement[]) {
+	public constructor(depth: number, position: ContextPosition, body?: Statement[]) {
 		super(position);
+
+		this._depth = depth;
 
 		this._body = body ?? [];
 	}
 
 	public toString(lineInfo = true): string {
 		if (this._body.length === 0) {
-			return 'else\n';
+			return `${getDepthIndent(this._depth)}else\n`;
 		}
 
-		return `else\n  ${this._body.map(x => x.toString(lineInfo)).join('\n  ')}\n`;
+		return `${getDepthIndent(this._depth)}else\n${this._body.map(x => x.toString(lineInfo)).join('\n')}`;
 	}
 }
 
 export class ForStatementNode extends BaseNode {
+	private _depth: number;
+
 	private _value: VariableNode;
 	private _keyOrIndex: VariableNode | undefined;
 	private _rangeExpression: Expression;
@@ -142,8 +170,10 @@ export class ForStatementNode extends BaseNode {
 		return this._statements;
 	}
 
-	private constructor(position: ContextPosition, value: VariableNode, rangeExpression: Expression, statements: Statement[], keyOrIndex?: VariableNode) {
+	private constructor(depth: number, position: ContextPosition, value: VariableNode, rangeExpression: Expression, statements: Statement[], keyOrIndex?: VariableNode) {
 		super(position);
+
+		this._depth = depth;
 
 		this._value = value;
 		this._keyOrIndex = keyOrIndex;
@@ -151,12 +181,12 @@ export class ForStatementNode extends BaseNode {
 		this._statements = statements;
 	}
 
-	public static new(position: ContextPosition, value: VariableNode, rangeExpression: Expression, statements: Statement[]): ForStatementNode {
-		return new ForStatementNode(position, value, rangeExpression, statements);
+	public static new(depth: number, position: ContextPosition, value: VariableNode, rangeExpression: Expression, statements: Statement[]): ForStatementNode {
+		return new ForStatementNode(depth, position, value, rangeExpression, statements);
 	}
 
-	public static withKeyOrIndex(position: ContextPosition, value: VariableNode, keyOrIndex: VariableNode, rangeExpression: Expression, statements: Statement[]): ForStatementNode {
-		return new ForStatementNode(position, value, rangeExpression, statements, keyOrIndex);
+	public static withKeyOrIndex(depth: number, position: ContextPosition, value: VariableNode, keyOrIndex: VariableNode, rangeExpression: Expression, statements: Statement[]): ForStatementNode {
+		return new ForStatementNode(depth, position, value, rangeExpression, statements, keyOrIndex);
 	}
 
 	public toString(lineInfo = true): string {
@@ -164,11 +194,19 @@ export class ForStatementNode extends BaseNode {
 
 		const keyOrIndex = this._keyOrIndex ? `, ${this._keyOrIndex.toString(lineInfo)}` : '';
 
-		return `for ${this._value.toString(lineInfo)}${keyOrIndex} in (${this._rangeExpression.toString(lineInfo)})\n${this._statements.map(x => x.toString(lineInfo)).join('\n')}\nendfor${base}`;
+		const forPart = `${getDepthIndent(this._depth)}for ${this._value.toString(lineInfo)}${keyOrIndex} in (${this._rangeExpression.toString(lineInfo)})\n`;
+
+		const bodyPart = `${this._statements.map(x => x.toString(lineInfo)).join('\n')}\n`;
+
+		const endFor = `${getDepthIndent(this._depth)}endfor`;
+
+		return `${forPart}${bodyPart}${endFor}${base}`;
 	}
 }
 
 export class RangedForStatementNode extends BaseNode {
+	private _depth: number;
+
 	private _value: VariableNode;
 	private _rangeStart: Expression;
 	private _rangeEnd: Expression;
@@ -190,8 +228,10 @@ export class RangedForStatementNode extends BaseNode {
 		return this._statements;
 	}
 
-	public constructor(position: ContextPosition, value: VariableNode, rangeStart: Expression, rangeEnd: Expression, statements: Statement[]) {
+	public constructor(depth: number, position: ContextPosition, value: VariableNode, rangeStart: Expression, rangeEnd: Expression, statements: Statement[]) {
 		super(position);
+
+		this._depth = depth;
 
 		this._value = value;
 		this._rangeStart = rangeStart;
@@ -202,11 +242,19 @@ export class RangedForStatementNode extends BaseNode {
 	public toString(lineInfo = true): string {
 		const base = lineInfo ? ` (${super.toString(lineInfo)})` : '';
 
-		return `for ${this._value.toString(lineInfo)} in [${this._rangeStart.toString(lineInfo)}..${this._rangeEnd.toString(lineInfo)}]\n${this._statements.map(x => x.toString(lineInfo)).join('\n')}\nendfor${base}`;
+		const forPart = `${getDepthIndent(this._depth)}for ${this._value.toString(lineInfo)} in [${this._rangeStart.toString(lineInfo)}..${this._rangeEnd.toString(lineInfo)}]\n`;
+
+		const bodyPart = `${this._statements.map(x => x.toString(lineInfo)).join('\n')}\n`;
+
+		const endFor = `${getDepthIndent(this._depth)}endfor`;
+
+		return `${forPart}${bodyPart}${endFor}${base}`;
 	}
 }
 
 export class WhileStatementNode extends BaseNode {
+	private _depth: number;
+
 	private _name: VariableNode | undefined;
 	private _conditions: Expression;
 	private _statements: Statement[];
@@ -223,20 +271,22 @@ export class WhileStatementNode extends BaseNode {
 		return this._statements;
 	}
 
-	private constructor(position: ContextPosition, conditions: Expression, statements: Statement[], name?: VariableNode) {
+	private constructor(depth: number, position: ContextPosition, conditions: Expression, statements: Statement[], name?: VariableNode) {
 		super(position);
+
+		this._depth = depth;
 
 		this._conditions = conditions;
 		this._statements = statements;
 		this._name = name;
 	}
 
-	public static new(position: ContextPosition, conditions: Expression, statements: Statement[]): WhileStatementNode {
-		return new WhileStatementNode(position, conditions, statements);
+	public static new(depth: number, position: ContextPosition, conditions: Expression, statements: Statement[]): WhileStatementNode {
+		return new WhileStatementNode(depth, position, conditions, statements);
 	}
 
-	public static withName(position: ContextPosition, conditions: Expression, statements: Statement[], name: VariableNode): WhileStatementNode {
-		return new WhileStatementNode(position, conditions, statements, name);
+	public static withName(depth: number, position: ContextPosition, conditions: Expression, statements: Statement[], name: VariableNode): WhileStatementNode {
+		return new WhileStatementNode(depth, position, conditions, statements, name);
 	}
 
 	public toString(lineInfo = true): string {
@@ -244,61 +294,19 @@ export class WhileStatementNode extends BaseNode {
 
 		const name = this._name ? `${this._name.toString(lineInfo)} ` : '';
 
-		return `while ${name}(${this._conditions.toString(lineInfo)})\n${this._statements.map(x => x.toString(lineInfo)).join('\n')}\nendwhile${base}`;
-	}
-}
+		const whilePart = `${getDepthIndent(this._depth)}while ${name}(${this._conditions.toString(lineInfo)})\n`;
 
-export class ExceptNode extends BaseNode {
-	private _errorInfo: VariableNode;
-	private _errorCodes: Expression;
-	private _statements: Statement[];
+		const bodyPart = `${this._statements.map(x => x.toString(lineInfo)).join('\n')}\n`;
 
-	// error info looks like this: {code, message, value, traceback}
+		const endWhile = `${getDepthIndent(this._depth)}endwhile`;
 
-	public get errorInfo(): VariableNode {
-		return this._errorInfo;
-	}
-
-	public get errorCodes(): Expression {
-		return this._errorCodes;
-	}
-
-	public get statements(): Statement[] {
-		return this._statements;
-	}
-
-	public constructor(position: ContextPosition, errorInfo: VariableNode, errorCodes: Expression, statements: Statement[]) {
-		super(position);
-
-		this._errorInfo = errorInfo;
-		this._errorCodes = errorCodes;
-		this._statements = statements;
-	}
-
-	public toString(lineInfo = true): string {
-		return `except ${this._errorInfo.toString(lineInfo)} (${this._errorCodes.toString(lineInfo)})\n${this._statements.map(x => x.toString(lineInfo)).join('\n')}`;
-	}
-}
-
-export class FinallyNode extends BaseNode {
-	private _statements: Statement[];
-
-	public get statements(): Statement[] {
-		return this._statements;
-	}
-
-	public constructor(position: ContextPosition, statements: Statement[]) {
-		super(position);
-
-		this._statements = statements;
-	}
-
-	public toString(lineInfo = true): string {
-		return `finally\n${this._statements.map(x => x.toString(lineInfo)).join('\n')}`;
+		return `${whilePart}${bodyPart}${endWhile}${base}`;
 	}
 }
 
 export class TryStatementNode extends BaseNode {
+	private _depth: number;
+
 	private _statements: Statement[];
 	private _excepts: ExceptNode[];
 	private _finally: FinallyNode | undefined;
@@ -315,8 +323,10 @@ export class TryStatementNode extends BaseNode {
 		return this._finally;
 	}
 
-	public constructor(position: ContextPosition, statements: Statement[], excepts: ExceptNode[], finallyNode?: FinallyNode) {
+	public constructor(depth: number, position: ContextPosition, statements: Statement[], excepts: ExceptNode[], finallyNode?: FinallyNode) {
 		super(position);
+
+		this._depth = depth;
 
 		this._statements = statements;
 		this._excepts = excepts;
@@ -326,13 +336,91 @@ export class TryStatementNode extends BaseNode {
 	public toString(lineInfo = true): string {
 		const base = lineInfo ? ` (${super.toString(lineInfo)})` : '';
 
-		const finallyBlock = this._finally ? this._finally.toString(lineInfo) : '';
+		const finallyBlock = this._finally ? `${this._finally.toString(lineInfo)}\n` : '';
 
-		return `try\n${this._statements.map(x => x.toString(lineInfo)).join('\n')}\n${this._excepts.map(x => x.toString(lineInfo)).join('\n')}\n${finallyBlock}\nendtry${base}`;
+		const tryPart = `${getDepthIndent(this._depth)}try\n`;
+
+		const tryBodyPart = `${this._statements.map(x => x.toString(lineInfo)).join('\n')}\n`;
+
+		const excepts = `${this._excepts.map(x => x.toString(lineInfo)).join('\n')}\n`;
+
+		const endTry = `${getDepthIndent(this._depth)}endtry`;
+
+		return `${tryPart}${tryBodyPart}${excepts}${finallyBlock}${endTry}${base}`;
+	}
+}
+
+export class ExceptNode extends BaseNode {
+	private _depth: number;
+
+	private _errorInfo: VariableNode;
+	private _errorCodes: ErrorCodeNode[];
+	private _statements: Statement[];
+
+	// error info looks like this: {code, message, value, traceback}
+
+	public get errorInfo(): VariableNode {
+		return this._errorInfo;
+	}
+
+	public get errorCodes(): ErrorCodeNode[] {
+		return this._errorCodes;
+	}
+
+	public get statements(): Statement[] {
+		return this._statements;
+	}
+
+	public constructor(depth: number, position: ContextPosition, errorInfo: VariableNode, errorCodes: ErrorCodeNode[], statements: Statement[]) {
+		super(position);
+
+		this._depth = depth;
+
+		this._errorInfo = errorInfo;
+		this._errorCodes = errorCodes;
+		this._statements = statements;
+	}
+
+	public toString(lineInfo = true): string {
+		const errorCodes = this._errorCodes.map(x => x.toString(lineInfo)).join(', ');
+
+		const exceptPart = `${getDepthIndent(this._depth)}except ${this._errorInfo.toString(lineInfo)} (${errorCodes})\n`;
+
+		const bodyPart = this._statements.map(x => x.toString(lineInfo)).join('\n');
+
+		return `${exceptPart}${bodyPart}`;
+	}
+}
+
+export class FinallyNode extends BaseNode {
+	private _depth: number;
+
+	private _statements: Statement[];
+
+	public get statements(): Statement[] {
+		return this._statements;
+	}
+
+	public constructor(depth: number, position: ContextPosition, statements: Statement[]) {
+		super(position);
+
+		this._depth = depth;
+
+		this._statements = statements;
+	}
+
+	public toString(lineInfo = true): string {
+		const finallyPart = `${getDepthIndent(this._depth)}finally\n`;
+
+		const bodyPart = this._statements.map(x => x.toString(lineInfo)).join('\n');
+
+		return `${finallyPart}${bodyPart}`;
 	}
 }
 
 export class ForkStatementNode extends BaseNode {
+	private _depth: number;
+
 	private _name: VariableNode | undefined;
 	private _expression: Expression;
 	private _statements: Statement[];
@@ -349,20 +437,22 @@ export class ForkStatementNode extends BaseNode {
 		return this._statements;
 	}
 
-	private constructor(position: ContextPosition, expression: Expression, statements: Statement[], nameVariable?: VariableNode) {
+	private constructor(depth: number, position: ContextPosition, expression: Expression, statements: Statement[], nameVariable?: VariableNode) {
 		super(position);
+
+		this._depth = depth;
 
 		this._name = nameVariable;
 		this._expression = expression;
 		this._statements = statements;
 	}
 
-	public static new(position: ContextPosition, expression: Expression, statements: Statement[]): ForkStatementNode {
-		return new ForkStatementNode(position, expression, statements);
+	public static new(depth: number, position: ContextPosition, expression: Expression, statements: Statement[]): ForkStatementNode {
+		return new ForkStatementNode(depth, position, expression, statements);
 	}
 
-	public static withName(position: ContextPosition, expression: Expression, statements: Statement[], nameVariable: VariableNode): ForkStatementNode {
-		return new ForkStatementNode(position, expression, statements, nameVariable);
+	public static withName(depth: number, position: ContextPosition, expression: Expression, statements: Statement[], nameVariable: VariableNode): ForkStatementNode {
+		return new ForkStatementNode(depth, position, expression, statements, nameVariable);
 	}
 
 	public toString(lineInfo = true): string {
@@ -370,7 +460,13 @@ export class ForkStatementNode extends BaseNode {
 
 		const name = this._name ? `${this._name.toString(lineInfo)} ` : '';
 
-		return `fork ${name}(${this._expression.toString(lineInfo)})\n${this._statements.map(x => x.toString(lineInfo)).join('\n')}\nendfork${base}`;
+		const forkPart = `${getDepthIndent(this._depth)}fork ${name}(${this._expression.toString(lineInfo)})\n`;
+
+		const bodyPart = `${this._statements.map(x => x.toString(lineInfo)).join('\n')}\n`;
+
+		const endFork = `${getDepthIndent(this._depth)}endfork`;
+
+		return `${forkPart}${bodyPart}${endFork}${base}`;
 	}
 }
 
@@ -378,7 +474,7 @@ export class ReturnStatementNode extends FlowControlStatementNode<Expression> {
 	public toString(lineInfo = true): string {
 		const base = `${super.toString(lineInfo)}`;
 
-		return `return${base}`;
+		return `${getDepthIndent(this._depth)}return${base}`;
 	}
 }
 
@@ -386,7 +482,7 @@ export class ContinueStatementNode extends FlowControlStatementNode<Expression> 
 	public toString(lineInfo = true): string {
 		const base = ` ${super.toString(lineInfo)}`;
 
-		return `return ${base}`;
+		return `${getDepthIndent(this._depth)}continue${base}`;
 	}
 }
 
@@ -394,19 +490,23 @@ export class BreakStatementNode extends FlowControlStatementNode<Expression> {
 	public toString(lineInfo = true): string {
 		const base = ` ${super.toString(lineInfo)}`;
 
-		return `return ${base}`;
+		return `${getDepthIndent(this._depth)}break${base}`;
 	}
 }
 
 export class CommentStatementNode extends BaseNode {
+	private _depth: number;
+
 	private _comment: string;
 
 	public get text(): string {
 		return this._comment;
 	}
 
-	public constructor(position: ContextPosition, comment: string) {
+	public constructor(depth: number, position: ContextPosition, comment: string) {
 		super(position);
+
+		this._depth = depth;
 
 		this._comment = comment;
 	}
@@ -414,34 +514,47 @@ export class CommentStatementNode extends BaseNode {
 	public toString(lineInfo = true): string {
 		const base = lineInfo ? ` (${super.toString(lineInfo)})` : '';
 
-		return `"${this._comment}";${base}`;
+		return `${getDepthIndent(this._depth)}"${this._comment}";${base}`;
 	}
 }
 
 export class EmptyStatementNode extends BaseNode {
+	private _depth: number;
+
+	public constructor(depth: number, position: ContextPosition) {
+		super(position);
+
+		this._depth = depth;
+	}
+
 	public toString(lineInfo = true): string {
 		const base = lineInfo ? ` (${super.toString(lineInfo)})` : '';
 
-		return `<empty>;${base}`;
+		return `${getDepthIndent(this._depth)}<empty>;${base}`;
 	}
 }
 
 export class ExpressionStatementNode extends BaseNode {
+	private _depth: number;
+
 	private _expression: Expression;
 
 	public get expression(): Expression {
 		return this._expression;
 	}
 
-	public constructor(position: ContextPosition, expression: Expression) {
+	public constructor(depth: number, position: ContextPosition, expression: Expression) {
 		super(position);
+
+		this._depth = depth;
 
 		this._expression = expression;
 	}
 
 	public toString(lineInfo = true): string {
 		const base = lineInfo ? ` (${super.toString(lineInfo)})` : '';
-		return `${this._expression.toString(lineInfo)};${base}`;
+
+		return `${getDepthIndent(this._depth)}${this._expression.toString(lineInfo)};${base}`;
 	}
 }
 
@@ -1038,5 +1151,19 @@ export class CorifiedValueNode extends ReferenceNode {
 	// eslint-disable-next-line @typescript-eslint/no-unused-vars
 	public toString(lineInfo = true): string {
 		return `\$${this._name}`;
+	}
+}
+
+export class RangeStartNode extends BaseNode {
+	// eslint-disable-next-line @typescript-eslint/no-unused-vars
+	public toString(lineInfo = true): string {
+		return '^';
+	}
+}
+
+export class RangeEndNode extends BaseNode {
+	// eslint-disable-next-line @typescript-eslint/no-unused-vars
+	public toString(lineInfo = true): string {
+		return '$';
 	}
 }

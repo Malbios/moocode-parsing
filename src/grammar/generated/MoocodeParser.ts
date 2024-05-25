@@ -177,8 +177,10 @@ export default class MoocodeParser extends Parser {
 	public static readonly RULE_string_literal = 66;
 	public static readonly RULE_integer_literal = 67;
 	public static readonly RULE_float_literal = 68;
-	public static readonly RULE_error_code = 69;
-	public static readonly RULE_identifier = 70;
+	public static readonly RULE_caret = 69;
+	public static readonly RULE_dollar = 70;
+	public static readonly RULE_error_code = 71;
+	public static readonly RULE_identifier = 72;
 	public static readonly literalNames: (string | null)[] = [ null, null, 
                                                             "'break'", "'continue'", 
                                                             "'else'", "'elseif'", 
@@ -312,7 +314,8 @@ export default class MoocodeParser extends Parser {
 		"bf_invocation", "primary_expression_start", "parenthesis_expression", 
 		"error_catcher", "list", "map", "map_entry", "indexer", "list_slicer", 
 		"object_reference", "object_id", "corified_value", "literal", "bool_literal", 
-		"string_literal", "integer_literal", "float_literal", "error_code", "identifier",
+		"string_literal", "integer_literal", "float_literal", "caret", "dollar", 
+		"error_code", "identifier",
 	];
 	public get grammarFileName(): string { return "MoocodeParser.g4"; }
 	public get literalNames(): (string | null)[] { return MoocodeParser.literalNames; }
@@ -336,21 +339,21 @@ export default class MoocodeParser extends Parser {
 		try {
 			this.enterOuterAlt(localctx, 1);
 			{
-			this.state = 145;
+			this.state = 149;
 			this._errHandler.sync(this);
 			_la = this._input.LA(1);
 			while ((((_la) & ~0x1F) === 0 && ((1 << _la) & 4294823948) !== 0) || ((((_la - 32)) & ~0x1F) === 0 && ((1 << (_la - 32)) & 2215165439) !== 0) || ((((_la - 71)) & ~0x1F) === 0 && ((1 << (_la - 71)) & 101433) !== 0)) {
 				{
 				{
-				this.state = 142;
+				this.state = 146;
 				this.statement();
 				}
 				}
-				this.state = 147;
+				this.state = 151;
 				this._errHandler.sync(this);
 				_la = this._input.LA(1);
 			}
-			this.state = 148;
+			this.state = 152;
 			this.match(MoocodeParser.EOF);
 			}
 		}
@@ -373,85 +376,85 @@ export default class MoocodeParser extends Parser {
 		let localctx: StatementContext = new StatementContext(this, this._ctx, this.state);
 		this.enterRule(localctx, 2, MoocodeParser.RULE_statement);
 		try {
-			this.state = 163;
+			this.state = 167;
 			this._errHandler.sync(this);
 			switch ( this._interp.adaptivePredict(this._input, 1, this._ctx) ) {
 			case 1:
 				this.enterOuterAlt(localctx, 1);
 				{
-				this.state = 150;
+				this.state = 154;
 				this.empty_statement();
 				}
 				break;
 			case 2:
 				this.enterOuterAlt(localctx, 2);
 				{
-				this.state = 151;
+				this.state = 155;
 				this.comment();
 				}
 				break;
 			case 3:
 				this.enterOuterAlt(localctx, 3);
 				{
-				this.state = 152;
+				this.state = 156;
 				this.expression();
-				this.state = 153;
+				this.state = 157;
 				this.match(MoocodeParser.SEMICOLON);
 				}
 				break;
 			case 4:
 				this.enterOuterAlt(localctx, 4);
 				{
-				this.state = 155;
+				this.state = 159;
 				this.return_statement();
 				}
 				break;
 			case 5:
 				this.enterOuterAlt(localctx, 5);
 				{
-				this.state = 156;
+				this.state = 160;
 				this.continue_statement();
 				}
 				break;
 			case 6:
 				this.enterOuterAlt(localctx, 6);
 				{
-				this.state = 157;
+				this.state = 161;
 				this.break_statement();
 				}
 				break;
 			case 7:
 				this.enterOuterAlt(localctx, 7);
 				{
-				this.state = 158;
+				this.state = 162;
 				this.fork_statement();
 				}
 				break;
 			case 8:
 				this.enterOuterAlt(localctx, 8);
 				{
-				this.state = 159;
+				this.state = 163;
 				this.try_statement();
 				}
 				break;
 			case 9:
 				this.enterOuterAlt(localctx, 9);
 				{
-				this.state = 160;
+				this.state = 164;
 				this.if_statement();
 				}
 				break;
 			case 10:
 				this.enterOuterAlt(localctx, 10);
 				{
-				this.state = 161;
+				this.state = 165;
 				this.for_loop_statement();
 				}
 				break;
 			case 11:
 				this.enterOuterAlt(localctx, 11);
 				{
-				this.state = 162;
+				this.state = 166;
 				this.while_loop_statement();
 				}
 				break;
@@ -479,17 +482,17 @@ export default class MoocodeParser extends Parser {
 		try {
 			this.enterOuterAlt(localctx, 1);
 			{
-			this.state = 168;
+			this.state = 172;
 			this._errHandler.sync(this);
 			_la = this._input.LA(1);
 			while ((((_la) & ~0x1F) === 0 && ((1 << _la) & 4294823948) !== 0) || ((((_la - 32)) & ~0x1F) === 0 && ((1 << (_la - 32)) & 2215165439) !== 0) || ((((_la - 71)) & ~0x1F) === 0 && ((1 << (_la - 71)) & 101433) !== 0)) {
 				{
 				{
-				this.state = 165;
+				this.state = 169;
 				this.statement();
 				}
 				}
-				this.state = 170;
+				this.state = 174;
 				this._errHandler.sync(this);
 				_la = this._input.LA(1);
 			}
@@ -516,7 +519,7 @@ export default class MoocodeParser extends Parser {
 		try {
 			this.enterOuterAlt(localctx, 1);
 			{
-			this.state = 171;
+			this.state = 175;
 			this.match(MoocodeParser.SEMICOLON);
 			}
 		}
@@ -541,9 +544,9 @@ export default class MoocodeParser extends Parser {
 		try {
 			this.enterOuterAlt(localctx, 1);
 			{
-			this.state = 173;
+			this.state = 177;
 			this.match(MoocodeParser.STRING_LITERAL);
-			this.state = 174;
+			this.state = 178;
 			this.match(MoocodeParser.SEMICOLON);
 			}
 		}
@@ -569,33 +572,33 @@ export default class MoocodeParser extends Parser {
 		try {
 			this.enterOuterAlt(localctx, 1);
 			{
-			this.state = 176;
-			this.if_expression();
 			this.state = 180;
+			this.if_expression();
+			this.state = 184;
 			this._errHandler.sync(this);
 			_la = this._input.LA(1);
 			while (_la===5) {
 				{
 				{
-				this.state = 177;
+				this.state = 181;
 				this.elseif_expression();
 				}
 				}
-				this.state = 182;
+				this.state = 186;
 				this._errHandler.sync(this);
 				_la = this._input.LA(1);
 			}
-			this.state = 184;
+			this.state = 188;
 			this._errHandler.sync(this);
 			_la = this._input.LA(1);
 			if (_la===4) {
 				{
-				this.state = 183;
+				this.state = 187;
 				this.else_expression();
 				}
 			}
 
-			this.state = 186;
+			this.state = 190;
 			this.match(MoocodeParser.ENDIF);
 			}
 		}
@@ -620,15 +623,15 @@ export default class MoocodeParser extends Parser {
 		try {
 			this.enterOuterAlt(localctx, 1);
 			{
-			this.state = 188;
-			this.match(MoocodeParser.IF);
-			this.state = 189;
-			this.match(MoocodeParser.OPEN_PARENS);
-			this.state = 190;
-			localctx._conditions = this.expression();
-			this.state = 191;
-			this.match(MoocodeParser.CLOSE_PARENS);
 			this.state = 192;
+			this.match(MoocodeParser.IF);
+			this.state = 193;
+			this.match(MoocodeParser.OPEN_PARENS);
+			this.state = 194;
+			localctx._conditions = this.expression();
+			this.state = 195;
+			this.match(MoocodeParser.CLOSE_PARENS);
+			this.state = 196;
 			localctx._body = this.statements();
 			}
 		}
@@ -653,15 +656,15 @@ export default class MoocodeParser extends Parser {
 		try {
 			this.enterOuterAlt(localctx, 1);
 			{
-			this.state = 194;
-			this.match(MoocodeParser.ELSEIF);
-			this.state = 195;
-			this.match(MoocodeParser.OPEN_PARENS);
-			this.state = 196;
-			localctx._conditions = this.expression();
-			this.state = 197;
-			this.match(MoocodeParser.CLOSE_PARENS);
 			this.state = 198;
+			this.match(MoocodeParser.ELSEIF);
+			this.state = 199;
+			this.match(MoocodeParser.OPEN_PARENS);
+			this.state = 200;
+			localctx._conditions = this.expression();
+			this.state = 201;
+			this.match(MoocodeParser.CLOSE_PARENS);
+			this.state = 202;
 			localctx._body = this.statements();
 			}
 		}
@@ -686,9 +689,9 @@ export default class MoocodeParser extends Parser {
 		try {
 			this.enterOuterAlt(localctx, 1);
 			{
-			this.state = 200;
+			this.state = 204;
 			this.match(MoocodeParser.ELSE);
-			this.state = 201;
+			this.state = 205;
 			localctx._body = this.statements();
 			}
 		}
@@ -713,23 +716,23 @@ export default class MoocodeParser extends Parser {
 		try {
 			this.enterOuterAlt(localctx, 1);
 			{
-			this.state = 205;
+			this.state = 209;
 			this._errHandler.sync(this);
 			switch ( this._interp.adaptivePredict(this._input, 5, this._ctx) ) {
 			case 1:
 				{
-				this.state = 203;
+				this.state = 207;
 				this.non_empty_return();
 				}
 				break;
 			case 2:
 				{
-				this.state = 204;
+				this.state = 208;
 				this.empty_return();
 				}
 				break;
 			}
-			this.state = 207;
+			this.state = 211;
 			this.match(MoocodeParser.SEMICOLON);
 			}
 		}
@@ -754,9 +757,9 @@ export default class MoocodeParser extends Parser {
 		try {
 			this.enterOuterAlt(localctx, 1);
 			{
-			this.state = 209;
+			this.state = 213;
 			this.match(MoocodeParser.RETURN);
-			this.state = 210;
+			this.state = 214;
 			this.expression();
 			}
 		}
@@ -781,7 +784,7 @@ export default class MoocodeParser extends Parser {
 		try {
 			this.enterOuterAlt(localctx, 1);
 			{
-			this.state = 212;
+			this.state = 216;
 			this.match(MoocodeParser.RETURN);
 			}
 		}
@@ -806,27 +809,27 @@ export default class MoocodeParser extends Parser {
 		try {
 			this.enterOuterAlt(localctx, 1);
 			{
-			this.state = 214;
+			this.state = 218;
 			this.match(MoocodeParser.FOR);
-			this.state = 217;
+			this.state = 221;
 			this._errHandler.sync(this);
 			switch ( this._interp.adaptivePredict(this._input, 6, this._ctx) ) {
 			case 1:
 				{
-				this.state = 215;
+				this.state = 219;
 				this.for_expression();
 				}
 				break;
 			case 2:
 				{
-				this.state = 216;
+				this.state = 220;
 				this.ranged_for_expression();
 				}
 				break;
 			}
-			this.state = 219;
+			this.state = 223;
 			localctx._body = this.statements();
-			this.state = 220;
+			this.state = 224;
 			this.match(MoocodeParser.ENDFOR);
 			}
 		}
@@ -852,27 +855,27 @@ export default class MoocodeParser extends Parser {
 		try {
 			this.enterOuterAlt(localctx, 1);
 			{
-			this.state = 222;
+			this.state = 226;
 			localctx._value = this.identifier();
-			this.state = 225;
+			this.state = 229;
 			this._errHandler.sync(this);
 			_la = this._input.LA(1);
 			if (_la===56) {
 				{
-				this.state = 223;
+				this.state = 227;
 				this.match(MoocodeParser.COMMA);
-				this.state = 224;
+				this.state = 228;
 				localctx._key = this.identifier();
 				}
 			}
 
-			this.state = 227;
+			this.state = 231;
 			this.match(MoocodeParser.IN);
-			this.state = 228;
+			this.state = 232;
 			this.match(MoocodeParser.OPEN_PARENS);
-			this.state = 229;
+			this.state = 233;
 			localctx._range = this.expression();
-			this.state = 230;
+			this.state = 234;
 			this.match(MoocodeParser.CLOSE_PARENS);
 			}
 		}
@@ -897,19 +900,19 @@ export default class MoocodeParser extends Parser {
 		try {
 			this.enterOuterAlt(localctx, 1);
 			{
-			this.state = 232;
-			localctx._value = this.identifier();
-			this.state = 233;
-			this.match(MoocodeParser.IN);
-			this.state = 234;
-			this.match(MoocodeParser.OPEN_BRACKET);
-			this.state = 235;
-			localctx._start = this.expression();
 			this.state = 236;
-			this.match(MoocodeParser.OP_RANGE);
+			localctx._value = this.identifier();
 			this.state = 237;
-			localctx._end = this.expression();
+			this.match(MoocodeParser.IN);
 			this.state = 238;
+			this.match(MoocodeParser.OPEN_BRACKET);
+			this.state = 239;
+			localctx._start = this.expression();
+			this.state = 240;
+			this.match(MoocodeParser.OP_RANGE);
+			this.state = 241;
+			localctx._end = this.expression();
+			this.state = 242;
 			this.match(MoocodeParser.CLOSE_BRACKET);
 			}
 		}
@@ -934,23 +937,23 @@ export default class MoocodeParser extends Parser {
 		try {
 			this.enterOuterAlt(localctx, 1);
 			{
-			this.state = 242;
+			this.state = 246;
 			this._errHandler.sync(this);
 			switch ( this._interp.adaptivePredict(this._input, 8, this._ctx) ) {
 			case 1:
 				{
-				this.state = 240;
+				this.state = 244;
 				this.empty_continue();
 				}
 				break;
 			case 2:
 				{
-				this.state = 241;
+				this.state = 245;
 				this.non_empty_continue();
 				}
 				break;
 			}
-			this.state = 244;
+			this.state = 248;
 			this.match(MoocodeParser.SEMICOLON);
 			}
 		}
@@ -975,7 +978,7 @@ export default class MoocodeParser extends Parser {
 		try {
 			this.enterOuterAlt(localctx, 1);
 			{
-			this.state = 246;
+			this.state = 250;
 			this.match(MoocodeParser.CONTINUE);
 			}
 		}
@@ -1000,9 +1003,9 @@ export default class MoocodeParser extends Parser {
 		try {
 			this.enterOuterAlt(localctx, 1);
 			{
-			this.state = 248;
+			this.state = 252;
 			this.match(MoocodeParser.CONTINUE);
-			this.state = 249;
+			this.state = 253;
 			this.identifier();
 			}
 		}
@@ -1027,23 +1030,23 @@ export default class MoocodeParser extends Parser {
 		try {
 			this.enterOuterAlt(localctx, 1);
 			{
-			this.state = 253;
+			this.state = 257;
 			this._errHandler.sync(this);
 			switch ( this._interp.adaptivePredict(this._input, 9, this._ctx) ) {
 			case 1:
 				{
-				this.state = 251;
+				this.state = 255;
 				this.empty_break();
 				}
 				break;
 			case 2:
 				{
-				this.state = 252;
+				this.state = 256;
 				this.non_empty_break();
 				}
 				break;
 			}
-			this.state = 255;
+			this.state = 259;
 			this.match(MoocodeParser.SEMICOLON);
 			}
 		}
@@ -1068,7 +1071,7 @@ export default class MoocodeParser extends Parser {
 		try {
 			this.enterOuterAlt(localctx, 1);
 			{
-			this.state = 257;
+			this.state = 261;
 			this.match(MoocodeParser.BREAK);
 			}
 		}
@@ -1093,9 +1096,9 @@ export default class MoocodeParser extends Parser {
 		try {
 			this.enterOuterAlt(localctx, 1);
 			{
-			this.state = 259;
+			this.state = 263;
 			this.match(MoocodeParser.BREAK);
-			this.state = 260;
+			this.state = 264;
 			this.identifier();
 			}
 		}
@@ -1121,39 +1124,39 @@ export default class MoocodeParser extends Parser {
 		try {
 			this.enterOuterAlt(localctx, 1);
 			{
-			this.state = 262;
+			this.state = 266;
 			this.match(MoocodeParser.WHILE);
-			this.state = 264;
+			this.state = 268;
 			this._errHandler.sync(this);
 			_la = this._input.LA(1);
 			if (_la===42) {
 				{
-				this.state = 263;
+				this.state = 267;
 				localctx._outer_name = this.identifier();
 				}
 			}
 
-			this.state = 266;
-			this.match(MoocodeParser.OPEN_PARENS);
 			this.state = 270;
+			this.match(MoocodeParser.OPEN_PARENS);
+			this.state = 274;
 			this._errHandler.sync(this);
 			switch ( this._interp.adaptivePredict(this._input, 11, this._ctx) ) {
 			case 1:
 				{
-				this.state = 267;
+				this.state = 271;
 				localctx._inner_name = this.identifier();
-				this.state = 268;
+				this.state = 272;
 				this.match(MoocodeParser.EQUALS);
 				}
 				break;
 			}
-			this.state = 272;
+			this.state = 276;
 			localctx._conditions = this.expression();
-			this.state = 273;
+			this.state = 277;
 			this.match(MoocodeParser.CLOSE_PARENS);
-			this.state = 274;
+			this.state = 278;
 			this.statements();
-			this.state = 275;
+			this.state = 279;
 			this.match(MoocodeParser.ENDWHILE);
 			}
 		}
@@ -1179,26 +1182,26 @@ export default class MoocodeParser extends Parser {
 		try {
 			this.enterOuterAlt(localctx, 1);
 			{
-			this.state = 277;
+			this.state = 281;
 			this.match(MoocodeParser.TRY);
-			this.state = 278;
+			this.state = 282;
 			this.statements();
-			this.state = 292;
+			this.state = 296;
 			this._errHandler.sync(this);
 			switch ( this._interp.adaptivePredict(this._input, 14, this._ctx) ) {
 			case 1:
 				{
-				this.state = 280;
+				this.state = 284;
 				this._errHandler.sync(this);
 				_la = this._input.LA(1);
 				do {
 					{
 					{
-					this.state = 279;
+					this.state = 283;
 					this.try_except();
 					}
 					}
-					this.state = 282;
+					this.state = 286;
 					this._errHandler.sync(this);
 					_la = this._input.LA(1);
 				} while (_la===11);
@@ -1206,32 +1209,32 @@ export default class MoocodeParser extends Parser {
 				break;
 			case 2:
 				{
-				this.state = 284;
+				this.state = 288;
 				this.try_finally();
 				}
 				break;
 			case 3:
 				{
-				this.state = 286;
+				this.state = 290;
 				this._errHandler.sync(this);
 				_la = this._input.LA(1);
 				do {
 					{
 					{
-					this.state = 285;
+					this.state = 289;
 					this.try_except();
 					}
 					}
-					this.state = 288;
+					this.state = 292;
 					this._errHandler.sync(this);
 					_la = this._input.LA(1);
 				} while (_la===11);
-				this.state = 290;
+				this.state = 294;
 				this.try_finally();
 				}
 				break;
 			}
-			this.state = 294;
+			this.state = 298;
 			this.match(MoocodeParser.ENDTRY);
 			}
 		}
@@ -1256,17 +1259,17 @@ export default class MoocodeParser extends Parser {
 		try {
 			this.enterOuterAlt(localctx, 1);
 			{
-			this.state = 296;
-			this.match(MoocodeParser.EXCEPT);
-			this.state = 297;
-			this.identifier();
-			this.state = 298;
-			this.match(MoocodeParser.OPEN_PARENS);
-			this.state = 299;
-			this.error_codes();
 			this.state = 300;
-			this.match(MoocodeParser.CLOSE_PARENS);
+			this.match(MoocodeParser.EXCEPT);
 			this.state = 301;
+			this.identifier();
+			this.state = 302;
+			this.match(MoocodeParser.OPEN_PARENS);
+			this.state = 303;
+			this.error_codes();
+			this.state = 304;
+			this.match(MoocodeParser.CLOSE_PARENS);
+			this.state = 305;
 			this.statements();
 			}
 		}
@@ -1291,9 +1294,9 @@ export default class MoocodeParser extends Parser {
 		try {
 			this.enterOuterAlt(localctx, 1);
 			{
-			this.state = 303;
+			this.state = 307;
 			this.match(MoocodeParser.FINALLY);
-			this.state = 304;
+			this.state = 308;
 			this.statements();
 			}
 		}
@@ -1319,27 +1322,27 @@ export default class MoocodeParser extends Parser {
 		try {
 			this.enterOuterAlt(localctx, 1);
 			{
-			this.state = 306;
+			this.state = 310;
 			this.match(MoocodeParser.FORK);
-			this.state = 308;
+			this.state = 312;
 			this._errHandler.sync(this);
 			_la = this._input.LA(1);
 			if (_la===42) {
 				{
-				this.state = 307;
+				this.state = 311;
 				localctx._name = this.identifier();
 				}
 			}
 
-			this.state = 310;
-			this.match(MoocodeParser.OPEN_PARENS);
-			this.state = 311;
-			localctx._schedule = this.expression();
-			this.state = 312;
-			this.match(MoocodeParser.CLOSE_PARENS);
-			this.state = 313;
-			this.statements();
 			this.state = 314;
+			this.match(MoocodeParser.OPEN_PARENS);
+			this.state = 315;
+			localctx._schedule = this.expression();
+			this.state = 316;
+			this.match(MoocodeParser.CLOSE_PARENS);
+			this.state = 317;
+			this.statements();
+			this.state = 318;
 			this.match(MoocodeParser.ENDFORK);
 			}
 		}
@@ -1363,13 +1366,13 @@ export default class MoocodeParser extends Parser {
 		this.enterRule(localctx, 52, MoocodeParser.RULE_error_codes);
 		let _la: number;
 		try {
-			this.state = 325;
+			this.state = 329;
 			this._errHandler.sync(this);
 			switch (this._input.LA(1)) {
 			case 41:
 				this.enterOuterAlt(localctx, 1);
 				{
-				this.state = 316;
+				this.state = 320;
 				this.any_error();
 				}
 				break;
@@ -1412,21 +1415,21 @@ export default class MoocodeParser extends Parser {
 				this.enterOuterAlt(localctx, 2);
 				{
 				{
-				this.state = 317;
+				this.state = 321;
 				this.expression();
-				this.state = 322;
+				this.state = 326;
 				this._errHandler.sync(this);
 				_la = this._input.LA(1);
 				while (_la===56) {
 					{
 					{
-					this.state = 318;
+					this.state = 322;
 					this.match(MoocodeParser.COMMA);
-					this.state = 319;
+					this.state = 323;
 					this.expression();
 					}
 					}
-					this.state = 324;
+					this.state = 328;
 					this._errHandler.sync(this);
 					_la = this._input.LA(1);
 				}
@@ -1458,7 +1461,7 @@ export default class MoocodeParser extends Parser {
 		try {
 			this.enterOuterAlt(localctx, 1);
 			{
-			this.state = 327;
+			this.state = 331;
 			this.match(MoocodeParser.ANY_ERROR);
 			}
 		}
@@ -1481,20 +1484,20 @@ export default class MoocodeParser extends Parser {
 		let localctx: ExpressionContext = new ExpressionContext(this, this._ctx, this.state);
 		this.enterRule(localctx, 56, MoocodeParser.RULE_expression);
 		try {
-			this.state = 331;
+			this.state = 335;
 			this._errHandler.sync(this);
 			switch ( this._interp.adaptivePredict(this._input, 18, this._ctx) ) {
 			case 1:
 				this.enterOuterAlt(localctx, 1);
 				{
-				this.state = 329;
+				this.state = 333;
 				this.assignment();
 				}
 				break;
 			case 2:
 				this.enterOuterAlt(localctx, 2);
 				{
-				this.state = 330;
+				this.state = 334;
 				this.non_assignment();
 				}
 				break;
@@ -1521,11 +1524,11 @@ export default class MoocodeParser extends Parser {
 		try {
 			this.enterOuterAlt(localctx, 1);
 			{
-			this.state = 333;
+			this.state = 337;
 			this.unary_expression();
-			this.state = 334;
+			this.state = 338;
 			this.assignment_operator();
-			this.state = 335;
+			this.state = 339;
 			this.expression();
 			}
 		}
@@ -1550,7 +1553,7 @@ export default class MoocodeParser extends Parser {
 		try {
 			this.enterOuterAlt(localctx, 1);
 			{
-			this.state = 337;
+			this.state = 341;
 			this.match(MoocodeParser.EQUALS);
 			}
 		}
@@ -1575,7 +1578,7 @@ export default class MoocodeParser extends Parser {
 		try {
 			this.enterOuterAlt(localctx, 1);
 			{
-			this.state = 339;
+			this.state = 343;
 			this.conditional_expression();
 			}
 		}
@@ -1601,20 +1604,20 @@ export default class MoocodeParser extends Parser {
 		try {
 			this.enterOuterAlt(localctx, 1);
 			{
-			this.state = 341;
+			this.state = 345;
 			localctx._if_conditions = this.conditional_in_expression();
-			this.state = 347;
+			this.state = 351;
 			this._errHandler.sync(this);
 			_la = this._input.LA(1);
 			if (_la===80) {
 				{
-				this.state = 342;
+				this.state = 346;
 				this.match(MoocodeParser.QUESTION_MARK);
-				this.state = 343;
+				this.state = 347;
 				localctx._true_ex = this.expression();
-				this.state = 344;
+				this.state = 348;
 				this.match(MoocodeParser.PIPE);
-				this.state = 345;
+				this.state = 349;
 				localctx._false_ex = this.expression();
 				}
 			}
@@ -1643,16 +1646,16 @@ export default class MoocodeParser extends Parser {
 		try {
 			this.enterOuterAlt(localctx, 1);
 			{
-			this.state = 349;
+			this.state = 353;
 			localctx._left = this.conditional_or_expression();
-			this.state = 352;
+			this.state = 356;
 			this._errHandler.sync(this);
 			_la = this._input.LA(1);
 			if (_la===17) {
 				{
-				this.state = 350;
+				this.state = 354;
 				this.match(MoocodeParser.IN);
-				this.state = 351;
+				this.state = 355;
 				localctx._right = this.conditional_or_expression();
 				}
 			}
@@ -1681,21 +1684,21 @@ export default class MoocodeParser extends Parser {
 		try {
 			this.enterOuterAlt(localctx, 1);
 			{
-			this.state = 354;
+			this.state = 358;
 			this.conditional_and_expression();
-			this.state = 359;
+			this.state = 363;
 			this._errHandler.sync(this);
 			_la = this._input.LA(1);
 			while (_la===72) {
 				{
 				{
-				this.state = 355;
+				this.state = 359;
 				this.match(MoocodeParser.OP_OR);
-				this.state = 356;
+				this.state = 360;
 				this.conditional_and_expression();
 				}
 				}
-				this.state = 361;
+				this.state = 365;
 				this._errHandler.sync(this);
 				_la = this._input.LA(1);
 			}
@@ -1723,21 +1726,21 @@ export default class MoocodeParser extends Parser {
 		try {
 			this.enterOuterAlt(localctx, 1);
 			{
-			this.state = 362;
+			this.state = 366;
 			this.inclusive_or_expression();
-			this.state = 367;
+			this.state = 371;
 			this._errHandler.sync(this);
 			_la = this._input.LA(1);
 			while (_la===64) {
 				{
 				{
-				this.state = 363;
+				this.state = 367;
 				this.match(MoocodeParser.OP_AND);
-				this.state = 364;
+				this.state = 368;
 				this.inclusive_or_expression();
 				}
 				}
-				this.state = 369;
+				this.state = 373;
 				this._errHandler.sync(this);
 				_la = this._input.LA(1);
 			}
@@ -1765,21 +1768,21 @@ export default class MoocodeParser extends Parser {
 		try {
 			this.enterOuterAlt(localctx, 1);
 			{
-			this.state = 370;
+			this.state = 374;
 			this.exclusive_or_expression();
-			this.state = 375;
+			this.state = 379;
 			this._errHandler.sync(this);
 			_la = this._input.LA(1);
 			while (_la===49) {
 				{
 				{
-				this.state = 371;
+				this.state = 375;
 				this.match(MoocodeParser.BIT_OR);
-				this.state = 372;
+				this.state = 376;
 				this.exclusive_or_expression();
 				}
 				}
-				this.state = 377;
+				this.state = 381;
 				this._errHandler.sync(this);
 				_la = this._input.LA(1);
 			}
@@ -1807,21 +1810,21 @@ export default class MoocodeParser extends Parser {
 		try {
 			this.enterOuterAlt(localctx, 1);
 			{
-			this.state = 378;
+			this.state = 382;
 			this.and_expression();
-			this.state = 383;
+			this.state = 387;
 			this._errHandler.sync(this);
 			_la = this._input.LA(1);
 			while (_la===50) {
 				{
 				{
-				this.state = 379;
+				this.state = 383;
 				this.match(MoocodeParser.BIT_XOR);
-				this.state = 380;
+				this.state = 384;
 				this.and_expression();
 				}
 				}
-				this.state = 385;
+				this.state = 389;
 				this._errHandler.sync(this);
 				_la = this._input.LA(1);
 			}
@@ -1849,21 +1852,21 @@ export default class MoocodeParser extends Parser {
 		try {
 			this.enterOuterAlt(localctx, 1);
 			{
-			this.state = 386;
+			this.state = 390;
 			this.equality_expression();
-			this.state = 391;
+			this.state = 395;
 			this._errHandler.sync(this);
 			_la = this._input.LA(1);
 			while (_la===48) {
 				{
 				{
-				this.state = 387;
+				this.state = 391;
 				this.match(MoocodeParser.BIT_AND);
-				this.state = 388;
+				this.state = 392;
 				this.equality_expression();
 				}
 				}
-				this.state = 393;
+				this.state = 397;
 				this._errHandler.sync(this);
 				_la = this._input.LA(1);
 			}
@@ -1891,15 +1894,15 @@ export default class MoocodeParser extends Parser {
 		try {
 			this.enterOuterAlt(localctx, 1);
 			{
-			this.state = 394;
+			this.state = 398;
 			this.relational_expression();
-			this.state = 399;
+			this.state = 403;
 			this._errHandler.sync(this);
 			_la = this._input.LA(1);
 			while (_la===65 || _la===70) {
 				{
 				{
-				this.state = 395;
+				this.state = 399;
 				_la = this._input.LA(1);
 				if(!(_la===65 || _la===70)) {
 				this._errHandler.recoverInline(this);
@@ -1908,11 +1911,11 @@ export default class MoocodeParser extends Parser {
 					this._errHandler.reportMatch(this);
 				    this.consume();
 				}
-				this.state = 396;
+				this.state = 400;
 				this.relational_expression();
 				}
 				}
-				this.state = 401;
+				this.state = 405;
 				this._errHandler.sync(this);
 				_la = this._input.LA(1);
 			}
@@ -1940,15 +1943,15 @@ export default class MoocodeParser extends Parser {
 		try {
 			this.enterOuterAlt(localctx, 1);
 			{
-			this.state = 402;
+			this.state = 406;
 			this.shift_expression();
-			this.state = 407;
+			this.state = 411;
 			this._errHandler.sync(this);
 			_la = this._input.LA(1);
 			while (((((_la - 66)) & ~0x1F) === 0 && ((1 << (_la - 66)) & 15) !== 0)) {
 				{
 				{
-				this.state = 403;
+				this.state = 407;
 				_la = this._input.LA(1);
 				if(!(((((_la - 66)) & ~0x1F) === 0 && ((1 << (_la - 66)) & 15) !== 0))) {
 				this._errHandler.recoverInline(this);
@@ -1957,11 +1960,11 @@ export default class MoocodeParser extends Parser {
 					this._errHandler.reportMatch(this);
 				    this.consume();
 				}
-				this.state = 404;
+				this.state = 408;
 				this.shift_expression();
 				}
 				}
-				this.state = 409;
+				this.state = 413;
 				this._errHandler.sync(this);
 				_la = this._input.LA(1);
 			}
@@ -1989,15 +1992,15 @@ export default class MoocodeParser extends Parser {
 		try {
 			this.enterOuterAlt(localctx, 1);
 			{
-			this.state = 410;
+			this.state = 414;
 			this.additive_expression();
-			this.state = 415;
+			this.state = 419;
 			this._errHandler.sync(this);
 			_la = this._input.LA(1);
 			while (_la===61 || _la===62) {
 				{
 				{
-				this.state = 411;
+				this.state = 415;
 				_la = this._input.LA(1);
 				if(!(_la===61 || _la===62)) {
 				this._errHandler.recoverInline(this);
@@ -2006,11 +2009,11 @@ export default class MoocodeParser extends Parser {
 					this._errHandler.reportMatch(this);
 				    this.consume();
 				}
-				this.state = 412;
+				this.state = 416;
 				this.additive_expression();
 				}
 				}
-				this.state = 417;
+				this.state = 421;
 				this._errHandler.sync(this);
 				_la = this._input.LA(1);
 			}
@@ -2038,15 +2041,15 @@ export default class MoocodeParser extends Parser {
 		try {
 			this.enterOuterAlt(localctx, 1);
 			{
-			this.state = 418;
+			this.state = 422;
 			this.multiplicative_expression();
-			this.state = 423;
+			this.state = 427;
 			this._errHandler.sync(this);
 			_la = this._input.LA(1);
 			while (_la===63 || _la===79) {
 				{
 				{
-				this.state = 419;
+				this.state = 423;
 				_la = this._input.LA(1);
 				if(!(_la===63 || _la===79)) {
 				this._errHandler.recoverInline(this);
@@ -2055,11 +2058,11 @@ export default class MoocodeParser extends Parser {
 					this._errHandler.reportMatch(this);
 				    this.consume();
 				}
-				this.state = 420;
+				this.state = 424;
 				this.multiplicative_expression();
 				}
 				}
-				this.state = 425;
+				this.state = 429;
 				this._errHandler.sync(this);
 				_la = this._input.LA(1);
 			}
@@ -2087,15 +2090,15 @@ export default class MoocodeParser extends Parser {
 		try {
 			this.enterOuterAlt(localctx, 1);
 			{
-			this.state = 426;
+			this.state = 430;
 			this.unary_expression();
-			this.state = 431;
+			this.state = 435;
 			this._errHandler.sync(this);
 			_la = this._input.LA(1);
 			while (((((_la - 57)) & ~0x1F) === 0 && ((1 << (_la - 57)) & 135266305) !== 0)) {
 				{
 				{
-				this.state = 427;
+				this.state = 431;
 				_la = this._input.LA(1);
 				if(!(((((_la - 57)) & ~0x1F) === 0 && ((1 << (_la - 57)) & 135266305) !== 0))) {
 				this._errHandler.recoverInline(this);
@@ -2104,11 +2107,11 @@ export default class MoocodeParser extends Parser {
 					this._errHandler.reportMatch(this);
 				    this.consume();
 				}
-				this.state = 428;
+				this.state = 432;
 				this.unary_expression();
 				}
 				}
-				this.state = 433;
+				this.state = 437;
 				this._errHandler.sync(this);
 				_la = this._input.LA(1);
 			}
@@ -2133,7 +2136,7 @@ export default class MoocodeParser extends Parser {
 		let localctx: Unary_expressionContext = new Unary_expressionContext(this, this._ctx, this.state);
 		this.enterRule(localctx, 88, MoocodeParser.RULE_unary_expression);
 		try {
-			this.state = 438;
+			this.state = 442;
 			this._errHandler.sync(this);
 			switch (this._input.LA(1)) {
 			case 12:
@@ -2171,28 +2174,28 @@ export default class MoocodeParser extends Parser {
 			case 86:
 				this.enterOuterAlt(localctx, 1);
 				{
-				this.state = 434;
+				this.state = 438;
 				this.primary_expression();
 				}
 				break;
 			case 63:
 				this.enterOuterAlt(localctx, 2);
 				{
-				this.state = 435;
+				this.state = 439;
 				this.negative_unary_expression();
 				}
 				break;
 			case 71:
 				this.enterOuterAlt(localctx, 3);
 				{
-				this.state = 436;
+				this.state = 440;
 				this.negated_unary_expression();
 				}
 				break;
 			case 87:
 				this.enterOuterAlt(localctx, 4);
 				{
-				this.state = 437;
+				this.state = 441;
 				this.complement_unary_expression();
 				}
 				break;
@@ -2221,9 +2224,9 @@ export default class MoocodeParser extends Parser {
 		try {
 			this.enterOuterAlt(localctx, 1);
 			{
-			this.state = 440;
+			this.state = 444;
 			this.match(MoocodeParser.MINUS);
-			this.state = 441;
+			this.state = 445;
 			this.unary_expression();
 			}
 		}
@@ -2248,9 +2251,9 @@ export default class MoocodeParser extends Parser {
 		try {
 			this.enterOuterAlt(localctx, 1);
 			{
-			this.state = 443;
+			this.state = 447;
 			this.match(MoocodeParser.OP_NOT);
-			this.state = 444;
+			this.state = 448;
 			this.unary_expression();
 			}
 		}
@@ -2275,9 +2278,9 @@ export default class MoocodeParser extends Parser {
 		try {
 			this.enterOuterAlt(localctx, 1);
 			{
-			this.state = 446;
+			this.state = 450;
 			this.match(MoocodeParser.WAVE);
-			this.state = 447;
+			this.state = 451;
 			this.unary_expression();
 			}
 		}
@@ -2303,37 +2306,37 @@ export default class MoocodeParser extends Parser {
 		try {
 			this.enterOuterAlt(localctx, 1);
 			{
-			this.state = 449;
+			this.state = 453;
 			localctx._pe = this.primary_expression_start();
-			this.state = 456;
+			this.state = 460;
 			this._errHandler.sync(this);
 			_la = this._input.LA(1);
 			while (((((_la - 55)) & ~0x1F) === 0 && ((1 << (_la - 55)) & 3145745) !== 0)) {
 				{
-				this.state = 454;
+				this.state = 458;
 				this._errHandler.sync(this);
 				switch (this._input.LA(1)) {
 				case 75:
 					{
-					this.state = 450;
+					this.state = 454;
 					this.indexer();
 					}
 					break;
 				case 59:
 					{
-					this.state = 451;
+					this.state = 455;
 					this.property_accessor();
 					}
 					break;
 				case 55:
 					{
-					this.state = 452;
+					this.state = 456;
 					this.verb_invocation();
 					}
 					break;
 				case 76:
 					{
-					this.state = 453;
+					this.state = 457;
 					this.bf_invocation();
 					}
 					break;
@@ -2341,7 +2344,7 @@ export default class MoocodeParser extends Parser {
 					throw new NoViableAltException(this);
 				}
 				}
-				this.state = 458;
+				this.state = 462;
 				this._errHandler.sync(this);
 				_la = this._input.LA(1);
 			}
@@ -2368,24 +2371,24 @@ export default class MoocodeParser extends Parser {
 		try {
 			this.enterOuterAlt(localctx, 1);
 			{
-			this.state = 459;
+			this.state = 463;
 			this.match(MoocodeParser.DOT);
-			this.state = 465;
+			this.state = 469;
 			this._errHandler.sync(this);
 			switch (this._input.LA(1)) {
 			case 42:
 				{
-				this.state = 460;
+				this.state = 464;
 				this.identifier();
 				}
 				break;
 			case 76:
 				{
-				this.state = 461;
+				this.state = 465;
 				this.match(MoocodeParser.OPEN_PARENS);
-				this.state = 462;
+				this.state = 466;
 				localctx._computed_prop_arguments = this.expression();
-				this.state = 463;
+				this.state = 467;
 				this.match(MoocodeParser.CLOSE_PARENS);
 				}
 				break;
@@ -2415,35 +2418,35 @@ export default class MoocodeParser extends Parser {
 		try {
 			this.enterOuterAlt(localctx, 1);
 			{
-			this.state = 467;
+			this.state = 471;
 			this.match(MoocodeParser.COLON);
-			this.state = 473;
+			this.state = 477;
 			this._errHandler.sync(this);
 			switch (this._input.LA(1)) {
 			case 42:
 				{
-				this.state = 468;
+				this.state = 472;
 				this.identifier();
 				}
 				break;
 			case 76:
 				{
-				this.state = 469;
+				this.state = 473;
 				this.match(MoocodeParser.OPEN_PARENS);
-				this.state = 470;
+				this.state = 474;
 				localctx._computed_verb_arguments = this.expression();
-				this.state = 471;
+				this.state = 475;
 				this.match(MoocodeParser.CLOSE_PARENS);
 				}
 				break;
 			default:
 				throw new NoViableAltException(this);
 			}
-			this.state = 475;
+			this.state = 479;
 			this.match(MoocodeParser.OPEN_PARENS);
-			this.state = 476;
+			this.state = 480;
 			localctx._arguments = this.expressions();
-			this.state = 477;
+			this.state = 481;
 			this.match(MoocodeParser.CLOSE_PARENS);
 			}
 		}
@@ -2469,29 +2472,29 @@ export default class MoocodeParser extends Parser {
 		try {
 			this.enterOuterAlt(localctx, 1);
 			{
-			this.state = 480;
+			this.state = 484;
 			this._errHandler.sync(this);
 			_la = this._input.LA(1);
 			if ((((_la) & ~0x1F) === 0 && ((1 << _la) & 4291301376) !== 0) || ((((_la - 32)) & ~0x1F) === 0 && ((1 << (_la - 32)) & 2215165439) !== 0) || ((((_la - 71)) & ~0x1F) === 0 && ((1 << (_la - 71)) & 100409) !== 0)) {
 				{
-				this.state = 479;
+				this.state = 483;
 				this.expression();
 				}
 			}
 
-			this.state = 486;
+			this.state = 490;
 			this._errHandler.sync(this);
 			_la = this._input.LA(1);
 			while (_la===56) {
 				{
 				{
-				this.state = 482;
+				this.state = 486;
 				this.match(MoocodeParser.COMMA);
-				this.state = 483;
+				this.state = 487;
 				this.expression();
 				}
 				}
-				this.state = 488;
+				this.state = 492;
 				this._errHandler.sync(this);
 				_la = this._input.LA(1);
 			}
@@ -2518,11 +2521,11 @@ export default class MoocodeParser extends Parser {
 		try {
 			this.enterOuterAlt(localctx, 1);
 			{
-			this.state = 489;
+			this.state = 493;
 			this.match(MoocodeParser.OPEN_PARENS);
-			this.state = 490;
+			this.state = 494;
 			localctx._arguments = this.expressions();
-			this.state = 491;
+			this.state = 495;
 			this.match(MoocodeParser.CLOSE_PARENS);
 			}
 		}
@@ -2545,69 +2548,69 @@ export default class MoocodeParser extends Parser {
 		let localctx: Primary_expression_startContext = new Primary_expression_startContext(this, this._ctx, this.state);
 		this.enterRule(localctx, 106, MoocodeParser.RULE_primary_expression_start);
 		try {
-			this.state = 502;
+			this.state = 506;
 			this._errHandler.sync(this);
 			switch ( this._interp.adaptivePredict(this._input, 38, this._ctx) ) {
 			case 1:
 				this.enterOuterAlt(localctx, 1);
 				{
-				this.state = 493;
+				this.state = 497;
 				this.identifier();
 				}
 				break;
 			case 2:
 				this.enterOuterAlt(localctx, 2);
 				{
-				this.state = 494;
+				this.state = 498;
 				this.literal();
 				}
 				break;
 			case 3:
 				this.enterOuterAlt(localctx, 3);
 				{
-				this.state = 495;
+				this.state = 499;
 				this.error_code();
 				}
 				break;
 			case 4:
 				this.enterOuterAlt(localctx, 4);
 				{
-				this.state = 496;
+				this.state = 500;
 				this.object_reference();
 				}
 				break;
 			case 5:
 				this.enterOuterAlt(localctx, 5);
 				{
-				this.state = 497;
+				this.state = 501;
 				this.list_slicer();
 				}
 				break;
 			case 6:
 				this.enterOuterAlt(localctx, 6);
 				{
-				this.state = 498;
+				this.state = 502;
 				this.list();
 				}
 				break;
 			case 7:
 				this.enterOuterAlt(localctx, 7);
 				{
-				this.state = 499;
+				this.state = 503;
 				this.map();
 				}
 				break;
 			case 8:
 				this.enterOuterAlt(localctx, 8);
 				{
-				this.state = 500;
+				this.state = 504;
 				this.error_catcher();
 				}
 				break;
 			case 9:
 				this.enterOuterAlt(localctx, 9);
 				{
-				this.state = 501;
+				this.state = 505;
 				this.parenthesis_expression();
 				}
 				break;
@@ -2634,11 +2637,11 @@ export default class MoocodeParser extends Parser {
 		try {
 			this.enterOuterAlt(localctx, 1);
 			{
-			this.state = 504;
+			this.state = 508;
 			this.match(MoocodeParser.OPEN_PARENS);
-			this.state = 505;
+			this.state = 509;
 			this.expression();
-			this.state = 506;
+			this.state = 510;
 			this.match(MoocodeParser.CLOSE_PARENS);
 			}
 		}
@@ -2664,27 +2667,27 @@ export default class MoocodeParser extends Parser {
 		try {
 			this.enterOuterAlt(localctx, 1);
 			{
-			this.state = 508;
+			this.state = 512;
 			this.match(MoocodeParser.TICK);
-			this.state = 509;
+			this.state = 513;
 			localctx._try_ = this.expression();
-			this.state = 510;
-			this.match(MoocodeParser.OP_NOT);
-			this.state = 511;
-			this.error_codes();
 			this.state = 514;
+			this.match(MoocodeParser.OP_NOT);
+			this.state = 515;
+			this.error_codes();
+			this.state = 518;
 			this._errHandler.sync(this);
 			_la = this._input.LA(1);
 			if (_la===46) {
 				{
-				this.state = 512;
+				this.state = 516;
 				this.match(MoocodeParser.ARROW);
-				this.state = 513;
+				this.state = 517;
 				localctx._on_error = this.expression();
 				}
 			}
 
-			this.state = 516;
+			this.state = 520;
 			this.match(MoocodeParser.SINGLE_QUOTE);
 			}
 		}
@@ -2710,35 +2713,35 @@ export default class MoocodeParser extends Parser {
 		try {
 			this.enterOuterAlt(localctx, 1);
 			{
-			this.state = 518;
+			this.state = 522;
 			this.match(MoocodeParser.OPEN_BRACE);
-			this.state = 520;
+			this.state = 524;
 			this._errHandler.sync(this);
 			_la = this._input.LA(1);
 			if ((((_la) & ~0x1F) === 0 && ((1 << _la) & 4291301376) !== 0) || ((((_la - 32)) & ~0x1F) === 0 && ((1 << (_la - 32)) & 2215165439) !== 0) || ((((_la - 71)) & ~0x1F) === 0 && ((1 << (_la - 71)) & 100409) !== 0)) {
 				{
-				this.state = 519;
+				this.state = 523;
 				this.expression();
 				}
 			}
 
-			this.state = 526;
+			this.state = 530;
 			this._errHandler.sync(this);
 			_la = this._input.LA(1);
 			while (_la===56) {
 				{
 				{
-				this.state = 522;
+				this.state = 526;
 				this.match(MoocodeParser.COMMA);
-				this.state = 523;
+				this.state = 527;
 				this.expression();
 				}
 				}
-				this.state = 528;
+				this.state = 532;
 				this._errHandler.sync(this);
 				_la = this._input.LA(1);
 			}
-			this.state = 529;
+			this.state = 533;
 			this.match(MoocodeParser.CLOSE_BRACE);
 			}
 		}
@@ -2764,35 +2767,35 @@ export default class MoocodeParser extends Parser {
 		try {
 			this.enterOuterAlt(localctx, 1);
 			{
-			this.state = 531;
+			this.state = 535;
 			this.match(MoocodeParser.OPEN_BRACKET);
-			this.state = 533;
+			this.state = 537;
 			this._errHandler.sync(this);
 			_la = this._input.LA(1);
 			if ((((_la) & ~0x1F) === 0 && ((1 << _la) & 4291301376) !== 0) || ((((_la - 32)) & ~0x1F) === 0 && ((1 << (_la - 32)) & 2215165439) !== 0) || ((((_la - 71)) & ~0x1F) === 0 && ((1 << (_la - 71)) & 100409) !== 0)) {
 				{
-				this.state = 532;
+				this.state = 536;
 				this.map_entry();
 				}
 			}
 
-			this.state = 539;
+			this.state = 543;
 			this._errHandler.sync(this);
 			_la = this._input.LA(1);
 			while (_la===56) {
 				{
 				{
-				this.state = 535;
+				this.state = 539;
 				this.match(MoocodeParser.COMMA);
-				this.state = 536;
+				this.state = 540;
 				this.map_entry();
 				}
 				}
-				this.state = 541;
+				this.state = 545;
 				this._errHandler.sync(this);
 				_la = this._input.LA(1);
 			}
-			this.state = 542;
+			this.state = 546;
 			this.match(MoocodeParser.CLOSE_BRACKET);
 			}
 		}
@@ -2817,11 +2820,11 @@ export default class MoocodeParser extends Parser {
 		try {
 			this.enterOuterAlt(localctx, 1);
 			{
-			this.state = 544;
+			this.state = 548;
 			localctx._map_key = this.expression();
-			this.state = 545;
+			this.state = 549;
 			this.match(MoocodeParser.THIN_ARROW);
-			this.state = 546;
+			this.state = 550;
 			localctx._map_value = this.expression();
 			}
 		}
@@ -2846,29 +2849,29 @@ export default class MoocodeParser extends Parser {
 		try {
 			this.enterOuterAlt(localctx, 1);
 			{
-			this.state = 548;
+			this.state = 552;
 			this.match(MoocodeParser.OPEN_BRACKET);
-			this.state = 554;
+			this.state = 558;
 			this._errHandler.sync(this);
 			switch ( this._interp.adaptivePredict(this._input, 44, this._ctx) ) {
 			case 1:
 				{
-				this.state = 549;
+				this.state = 553;
 				localctx._argument = this.expression();
 				}
 				break;
 			case 2:
 				{
-				this.state = 550;
+				this.state = 554;
 				localctx._start = this.expression();
-				this.state = 551;
+				this.state = 555;
 				this.match(MoocodeParser.OP_RANGE);
-				this.state = 552;
+				this.state = 556;
 				localctx._end = this.expression();
 				}
 				break;
 			}
-			this.state = 556;
+			this.state = 560;
 			this.match(MoocodeParser.CLOSE_BRACKET);
 			}
 		}
@@ -2893,9 +2896,9 @@ export default class MoocodeParser extends Parser {
 		try {
 			this.enterOuterAlt(localctx, 1);
 			{
-			this.state = 558;
+			this.state = 562;
 			this.match(MoocodeParser.AT);
-			this.state = 559;
+			this.state = 563;
 			this.identifier();
 			}
 		}
@@ -2918,20 +2921,20 @@ export default class MoocodeParser extends Parser {
 		let localctx: Object_referenceContext = new Object_referenceContext(this, this._ctx, this.state);
 		this.enterRule(localctx, 122, MoocodeParser.RULE_object_reference);
 		try {
-			this.state = 563;
+			this.state = 567;
 			this._errHandler.sync(this);
 			switch (this._input.LA(1)) {
 			case 82:
 				this.enterOuterAlt(localctx, 1);
 				{
-				this.state = 561;
+				this.state = 565;
 				this.object_id();
 				}
 				break;
 			case 58:
 				this.enterOuterAlt(localctx, 2);
 				{
-				this.state = 562;
+				this.state = 566;
 				this.corified_value();
 				}
 				break;
@@ -2961,19 +2964,19 @@ export default class MoocodeParser extends Parser {
 		try {
 			this.enterOuterAlt(localctx, 1);
 			{
-			this.state = 565;
+			this.state = 569;
 			this.match(MoocodeParser.SHARP);
-			this.state = 567;
+			this.state = 571;
 			this._errHandler.sync(this);
 			_la = this._input.LA(1);
 			if (_la===63) {
 				{
-				this.state = 566;
+				this.state = 570;
 				this.match(MoocodeParser.MINUS);
 				}
 			}
 
-			this.state = 569;
+			this.state = 573;
 			this.integer_literal();
 			}
 		}
@@ -2998,9 +3001,9 @@ export default class MoocodeParser extends Parser {
 		try {
 			this.enterOuterAlt(localctx, 1);
 			{
-			this.state = 571;
+			this.state = 575;
 			this.match(MoocodeParser.DOLLAR);
-			this.state = 572;
+			this.state = 576;
 			this.identifier();
 			}
 		}
@@ -3023,50 +3026,50 @@ export default class MoocodeParser extends Parser {
 		let localctx: LiteralContext = new LiteralContext(this, this._ctx, this.state);
 		this.enterRule(localctx, 128, MoocodeParser.RULE_literal);
 		try {
-			this.state = 580;
+			this.state = 584;
 			this._errHandler.sync(this);
 			switch (this._input.LA(1)) {
 			case 12:
 			case 19:
 				this.enterOuterAlt(localctx, 1);
 				{
-				this.state = 574;
+				this.state = 578;
 				this.bool_literal();
 				}
 				break;
 			case 45:
 				this.enterOuterAlt(localctx, 2);
 				{
-				this.state = 575;
+				this.state = 579;
 				this.string_literal();
 				}
 				break;
 			case 43:
 				this.enterOuterAlt(localctx, 3);
 				{
-				this.state = 576;
+				this.state = 580;
 				this.integer_literal();
 				}
 				break;
 			case 44:
 				this.enterOuterAlt(localctx, 4);
 				{
-				this.state = 577;
+				this.state = 581;
 				this.float_literal();
 				}
 				break;
 			case 51:
 				this.enterOuterAlt(localctx, 5);
 				{
-				this.state = 578;
-				this.match(MoocodeParser.CARET);
+				this.state = 582;
+				this.caret();
 				}
 				break;
 			case 58:
 				this.enterOuterAlt(localctx, 6);
 				{
-				this.state = 579;
-				this.match(MoocodeParser.DOLLAR);
+				this.state = 583;
+				this.dollar();
 				}
 				break;
 			default:
@@ -3095,7 +3098,7 @@ export default class MoocodeParser extends Parser {
 		try {
 			this.enterOuterAlt(localctx, 1);
 			{
-			this.state = 582;
+			this.state = 586;
 			_la = this._input.LA(1);
 			if(!(_la===12 || _la===19)) {
 			this._errHandler.recoverInline(this);
@@ -3127,7 +3130,7 @@ export default class MoocodeParser extends Parser {
 		try {
 			this.enterOuterAlt(localctx, 1);
 			{
-			this.state = 584;
+			this.state = 588;
 			this.match(MoocodeParser.STRING_LITERAL);
 			}
 		}
@@ -3152,7 +3155,7 @@ export default class MoocodeParser extends Parser {
 		try {
 			this.enterOuterAlt(localctx, 1);
 			{
-			this.state = 586;
+			this.state = 590;
 			this.match(MoocodeParser.INTEGER_LITERAL);
 			}
 		}
@@ -3177,8 +3180,58 @@ export default class MoocodeParser extends Parser {
 		try {
 			this.enterOuterAlt(localctx, 1);
 			{
-			this.state = 588;
+			this.state = 592;
 			this.match(MoocodeParser.FLOAT_LITERAL);
+			}
+		}
+		catch (re) {
+			if (re instanceof RecognitionException) {
+				localctx.exception = re;
+				this._errHandler.reportError(this, re);
+				this._errHandler.recover(this, re);
+			} else {
+				throw re;
+			}
+		}
+		finally {
+			this.exitRule();
+		}
+		return localctx;
+	}
+	// @RuleVersion(0)
+	public caret(): CaretContext {
+		let localctx: CaretContext = new CaretContext(this, this._ctx, this.state);
+		this.enterRule(localctx, 138, MoocodeParser.RULE_caret);
+		try {
+			this.enterOuterAlt(localctx, 1);
+			{
+			this.state = 594;
+			this.match(MoocodeParser.CARET);
+			}
+		}
+		catch (re) {
+			if (re instanceof RecognitionException) {
+				localctx.exception = re;
+				this._errHandler.reportError(this, re);
+				this._errHandler.recover(this, re);
+			} else {
+				throw re;
+			}
+		}
+		finally {
+			this.exitRule();
+		}
+		return localctx;
+	}
+	// @RuleVersion(0)
+	public dollar(): DollarContext {
+		let localctx: DollarContext = new DollarContext(this, this._ctx, this.state);
+		this.enterRule(localctx, 140, MoocodeParser.RULE_dollar);
+		try {
+			this.enterOuterAlt(localctx, 1);
+			{
+			this.state = 596;
+			this.match(MoocodeParser.DOLLAR);
 			}
 		}
 		catch (re) {
@@ -3198,12 +3251,12 @@ export default class MoocodeParser extends Parser {
 	// @RuleVersion(0)
 	public error_code(): Error_codeContext {
 		let localctx: Error_codeContext = new Error_codeContext(this, this._ctx, this.state);
-		this.enterRule(localctx, 138, MoocodeParser.RULE_error_code);
+		this.enterRule(localctx, 142, MoocodeParser.RULE_error_code);
 		let _la: number;
 		try {
 			this.enterOuterAlt(localctx, 1);
 			{
-			this.state = 590;
+			this.state = 598;
 			_la = this._input.LA(1);
 			if(!(((((_la - 22)) & ~0x1F) === 0 && ((1 << (_la - 22)) & 524287) !== 0))) {
 			this._errHandler.recoverInline(this);
@@ -3231,11 +3284,11 @@ export default class MoocodeParser extends Parser {
 	// @RuleVersion(0)
 	public identifier(): IdentifierContext {
 		let localctx: IdentifierContext = new IdentifierContext(this, this._ctx, this.state);
-		this.enterRule(localctx, 140, MoocodeParser.RULE_identifier);
+		this.enterRule(localctx, 144, MoocodeParser.RULE_identifier);
 		try {
 			this.enterOuterAlt(localctx, 1);
 			{
-			this.state = 592;
+			this.state = 600;
 			this.match(MoocodeParser.IDENTIFIER);
 			}
 		}
@@ -3254,7 +3307,7 @@ export default class MoocodeParser extends Parser {
 		return localctx;
 	}
 
-	public static readonly _serializedATN: number[] = [4,1,88,595,2,0,7,0,2,
+	public static readonly _serializedATN: number[] = [4,1,88,603,2,0,7,0,2,
 	1,7,1,2,2,7,2,2,3,7,3,2,4,7,4,2,5,7,5,2,6,7,6,2,7,7,7,2,8,7,8,2,9,7,9,2,
 	10,7,10,2,11,7,11,2,12,7,12,2,13,7,13,2,14,7,14,2,15,7,15,2,16,7,16,2,17,
 	7,17,2,18,7,18,2,19,7,19,2,20,7,20,2,21,7,21,2,22,7,22,2,23,7,23,2,24,7,
@@ -3264,185 +3317,187 @@ export default class MoocodeParser extends Parser {
 	7,46,2,47,7,47,2,48,7,48,2,49,7,49,2,50,7,50,2,51,7,51,2,52,7,52,2,53,7,
 	53,2,54,7,54,2,55,7,55,2,56,7,56,2,57,7,57,2,58,7,58,2,59,7,59,2,60,7,60,
 	2,61,7,61,2,62,7,62,2,63,7,63,2,64,7,64,2,65,7,65,2,66,7,66,2,67,7,67,2,
-	68,7,68,2,69,7,69,2,70,7,70,1,0,5,0,144,8,0,10,0,12,0,147,9,0,1,0,1,0,1,
-	1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,3,1,164,8,1,1,2,5,2,167,
-	8,2,10,2,12,2,170,9,2,1,3,1,3,1,4,1,4,1,4,1,5,1,5,5,5,179,8,5,10,5,12,5,
-	182,9,5,1,5,3,5,185,8,5,1,5,1,5,1,6,1,6,1,6,1,6,1,6,1,6,1,7,1,7,1,7,1,7,
-	1,7,1,7,1,8,1,8,1,8,1,9,1,9,3,9,206,8,9,1,9,1,9,1,10,1,10,1,10,1,11,1,11,
-	1,12,1,12,1,12,3,12,218,8,12,1,12,1,12,1,12,1,13,1,13,1,13,3,13,226,8,13,
-	1,13,1,13,1,13,1,13,1,13,1,14,1,14,1,14,1,14,1,14,1,14,1,14,1,14,1,15,1,
-	15,3,15,243,8,15,1,15,1,15,1,16,1,16,1,17,1,17,1,17,1,18,1,18,3,18,254,
-	8,18,1,18,1,18,1,19,1,19,1,20,1,20,1,20,1,21,1,21,3,21,265,8,21,1,21,1,
-	21,1,21,1,21,3,21,271,8,21,1,21,1,21,1,21,1,21,1,21,1,22,1,22,1,22,4,22,
-	281,8,22,11,22,12,22,282,1,22,1,22,4,22,287,8,22,11,22,12,22,288,1,22,1,
-	22,3,22,293,8,22,1,22,1,22,1,23,1,23,1,23,1,23,1,23,1,23,1,23,1,24,1,24,
-	1,24,1,25,1,25,3,25,309,8,25,1,25,1,25,1,25,1,25,1,25,1,25,1,26,1,26,1,
-	26,1,26,5,26,321,8,26,10,26,12,26,324,9,26,3,26,326,8,26,1,27,1,27,1,28,
-	1,28,3,28,332,8,28,1,29,1,29,1,29,1,29,1,30,1,30,1,31,1,31,1,32,1,32,1,
-	32,1,32,1,32,1,32,3,32,348,8,32,1,33,1,33,1,33,3,33,353,8,33,1,34,1,34,
-	1,34,5,34,358,8,34,10,34,12,34,361,9,34,1,35,1,35,1,35,5,35,366,8,35,10,
-	35,12,35,369,9,35,1,36,1,36,1,36,5,36,374,8,36,10,36,12,36,377,9,36,1,37,
-	1,37,1,37,5,37,382,8,37,10,37,12,37,385,9,37,1,38,1,38,1,38,5,38,390,8,
-	38,10,38,12,38,393,9,38,1,39,1,39,1,39,5,39,398,8,39,10,39,12,39,401,9,
-	39,1,40,1,40,1,40,5,40,406,8,40,10,40,12,40,409,9,40,1,41,1,41,1,41,5,41,
-	414,8,41,10,41,12,41,417,9,41,1,42,1,42,1,42,5,42,422,8,42,10,42,12,42,
-	425,9,42,1,43,1,43,1,43,5,43,430,8,43,10,43,12,43,433,9,43,1,44,1,44,1,
-	44,1,44,3,44,439,8,44,1,45,1,45,1,45,1,46,1,46,1,46,1,47,1,47,1,47,1,48,
-	1,48,1,48,1,48,1,48,5,48,455,8,48,10,48,12,48,458,9,48,1,49,1,49,1,49,1,
-	49,1,49,1,49,3,49,466,8,49,1,50,1,50,1,50,1,50,1,50,1,50,3,50,474,8,50,
-	1,50,1,50,1,50,1,50,1,51,3,51,481,8,51,1,51,1,51,5,51,485,8,51,10,51,12,
-	51,488,9,51,1,52,1,52,1,52,1,52,1,53,1,53,1,53,1,53,1,53,1,53,1,53,1,53,
-	1,53,3,53,503,8,53,1,54,1,54,1,54,1,54,1,55,1,55,1,55,1,55,1,55,1,55,3,
-	55,515,8,55,1,55,1,55,1,56,1,56,3,56,521,8,56,1,56,1,56,5,56,525,8,56,10,
-	56,12,56,528,9,56,1,56,1,56,1,57,1,57,3,57,534,8,57,1,57,1,57,5,57,538,
-	8,57,10,57,12,57,541,9,57,1,57,1,57,1,58,1,58,1,58,1,58,1,59,1,59,1,59,
-	1,59,1,59,1,59,3,59,555,8,59,1,59,1,59,1,60,1,60,1,60,1,61,1,61,3,61,564,
-	8,61,1,62,1,62,3,62,568,8,62,1,62,1,62,1,63,1,63,1,63,1,64,1,64,1,64,1,
-	64,1,64,1,64,3,64,581,8,64,1,65,1,65,1,66,1,66,1,67,1,67,1,68,1,68,1,69,
-	1,69,1,70,1,70,1,70,0,0,71,0,2,4,6,8,10,12,14,16,18,20,22,24,26,28,30,32,
-	34,36,38,40,42,44,46,48,50,52,54,56,58,60,62,64,66,68,70,72,74,76,78,80,
-	82,84,86,88,90,92,94,96,98,100,102,104,106,108,110,112,114,116,118,120,
-	122,124,126,128,130,132,134,136,138,140,0,7,2,0,65,65,70,70,1,0,66,69,1,
-	0,61,62,2,0,63,63,79,79,3,0,57,57,77,77,84,84,2,0,12,12,19,19,1,0,22,40,
-	596,0,145,1,0,0,0,2,163,1,0,0,0,4,168,1,0,0,0,6,171,1,0,0,0,8,173,1,0,0,
-	0,10,176,1,0,0,0,12,188,1,0,0,0,14,194,1,0,0,0,16,200,1,0,0,0,18,205,1,
-	0,0,0,20,209,1,0,0,0,22,212,1,0,0,0,24,214,1,0,0,0,26,222,1,0,0,0,28,232,
-	1,0,0,0,30,242,1,0,0,0,32,246,1,0,0,0,34,248,1,0,0,0,36,253,1,0,0,0,38,
-	257,1,0,0,0,40,259,1,0,0,0,42,262,1,0,0,0,44,277,1,0,0,0,46,296,1,0,0,0,
-	48,303,1,0,0,0,50,306,1,0,0,0,52,325,1,0,0,0,54,327,1,0,0,0,56,331,1,0,
-	0,0,58,333,1,0,0,0,60,337,1,0,0,0,62,339,1,0,0,0,64,341,1,0,0,0,66,349,
-	1,0,0,0,68,354,1,0,0,0,70,362,1,0,0,0,72,370,1,0,0,0,74,378,1,0,0,0,76,
-	386,1,0,0,0,78,394,1,0,0,0,80,402,1,0,0,0,82,410,1,0,0,0,84,418,1,0,0,0,
-	86,426,1,0,0,0,88,438,1,0,0,0,90,440,1,0,0,0,92,443,1,0,0,0,94,446,1,0,
-	0,0,96,449,1,0,0,0,98,459,1,0,0,0,100,467,1,0,0,0,102,480,1,0,0,0,104,489,
-	1,0,0,0,106,502,1,0,0,0,108,504,1,0,0,0,110,508,1,0,0,0,112,518,1,0,0,0,
-	114,531,1,0,0,0,116,544,1,0,0,0,118,548,1,0,0,0,120,558,1,0,0,0,122,563,
-	1,0,0,0,124,565,1,0,0,0,126,571,1,0,0,0,128,580,1,0,0,0,130,582,1,0,0,0,
-	132,584,1,0,0,0,134,586,1,0,0,0,136,588,1,0,0,0,138,590,1,0,0,0,140,592,
-	1,0,0,0,142,144,3,2,1,0,143,142,1,0,0,0,144,147,1,0,0,0,145,143,1,0,0,0,
-	145,146,1,0,0,0,146,148,1,0,0,0,147,145,1,0,0,0,148,149,5,0,0,1,149,1,1,
-	0,0,0,150,164,3,6,3,0,151,164,3,8,4,0,152,153,3,56,28,0,153,154,5,81,0,
-	0,154,164,1,0,0,0,155,164,3,18,9,0,156,164,3,30,15,0,157,164,3,36,18,0,
-	158,164,3,50,25,0,159,164,3,44,22,0,160,164,3,10,5,0,161,164,3,24,12,0,
-	162,164,3,42,21,0,163,150,1,0,0,0,163,151,1,0,0,0,163,152,1,0,0,0,163,155,
-	1,0,0,0,163,156,1,0,0,0,163,157,1,0,0,0,163,158,1,0,0,0,163,159,1,0,0,0,
-	163,160,1,0,0,0,163,161,1,0,0,0,163,162,1,0,0,0,164,3,1,0,0,0,165,167,3,
-	2,1,0,166,165,1,0,0,0,167,170,1,0,0,0,168,166,1,0,0,0,168,169,1,0,0,0,169,
-	5,1,0,0,0,170,168,1,0,0,0,171,172,5,81,0,0,172,7,1,0,0,0,173,174,5,45,0,
-	0,174,175,5,81,0,0,175,9,1,0,0,0,176,180,3,12,6,0,177,179,3,14,7,0,178,
-	177,1,0,0,0,179,182,1,0,0,0,180,178,1,0,0,0,180,181,1,0,0,0,181,184,1,0,
-	0,0,182,180,1,0,0,0,183,185,3,16,8,0,184,183,1,0,0,0,184,185,1,0,0,0,185,
-	186,1,0,0,0,186,187,5,8,0,0,187,11,1,0,0,0,188,189,5,16,0,0,189,190,5,76,
-	0,0,190,191,3,56,28,0,191,192,5,54,0,0,192,193,3,4,2,0,193,13,1,0,0,0,194,
-	195,5,5,0,0,195,196,5,76,0,0,196,197,3,56,28,0,197,198,5,54,0,0,198,199,
-	3,4,2,0,199,15,1,0,0,0,200,201,5,4,0,0,201,202,3,4,2,0,202,17,1,0,0,0,203,
-	206,3,20,10,0,204,206,3,22,11,0,205,203,1,0,0,0,205,204,1,0,0,0,206,207,
-	1,0,0,0,207,208,5,81,0,0,208,19,1,0,0,0,209,210,5,18,0,0,210,211,3,56,28,
-	0,211,21,1,0,0,0,212,213,5,18,0,0,213,23,1,0,0,0,214,217,5,14,0,0,215,218,
-	3,26,13,0,216,218,3,28,14,0,217,215,1,0,0,0,217,216,1,0,0,0,218,219,1,0,
-	0,0,219,220,3,4,2,0,220,221,5,6,0,0,221,25,1,0,0,0,222,225,3,140,70,0,223,
-	224,5,56,0,0,224,226,3,140,70,0,225,223,1,0,0,0,225,226,1,0,0,0,226,227,
-	1,0,0,0,227,228,5,17,0,0,228,229,5,76,0,0,229,230,3,56,28,0,230,231,5,54,
-	0,0,231,27,1,0,0,0,232,233,3,140,70,0,233,234,5,17,0,0,234,235,5,75,0,0,
-	235,236,3,56,28,0,236,237,5,73,0,0,237,238,3,56,28,0,238,239,5,53,0,0,239,
-	29,1,0,0,0,240,243,3,32,16,0,241,243,3,34,17,0,242,240,1,0,0,0,242,241,
-	1,0,0,0,243,244,1,0,0,0,244,245,5,81,0,0,245,31,1,0,0,0,246,247,5,3,0,0,
-	247,33,1,0,0,0,248,249,5,3,0,0,249,250,3,140,70,0,250,35,1,0,0,0,251,254,
-	3,38,19,0,252,254,3,40,20,0,253,251,1,0,0,0,253,252,1,0,0,0,254,255,1,0,
-	0,0,255,256,5,81,0,0,256,37,1,0,0,0,257,258,5,2,0,0,258,39,1,0,0,0,259,
-	260,5,2,0,0,260,261,3,140,70,0,261,41,1,0,0,0,262,264,5,21,0,0,263,265,
-	3,140,70,0,264,263,1,0,0,0,264,265,1,0,0,0,265,266,1,0,0,0,266,270,5,76,
-	0,0,267,268,3,140,70,0,268,269,5,60,0,0,269,271,1,0,0,0,270,267,1,0,0,0,
-	270,271,1,0,0,0,271,272,1,0,0,0,272,273,3,56,28,0,273,274,5,54,0,0,274,
-	275,3,4,2,0,275,276,5,10,0,0,276,43,1,0,0,0,277,278,5,20,0,0,278,292,3,
-	4,2,0,279,281,3,46,23,0,280,279,1,0,0,0,281,282,1,0,0,0,282,280,1,0,0,0,
-	282,283,1,0,0,0,283,293,1,0,0,0,284,293,3,48,24,0,285,287,3,46,23,0,286,
-	285,1,0,0,0,287,288,1,0,0,0,288,286,1,0,0,0,288,289,1,0,0,0,289,290,1,0,
-	0,0,290,291,3,48,24,0,291,293,1,0,0,0,292,280,1,0,0,0,292,284,1,0,0,0,292,
-	286,1,0,0,0,293,294,1,0,0,0,294,295,5,9,0,0,295,45,1,0,0,0,296,297,5,11,
-	0,0,297,298,3,140,70,0,298,299,5,76,0,0,299,300,3,52,26,0,300,301,5,54,
-	0,0,301,302,3,4,2,0,302,47,1,0,0,0,303,304,5,13,0,0,304,305,3,4,2,0,305,
-	49,1,0,0,0,306,308,5,15,0,0,307,309,3,140,70,0,308,307,1,0,0,0,308,309,
-	1,0,0,0,309,310,1,0,0,0,310,311,5,76,0,0,311,312,3,56,28,0,312,313,5,54,
-	0,0,313,314,3,4,2,0,314,315,5,7,0,0,315,51,1,0,0,0,316,326,3,54,27,0,317,
-	322,3,56,28,0,318,319,5,56,0,0,319,321,3,56,28,0,320,318,1,0,0,0,321,324,
-	1,0,0,0,322,320,1,0,0,0,322,323,1,0,0,0,323,326,1,0,0,0,324,322,1,0,0,0,
-	325,316,1,0,0,0,325,317,1,0,0,0,326,53,1,0,0,0,327,328,5,41,0,0,328,55,
-	1,0,0,0,329,332,3,58,29,0,330,332,3,62,31,0,331,329,1,0,0,0,331,330,1,0,
-	0,0,332,57,1,0,0,0,333,334,3,88,44,0,334,335,3,60,30,0,335,336,3,56,28,
-	0,336,59,1,0,0,0,337,338,5,60,0,0,338,61,1,0,0,0,339,340,3,64,32,0,340,
-	63,1,0,0,0,341,347,3,66,33,0,342,343,5,80,0,0,343,344,3,56,28,0,344,345,
-	5,78,0,0,345,346,3,56,28,0,346,348,1,0,0,0,347,342,1,0,0,0,347,348,1,0,
-	0,0,348,65,1,0,0,0,349,352,3,68,34,0,350,351,5,17,0,0,351,353,3,68,34,0,
-	352,350,1,0,0,0,352,353,1,0,0,0,353,67,1,0,0,0,354,359,3,70,35,0,355,356,
-	5,72,0,0,356,358,3,70,35,0,357,355,1,0,0,0,358,361,1,0,0,0,359,357,1,0,
-	0,0,359,360,1,0,0,0,360,69,1,0,0,0,361,359,1,0,0,0,362,367,3,72,36,0,363,
-	364,5,64,0,0,364,366,3,72,36,0,365,363,1,0,0,0,366,369,1,0,0,0,367,365,
-	1,0,0,0,367,368,1,0,0,0,368,71,1,0,0,0,369,367,1,0,0,0,370,375,3,74,37,
-	0,371,372,5,49,0,0,372,374,3,74,37,0,373,371,1,0,0,0,374,377,1,0,0,0,375,
-	373,1,0,0,0,375,376,1,0,0,0,376,73,1,0,0,0,377,375,1,0,0,0,378,383,3,76,
-	38,0,379,380,5,50,0,0,380,382,3,76,38,0,381,379,1,0,0,0,382,385,1,0,0,0,
-	383,381,1,0,0,0,383,384,1,0,0,0,384,75,1,0,0,0,385,383,1,0,0,0,386,391,
-	3,78,39,0,387,388,5,48,0,0,388,390,3,78,39,0,389,387,1,0,0,0,390,393,1,
-	0,0,0,391,389,1,0,0,0,391,392,1,0,0,0,392,77,1,0,0,0,393,391,1,0,0,0,394,
-	399,3,80,40,0,395,396,7,0,0,0,396,398,3,80,40,0,397,395,1,0,0,0,398,401,
-	1,0,0,0,399,397,1,0,0,0,399,400,1,0,0,0,400,79,1,0,0,0,401,399,1,0,0,0,
-	402,407,3,82,41,0,403,404,7,1,0,0,404,406,3,82,41,0,405,403,1,0,0,0,406,
-	409,1,0,0,0,407,405,1,0,0,0,407,408,1,0,0,0,408,81,1,0,0,0,409,407,1,0,
-	0,0,410,415,3,84,42,0,411,412,7,2,0,0,412,414,3,84,42,0,413,411,1,0,0,0,
-	414,417,1,0,0,0,415,413,1,0,0,0,415,416,1,0,0,0,416,83,1,0,0,0,417,415,
-	1,0,0,0,418,423,3,86,43,0,419,420,7,3,0,0,420,422,3,86,43,0,421,419,1,0,
-	0,0,422,425,1,0,0,0,423,421,1,0,0,0,423,424,1,0,0,0,424,85,1,0,0,0,425,
-	423,1,0,0,0,426,431,3,88,44,0,427,428,7,4,0,0,428,430,3,88,44,0,429,427,
-	1,0,0,0,430,433,1,0,0,0,431,429,1,0,0,0,431,432,1,0,0,0,432,87,1,0,0,0,
-	433,431,1,0,0,0,434,439,3,96,48,0,435,439,3,90,45,0,436,439,3,92,46,0,437,
-	439,3,94,47,0,438,434,1,0,0,0,438,435,1,0,0,0,438,436,1,0,0,0,438,437,1,
-	0,0,0,439,89,1,0,0,0,440,441,5,63,0,0,441,442,3,88,44,0,442,91,1,0,0,0,
-	443,444,5,71,0,0,444,445,3,88,44,0,445,93,1,0,0,0,446,447,5,87,0,0,447,
-	448,3,88,44,0,448,95,1,0,0,0,449,456,3,106,53,0,450,455,3,118,59,0,451,
-	455,3,98,49,0,452,455,3,100,50,0,453,455,3,104,52,0,454,450,1,0,0,0,454,
-	451,1,0,0,0,454,452,1,0,0,0,454,453,1,0,0,0,455,458,1,0,0,0,456,454,1,0,
-	0,0,456,457,1,0,0,0,457,97,1,0,0,0,458,456,1,0,0,0,459,465,5,59,0,0,460,
-	466,3,140,70,0,461,462,5,76,0,0,462,463,3,56,28,0,463,464,5,54,0,0,464,
-	466,1,0,0,0,465,460,1,0,0,0,465,461,1,0,0,0,466,99,1,0,0,0,467,473,5,55,
-	0,0,468,474,3,140,70,0,469,470,5,76,0,0,470,471,3,56,28,0,471,472,5,54,
-	0,0,472,474,1,0,0,0,473,468,1,0,0,0,473,469,1,0,0,0,474,475,1,0,0,0,475,
-	476,5,76,0,0,476,477,3,102,51,0,477,478,5,54,0,0,478,101,1,0,0,0,479,481,
-	3,56,28,0,480,479,1,0,0,0,480,481,1,0,0,0,481,486,1,0,0,0,482,483,5,56,
-	0,0,483,485,3,56,28,0,484,482,1,0,0,0,485,488,1,0,0,0,486,484,1,0,0,0,486,
-	487,1,0,0,0,487,103,1,0,0,0,488,486,1,0,0,0,489,490,5,76,0,0,490,491,3,
-	102,51,0,491,492,5,54,0,0,492,105,1,0,0,0,493,503,3,140,70,0,494,503,3,
-	128,64,0,495,503,3,138,69,0,496,503,3,122,61,0,497,503,3,120,60,0,498,503,
-	3,112,56,0,499,503,3,114,57,0,500,503,3,110,55,0,501,503,3,108,54,0,502,
-	493,1,0,0,0,502,494,1,0,0,0,502,495,1,0,0,0,502,496,1,0,0,0,502,497,1,0,
-	0,0,502,498,1,0,0,0,502,499,1,0,0,0,502,500,1,0,0,0,502,501,1,0,0,0,503,
-	107,1,0,0,0,504,505,5,76,0,0,505,506,3,56,28,0,506,507,5,54,0,0,507,109,
-	1,0,0,0,508,509,5,86,0,0,509,510,3,56,28,0,510,511,5,71,0,0,511,514,3,52,
-	26,0,512,513,5,46,0,0,513,515,3,56,28,0,514,512,1,0,0,0,514,515,1,0,0,0,
-	515,516,1,0,0,0,516,517,5,83,0,0,517,111,1,0,0,0,518,520,5,74,0,0,519,521,
-	3,56,28,0,520,519,1,0,0,0,520,521,1,0,0,0,521,526,1,0,0,0,522,523,5,56,
-	0,0,523,525,3,56,28,0,524,522,1,0,0,0,525,528,1,0,0,0,526,524,1,0,0,0,526,
-	527,1,0,0,0,527,529,1,0,0,0,528,526,1,0,0,0,529,530,5,52,0,0,530,113,1,
-	0,0,0,531,533,5,75,0,0,532,534,3,116,58,0,533,532,1,0,0,0,533,534,1,0,0,
-	0,534,539,1,0,0,0,535,536,5,56,0,0,536,538,3,116,58,0,537,535,1,0,0,0,538,
-	541,1,0,0,0,539,537,1,0,0,0,539,540,1,0,0,0,540,542,1,0,0,0,541,539,1,0,
-	0,0,542,543,5,53,0,0,543,115,1,0,0,0,544,545,3,56,28,0,545,546,5,85,0,0,
-	546,547,3,56,28,0,547,117,1,0,0,0,548,554,5,75,0,0,549,555,3,56,28,0,550,
-	551,3,56,28,0,551,552,5,73,0,0,552,553,3,56,28,0,553,555,1,0,0,0,554,549,
-	1,0,0,0,554,550,1,0,0,0,555,556,1,0,0,0,556,557,5,53,0,0,557,119,1,0,0,
-	0,558,559,5,47,0,0,559,560,3,140,70,0,560,121,1,0,0,0,561,564,3,124,62,
-	0,562,564,3,126,63,0,563,561,1,0,0,0,563,562,1,0,0,0,564,123,1,0,0,0,565,
-	567,5,82,0,0,566,568,5,63,0,0,567,566,1,0,0,0,567,568,1,0,0,0,568,569,1,
-	0,0,0,569,570,3,134,67,0,570,125,1,0,0,0,571,572,5,58,0,0,572,573,3,140,
-	70,0,573,127,1,0,0,0,574,581,3,130,65,0,575,581,3,132,66,0,576,581,3,134,
-	67,0,577,581,3,136,68,0,578,581,5,51,0,0,579,581,5,58,0,0,580,574,1,0,0,
-	0,580,575,1,0,0,0,580,576,1,0,0,0,580,577,1,0,0,0,580,578,1,0,0,0,580,579,
-	1,0,0,0,581,129,1,0,0,0,582,583,7,5,0,0,583,131,1,0,0,0,584,585,5,45,0,
-	0,585,133,1,0,0,0,586,587,5,43,0,0,587,135,1,0,0,0,588,589,5,44,0,0,589,
-	137,1,0,0,0,590,591,7,6,0,0,591,139,1,0,0,0,592,593,5,42,0,0,593,141,1,
-	0,0,0,48,145,163,168,180,184,205,217,225,242,253,264,270,282,288,292,308,
-	322,325,331,347,352,359,367,375,383,391,399,407,415,423,431,438,454,456,
-	465,473,480,486,502,514,520,526,533,539,554,563,567,580];
+	68,7,68,2,69,7,69,2,70,7,70,2,71,7,71,2,72,7,72,1,0,5,0,148,8,0,10,0,12,
+	0,151,9,0,1,0,1,0,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,3,
+	1,168,8,1,1,2,5,2,171,8,2,10,2,12,2,174,9,2,1,3,1,3,1,4,1,4,1,4,1,5,1,5,
+	5,5,183,8,5,10,5,12,5,186,9,5,1,5,3,5,189,8,5,1,5,1,5,1,6,1,6,1,6,1,6,1,
+	6,1,6,1,7,1,7,1,7,1,7,1,7,1,7,1,8,1,8,1,8,1,9,1,9,3,9,210,8,9,1,9,1,9,1,
+	10,1,10,1,10,1,11,1,11,1,12,1,12,1,12,3,12,222,8,12,1,12,1,12,1,12,1,13,
+	1,13,1,13,3,13,230,8,13,1,13,1,13,1,13,1,13,1,13,1,14,1,14,1,14,1,14,1,
+	14,1,14,1,14,1,14,1,15,1,15,3,15,247,8,15,1,15,1,15,1,16,1,16,1,17,1,17,
+	1,17,1,18,1,18,3,18,258,8,18,1,18,1,18,1,19,1,19,1,20,1,20,1,20,1,21,1,
+	21,3,21,269,8,21,1,21,1,21,1,21,1,21,3,21,275,8,21,1,21,1,21,1,21,1,21,
+	1,21,1,22,1,22,1,22,4,22,285,8,22,11,22,12,22,286,1,22,1,22,4,22,291,8,
+	22,11,22,12,22,292,1,22,1,22,3,22,297,8,22,1,22,1,22,1,23,1,23,1,23,1,23,
+	1,23,1,23,1,23,1,24,1,24,1,24,1,25,1,25,3,25,313,8,25,1,25,1,25,1,25,1,
+	25,1,25,1,25,1,26,1,26,1,26,1,26,5,26,325,8,26,10,26,12,26,328,9,26,3,26,
+	330,8,26,1,27,1,27,1,28,1,28,3,28,336,8,28,1,29,1,29,1,29,1,29,1,30,1,30,
+	1,31,1,31,1,32,1,32,1,32,1,32,1,32,1,32,3,32,352,8,32,1,33,1,33,1,33,3,
+	33,357,8,33,1,34,1,34,1,34,5,34,362,8,34,10,34,12,34,365,9,34,1,35,1,35,
+	1,35,5,35,370,8,35,10,35,12,35,373,9,35,1,36,1,36,1,36,5,36,378,8,36,10,
+	36,12,36,381,9,36,1,37,1,37,1,37,5,37,386,8,37,10,37,12,37,389,9,37,1,38,
+	1,38,1,38,5,38,394,8,38,10,38,12,38,397,9,38,1,39,1,39,1,39,5,39,402,8,
+	39,10,39,12,39,405,9,39,1,40,1,40,1,40,5,40,410,8,40,10,40,12,40,413,9,
+	40,1,41,1,41,1,41,5,41,418,8,41,10,41,12,41,421,9,41,1,42,1,42,1,42,5,42,
+	426,8,42,10,42,12,42,429,9,42,1,43,1,43,1,43,5,43,434,8,43,10,43,12,43,
+	437,9,43,1,44,1,44,1,44,1,44,3,44,443,8,44,1,45,1,45,1,45,1,46,1,46,1,46,
+	1,47,1,47,1,47,1,48,1,48,1,48,1,48,1,48,5,48,459,8,48,10,48,12,48,462,9,
+	48,1,49,1,49,1,49,1,49,1,49,1,49,3,49,470,8,49,1,50,1,50,1,50,1,50,1,50,
+	1,50,3,50,478,8,50,1,50,1,50,1,50,1,50,1,51,3,51,485,8,51,1,51,1,51,5,51,
+	489,8,51,10,51,12,51,492,9,51,1,52,1,52,1,52,1,52,1,53,1,53,1,53,1,53,1,
+	53,1,53,1,53,1,53,1,53,3,53,507,8,53,1,54,1,54,1,54,1,54,1,55,1,55,1,55,
+	1,55,1,55,1,55,3,55,519,8,55,1,55,1,55,1,56,1,56,3,56,525,8,56,1,56,1,56,
+	5,56,529,8,56,10,56,12,56,532,9,56,1,56,1,56,1,57,1,57,3,57,538,8,57,1,
+	57,1,57,5,57,542,8,57,10,57,12,57,545,9,57,1,57,1,57,1,58,1,58,1,58,1,58,
+	1,59,1,59,1,59,1,59,1,59,1,59,3,59,559,8,59,1,59,1,59,1,60,1,60,1,60,1,
+	61,1,61,3,61,568,8,61,1,62,1,62,3,62,572,8,62,1,62,1,62,1,63,1,63,1,63,
+	1,64,1,64,1,64,1,64,1,64,1,64,3,64,585,8,64,1,65,1,65,1,66,1,66,1,67,1,
+	67,1,68,1,68,1,69,1,69,1,70,1,70,1,71,1,71,1,72,1,72,1,72,0,0,73,0,2,4,
+	6,8,10,12,14,16,18,20,22,24,26,28,30,32,34,36,38,40,42,44,46,48,50,52,54,
+	56,58,60,62,64,66,68,70,72,74,76,78,80,82,84,86,88,90,92,94,96,98,100,102,
+	104,106,108,110,112,114,116,118,120,122,124,126,128,130,132,134,136,138,
+	140,142,144,0,7,2,0,65,65,70,70,1,0,66,69,1,0,61,62,2,0,63,63,79,79,3,0,
+	57,57,77,77,84,84,2,0,12,12,19,19,1,0,22,40,602,0,149,1,0,0,0,2,167,1,0,
+	0,0,4,172,1,0,0,0,6,175,1,0,0,0,8,177,1,0,0,0,10,180,1,0,0,0,12,192,1,0,
+	0,0,14,198,1,0,0,0,16,204,1,0,0,0,18,209,1,0,0,0,20,213,1,0,0,0,22,216,
+	1,0,0,0,24,218,1,0,0,0,26,226,1,0,0,0,28,236,1,0,0,0,30,246,1,0,0,0,32,
+	250,1,0,0,0,34,252,1,0,0,0,36,257,1,0,0,0,38,261,1,0,0,0,40,263,1,0,0,0,
+	42,266,1,0,0,0,44,281,1,0,0,0,46,300,1,0,0,0,48,307,1,0,0,0,50,310,1,0,
+	0,0,52,329,1,0,0,0,54,331,1,0,0,0,56,335,1,0,0,0,58,337,1,0,0,0,60,341,
+	1,0,0,0,62,343,1,0,0,0,64,345,1,0,0,0,66,353,1,0,0,0,68,358,1,0,0,0,70,
+	366,1,0,0,0,72,374,1,0,0,0,74,382,1,0,0,0,76,390,1,0,0,0,78,398,1,0,0,0,
+	80,406,1,0,0,0,82,414,1,0,0,0,84,422,1,0,0,0,86,430,1,0,0,0,88,442,1,0,
+	0,0,90,444,1,0,0,0,92,447,1,0,0,0,94,450,1,0,0,0,96,453,1,0,0,0,98,463,
+	1,0,0,0,100,471,1,0,0,0,102,484,1,0,0,0,104,493,1,0,0,0,106,506,1,0,0,0,
+	108,508,1,0,0,0,110,512,1,0,0,0,112,522,1,0,0,0,114,535,1,0,0,0,116,548,
+	1,0,0,0,118,552,1,0,0,0,120,562,1,0,0,0,122,567,1,0,0,0,124,569,1,0,0,0,
+	126,575,1,0,0,0,128,584,1,0,0,0,130,586,1,0,0,0,132,588,1,0,0,0,134,590,
+	1,0,0,0,136,592,1,0,0,0,138,594,1,0,0,0,140,596,1,0,0,0,142,598,1,0,0,0,
+	144,600,1,0,0,0,146,148,3,2,1,0,147,146,1,0,0,0,148,151,1,0,0,0,149,147,
+	1,0,0,0,149,150,1,0,0,0,150,152,1,0,0,0,151,149,1,0,0,0,152,153,5,0,0,1,
+	153,1,1,0,0,0,154,168,3,6,3,0,155,168,3,8,4,0,156,157,3,56,28,0,157,158,
+	5,81,0,0,158,168,1,0,0,0,159,168,3,18,9,0,160,168,3,30,15,0,161,168,3,36,
+	18,0,162,168,3,50,25,0,163,168,3,44,22,0,164,168,3,10,5,0,165,168,3,24,
+	12,0,166,168,3,42,21,0,167,154,1,0,0,0,167,155,1,0,0,0,167,156,1,0,0,0,
+	167,159,1,0,0,0,167,160,1,0,0,0,167,161,1,0,0,0,167,162,1,0,0,0,167,163,
+	1,0,0,0,167,164,1,0,0,0,167,165,1,0,0,0,167,166,1,0,0,0,168,3,1,0,0,0,169,
+	171,3,2,1,0,170,169,1,0,0,0,171,174,1,0,0,0,172,170,1,0,0,0,172,173,1,0,
+	0,0,173,5,1,0,0,0,174,172,1,0,0,0,175,176,5,81,0,0,176,7,1,0,0,0,177,178,
+	5,45,0,0,178,179,5,81,0,0,179,9,1,0,0,0,180,184,3,12,6,0,181,183,3,14,7,
+	0,182,181,1,0,0,0,183,186,1,0,0,0,184,182,1,0,0,0,184,185,1,0,0,0,185,188,
+	1,0,0,0,186,184,1,0,0,0,187,189,3,16,8,0,188,187,1,0,0,0,188,189,1,0,0,
+	0,189,190,1,0,0,0,190,191,5,8,0,0,191,11,1,0,0,0,192,193,5,16,0,0,193,194,
+	5,76,0,0,194,195,3,56,28,0,195,196,5,54,0,0,196,197,3,4,2,0,197,13,1,0,
+	0,0,198,199,5,5,0,0,199,200,5,76,0,0,200,201,3,56,28,0,201,202,5,54,0,0,
+	202,203,3,4,2,0,203,15,1,0,0,0,204,205,5,4,0,0,205,206,3,4,2,0,206,17,1,
+	0,0,0,207,210,3,20,10,0,208,210,3,22,11,0,209,207,1,0,0,0,209,208,1,0,0,
+	0,210,211,1,0,0,0,211,212,5,81,0,0,212,19,1,0,0,0,213,214,5,18,0,0,214,
+	215,3,56,28,0,215,21,1,0,0,0,216,217,5,18,0,0,217,23,1,0,0,0,218,221,5,
+	14,0,0,219,222,3,26,13,0,220,222,3,28,14,0,221,219,1,0,0,0,221,220,1,0,
+	0,0,222,223,1,0,0,0,223,224,3,4,2,0,224,225,5,6,0,0,225,25,1,0,0,0,226,
+	229,3,144,72,0,227,228,5,56,0,0,228,230,3,144,72,0,229,227,1,0,0,0,229,
+	230,1,0,0,0,230,231,1,0,0,0,231,232,5,17,0,0,232,233,5,76,0,0,233,234,3,
+	56,28,0,234,235,5,54,0,0,235,27,1,0,0,0,236,237,3,144,72,0,237,238,5,17,
+	0,0,238,239,5,75,0,0,239,240,3,56,28,0,240,241,5,73,0,0,241,242,3,56,28,
+	0,242,243,5,53,0,0,243,29,1,0,0,0,244,247,3,32,16,0,245,247,3,34,17,0,246,
+	244,1,0,0,0,246,245,1,0,0,0,247,248,1,0,0,0,248,249,5,81,0,0,249,31,1,0,
+	0,0,250,251,5,3,0,0,251,33,1,0,0,0,252,253,5,3,0,0,253,254,3,144,72,0,254,
+	35,1,0,0,0,255,258,3,38,19,0,256,258,3,40,20,0,257,255,1,0,0,0,257,256,
+	1,0,0,0,258,259,1,0,0,0,259,260,5,81,0,0,260,37,1,0,0,0,261,262,5,2,0,0,
+	262,39,1,0,0,0,263,264,5,2,0,0,264,265,3,144,72,0,265,41,1,0,0,0,266,268,
+	5,21,0,0,267,269,3,144,72,0,268,267,1,0,0,0,268,269,1,0,0,0,269,270,1,0,
+	0,0,270,274,5,76,0,0,271,272,3,144,72,0,272,273,5,60,0,0,273,275,1,0,0,
+	0,274,271,1,0,0,0,274,275,1,0,0,0,275,276,1,0,0,0,276,277,3,56,28,0,277,
+	278,5,54,0,0,278,279,3,4,2,0,279,280,5,10,0,0,280,43,1,0,0,0,281,282,5,
+	20,0,0,282,296,3,4,2,0,283,285,3,46,23,0,284,283,1,0,0,0,285,286,1,0,0,
+	0,286,284,1,0,0,0,286,287,1,0,0,0,287,297,1,0,0,0,288,297,3,48,24,0,289,
+	291,3,46,23,0,290,289,1,0,0,0,291,292,1,0,0,0,292,290,1,0,0,0,292,293,1,
+	0,0,0,293,294,1,0,0,0,294,295,3,48,24,0,295,297,1,0,0,0,296,284,1,0,0,0,
+	296,288,1,0,0,0,296,290,1,0,0,0,297,298,1,0,0,0,298,299,5,9,0,0,299,45,
+	1,0,0,0,300,301,5,11,0,0,301,302,3,144,72,0,302,303,5,76,0,0,303,304,3,
+	52,26,0,304,305,5,54,0,0,305,306,3,4,2,0,306,47,1,0,0,0,307,308,5,13,0,
+	0,308,309,3,4,2,0,309,49,1,0,0,0,310,312,5,15,0,0,311,313,3,144,72,0,312,
+	311,1,0,0,0,312,313,1,0,0,0,313,314,1,0,0,0,314,315,5,76,0,0,315,316,3,
+	56,28,0,316,317,5,54,0,0,317,318,3,4,2,0,318,319,5,7,0,0,319,51,1,0,0,0,
+	320,330,3,54,27,0,321,326,3,56,28,0,322,323,5,56,0,0,323,325,3,56,28,0,
+	324,322,1,0,0,0,325,328,1,0,0,0,326,324,1,0,0,0,326,327,1,0,0,0,327,330,
+	1,0,0,0,328,326,1,0,0,0,329,320,1,0,0,0,329,321,1,0,0,0,330,53,1,0,0,0,
+	331,332,5,41,0,0,332,55,1,0,0,0,333,336,3,58,29,0,334,336,3,62,31,0,335,
+	333,1,0,0,0,335,334,1,0,0,0,336,57,1,0,0,0,337,338,3,88,44,0,338,339,3,
+	60,30,0,339,340,3,56,28,0,340,59,1,0,0,0,341,342,5,60,0,0,342,61,1,0,0,
+	0,343,344,3,64,32,0,344,63,1,0,0,0,345,351,3,66,33,0,346,347,5,80,0,0,347,
+	348,3,56,28,0,348,349,5,78,0,0,349,350,3,56,28,0,350,352,1,0,0,0,351,346,
+	1,0,0,0,351,352,1,0,0,0,352,65,1,0,0,0,353,356,3,68,34,0,354,355,5,17,0,
+	0,355,357,3,68,34,0,356,354,1,0,0,0,356,357,1,0,0,0,357,67,1,0,0,0,358,
+	363,3,70,35,0,359,360,5,72,0,0,360,362,3,70,35,0,361,359,1,0,0,0,362,365,
+	1,0,0,0,363,361,1,0,0,0,363,364,1,0,0,0,364,69,1,0,0,0,365,363,1,0,0,0,
+	366,371,3,72,36,0,367,368,5,64,0,0,368,370,3,72,36,0,369,367,1,0,0,0,370,
+	373,1,0,0,0,371,369,1,0,0,0,371,372,1,0,0,0,372,71,1,0,0,0,373,371,1,0,
+	0,0,374,379,3,74,37,0,375,376,5,49,0,0,376,378,3,74,37,0,377,375,1,0,0,
+	0,378,381,1,0,0,0,379,377,1,0,0,0,379,380,1,0,0,0,380,73,1,0,0,0,381,379,
+	1,0,0,0,382,387,3,76,38,0,383,384,5,50,0,0,384,386,3,76,38,0,385,383,1,
+	0,0,0,386,389,1,0,0,0,387,385,1,0,0,0,387,388,1,0,0,0,388,75,1,0,0,0,389,
+	387,1,0,0,0,390,395,3,78,39,0,391,392,5,48,0,0,392,394,3,78,39,0,393,391,
+	1,0,0,0,394,397,1,0,0,0,395,393,1,0,0,0,395,396,1,0,0,0,396,77,1,0,0,0,
+	397,395,1,0,0,0,398,403,3,80,40,0,399,400,7,0,0,0,400,402,3,80,40,0,401,
+	399,1,0,0,0,402,405,1,0,0,0,403,401,1,0,0,0,403,404,1,0,0,0,404,79,1,0,
+	0,0,405,403,1,0,0,0,406,411,3,82,41,0,407,408,7,1,0,0,408,410,3,82,41,0,
+	409,407,1,0,0,0,410,413,1,0,0,0,411,409,1,0,0,0,411,412,1,0,0,0,412,81,
+	1,0,0,0,413,411,1,0,0,0,414,419,3,84,42,0,415,416,7,2,0,0,416,418,3,84,
+	42,0,417,415,1,0,0,0,418,421,1,0,0,0,419,417,1,0,0,0,419,420,1,0,0,0,420,
+	83,1,0,0,0,421,419,1,0,0,0,422,427,3,86,43,0,423,424,7,3,0,0,424,426,3,
+	86,43,0,425,423,1,0,0,0,426,429,1,0,0,0,427,425,1,0,0,0,427,428,1,0,0,0,
+	428,85,1,0,0,0,429,427,1,0,0,0,430,435,3,88,44,0,431,432,7,4,0,0,432,434,
+	3,88,44,0,433,431,1,0,0,0,434,437,1,0,0,0,435,433,1,0,0,0,435,436,1,0,0,
+	0,436,87,1,0,0,0,437,435,1,0,0,0,438,443,3,96,48,0,439,443,3,90,45,0,440,
+	443,3,92,46,0,441,443,3,94,47,0,442,438,1,0,0,0,442,439,1,0,0,0,442,440,
+	1,0,0,0,442,441,1,0,0,0,443,89,1,0,0,0,444,445,5,63,0,0,445,446,3,88,44,
+	0,446,91,1,0,0,0,447,448,5,71,0,0,448,449,3,88,44,0,449,93,1,0,0,0,450,
+	451,5,87,0,0,451,452,3,88,44,0,452,95,1,0,0,0,453,460,3,106,53,0,454,459,
+	3,118,59,0,455,459,3,98,49,0,456,459,3,100,50,0,457,459,3,104,52,0,458,
+	454,1,0,0,0,458,455,1,0,0,0,458,456,1,0,0,0,458,457,1,0,0,0,459,462,1,0,
+	0,0,460,458,1,0,0,0,460,461,1,0,0,0,461,97,1,0,0,0,462,460,1,0,0,0,463,
+	469,5,59,0,0,464,470,3,144,72,0,465,466,5,76,0,0,466,467,3,56,28,0,467,
+	468,5,54,0,0,468,470,1,0,0,0,469,464,1,0,0,0,469,465,1,0,0,0,470,99,1,0,
+	0,0,471,477,5,55,0,0,472,478,3,144,72,0,473,474,5,76,0,0,474,475,3,56,28,
+	0,475,476,5,54,0,0,476,478,1,0,0,0,477,472,1,0,0,0,477,473,1,0,0,0,478,
+	479,1,0,0,0,479,480,5,76,0,0,480,481,3,102,51,0,481,482,5,54,0,0,482,101,
+	1,0,0,0,483,485,3,56,28,0,484,483,1,0,0,0,484,485,1,0,0,0,485,490,1,0,0,
+	0,486,487,5,56,0,0,487,489,3,56,28,0,488,486,1,0,0,0,489,492,1,0,0,0,490,
+	488,1,0,0,0,490,491,1,0,0,0,491,103,1,0,0,0,492,490,1,0,0,0,493,494,5,76,
+	0,0,494,495,3,102,51,0,495,496,5,54,0,0,496,105,1,0,0,0,497,507,3,144,72,
+	0,498,507,3,128,64,0,499,507,3,142,71,0,500,507,3,122,61,0,501,507,3,120,
+	60,0,502,507,3,112,56,0,503,507,3,114,57,0,504,507,3,110,55,0,505,507,3,
+	108,54,0,506,497,1,0,0,0,506,498,1,0,0,0,506,499,1,0,0,0,506,500,1,0,0,
+	0,506,501,1,0,0,0,506,502,1,0,0,0,506,503,1,0,0,0,506,504,1,0,0,0,506,505,
+	1,0,0,0,507,107,1,0,0,0,508,509,5,76,0,0,509,510,3,56,28,0,510,511,5,54,
+	0,0,511,109,1,0,0,0,512,513,5,86,0,0,513,514,3,56,28,0,514,515,5,71,0,0,
+	515,518,3,52,26,0,516,517,5,46,0,0,517,519,3,56,28,0,518,516,1,0,0,0,518,
+	519,1,0,0,0,519,520,1,0,0,0,520,521,5,83,0,0,521,111,1,0,0,0,522,524,5,
+	74,0,0,523,525,3,56,28,0,524,523,1,0,0,0,524,525,1,0,0,0,525,530,1,0,0,
+	0,526,527,5,56,0,0,527,529,3,56,28,0,528,526,1,0,0,0,529,532,1,0,0,0,530,
+	528,1,0,0,0,530,531,1,0,0,0,531,533,1,0,0,0,532,530,1,0,0,0,533,534,5,52,
+	0,0,534,113,1,0,0,0,535,537,5,75,0,0,536,538,3,116,58,0,537,536,1,0,0,0,
+	537,538,1,0,0,0,538,543,1,0,0,0,539,540,5,56,0,0,540,542,3,116,58,0,541,
+	539,1,0,0,0,542,545,1,0,0,0,543,541,1,0,0,0,543,544,1,0,0,0,544,546,1,0,
+	0,0,545,543,1,0,0,0,546,547,5,53,0,0,547,115,1,0,0,0,548,549,3,56,28,0,
+	549,550,5,85,0,0,550,551,3,56,28,0,551,117,1,0,0,0,552,558,5,75,0,0,553,
+	559,3,56,28,0,554,555,3,56,28,0,555,556,5,73,0,0,556,557,3,56,28,0,557,
+	559,1,0,0,0,558,553,1,0,0,0,558,554,1,0,0,0,559,560,1,0,0,0,560,561,5,53,
+	0,0,561,119,1,0,0,0,562,563,5,47,0,0,563,564,3,144,72,0,564,121,1,0,0,0,
+	565,568,3,124,62,0,566,568,3,126,63,0,567,565,1,0,0,0,567,566,1,0,0,0,568,
+	123,1,0,0,0,569,571,5,82,0,0,570,572,5,63,0,0,571,570,1,0,0,0,571,572,1,
+	0,0,0,572,573,1,0,0,0,573,574,3,134,67,0,574,125,1,0,0,0,575,576,5,58,0,
+	0,576,577,3,144,72,0,577,127,1,0,0,0,578,585,3,130,65,0,579,585,3,132,66,
+	0,580,585,3,134,67,0,581,585,3,136,68,0,582,585,3,138,69,0,583,585,3,140,
+	70,0,584,578,1,0,0,0,584,579,1,0,0,0,584,580,1,0,0,0,584,581,1,0,0,0,584,
+	582,1,0,0,0,584,583,1,0,0,0,585,129,1,0,0,0,586,587,7,5,0,0,587,131,1,0,
+	0,0,588,589,5,45,0,0,589,133,1,0,0,0,590,591,5,43,0,0,591,135,1,0,0,0,592,
+	593,5,44,0,0,593,137,1,0,0,0,594,595,5,51,0,0,595,139,1,0,0,0,596,597,5,
+	58,0,0,597,141,1,0,0,0,598,599,7,6,0,0,599,143,1,0,0,0,600,601,5,42,0,0,
+	601,145,1,0,0,0,48,149,167,172,184,188,209,221,229,246,257,268,274,286,
+	292,296,312,326,329,335,351,356,363,371,379,387,395,403,411,419,427,435,
+	442,458,460,469,477,484,490,506,518,524,530,537,543,558,567,571,584];
 
 	private static __ATN: ATN;
 	public static get _ATN(): ATN {
@@ -6169,11 +6224,11 @@ export class LiteralContext extends ParserRuleContext {
 	public float_literal(): Float_literalContext {
 		return this.getTypedRuleContext(Float_literalContext, 0) as Float_literalContext;
 	}
-	public CARET(): TerminalNode {
-		return this.getToken(MoocodeParser.CARET, 0);
+	public caret(): CaretContext {
+		return this.getTypedRuleContext(CaretContext, 0) as CaretContext;
 	}
-	public DOLLAR(): TerminalNode {
-		return this.getToken(MoocodeParser.DOLLAR, 0);
+	public dollar(): DollarContext {
+		return this.getTypedRuleContext(DollarContext, 0) as DollarContext;
 	}
     public get ruleIndex(): number {
     	return MoocodeParser.RULE_literal;
@@ -6323,6 +6378,70 @@ export class Float_literalContext extends ParserRuleContext {
 	public accept<Result>(visitor: MoocodeParserVisitor<Result>): Result {
 		if (visitor.visitFloat_literal) {
 			return visitor.visitFloat_literal(this);
+		} else {
+			return visitor.visitChildren(this);
+		}
+	}
+}
+
+
+export class CaretContext extends ParserRuleContext {
+	constructor(parser?: MoocodeParser, parent?: ParserRuleContext, invokingState?: number) {
+		super(parent, invokingState);
+    	this.parser = parser;
+	}
+	public CARET(): TerminalNode {
+		return this.getToken(MoocodeParser.CARET, 0);
+	}
+    public get ruleIndex(): number {
+    	return MoocodeParser.RULE_caret;
+	}
+	public enterRule(listener: MoocodeParserListener): void {
+	    if(listener.enterCaret) {
+	 		listener.enterCaret(this);
+		}
+	}
+	public exitRule(listener: MoocodeParserListener): void {
+	    if(listener.exitCaret) {
+	 		listener.exitCaret(this);
+		}
+	}
+	// @Override
+	public accept<Result>(visitor: MoocodeParserVisitor<Result>): Result {
+		if (visitor.visitCaret) {
+			return visitor.visitCaret(this);
+		} else {
+			return visitor.visitChildren(this);
+		}
+	}
+}
+
+
+export class DollarContext extends ParserRuleContext {
+	constructor(parser?: MoocodeParser, parent?: ParserRuleContext, invokingState?: number) {
+		super(parent, invokingState);
+    	this.parser = parser;
+	}
+	public DOLLAR(): TerminalNode {
+		return this.getToken(MoocodeParser.DOLLAR, 0);
+	}
+    public get ruleIndex(): number {
+    	return MoocodeParser.RULE_dollar;
+	}
+	public enterRule(listener: MoocodeParserListener): void {
+	    if(listener.enterDollar) {
+	 		listener.enterDollar(this);
+		}
+	}
+	public exitRule(listener: MoocodeParserListener): void {
+	    if(listener.exitDollar) {
+	 		listener.exitDollar(this);
+		}
+	}
+	// @Override
+	public accept<Result>(visitor: MoocodeParserVisitor<Result>): Result {
+		if (visitor.visitDollar) {
+			return visitor.visitDollar(this);
 		} else {
 			return visitor.visitChildren(this);
 		}
