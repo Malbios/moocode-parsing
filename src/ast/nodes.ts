@@ -10,7 +10,7 @@ export type Computation = (Bitwise | Logical | Equality | Relational | Shift | A
 export type Assignment = (VariableAssignmentNode | PropertyAssignmentNode | ListAssignmentNode);
 export type Logical = (ConditionalNode | ConditionalInNode | ConditionalAndNode | ConditionalOrNode | NegatedNode);
 export type Bitwise = (BitwiseAndNode | BitwiseInclusiveOrNode | BitwiseExclusiveOrNode | ComplementNode);
-export type Equality = (EqualNode | UnequalNode);
+export type Equality = (EqualsNode | UnequalsNode);
 export type Relational = (GreaterThanNode | LessThanNode | GreaterOrEqualNode | LessOrEqualNode);
 export type Shift = (ShiftLeftNode | ShiftRightNode);
 export type Arithmetic = (AdditionNode | SubtractionNode | MultiplicationNode | DivisionNode | ModulationNode | NegativeNode);
@@ -660,118 +660,80 @@ export class ConditionalNode extends BaseNode {
 	}
 }
 
-export class ConditionalInNode extends TwoPartNode<Expression, Expression> {
-	public toString(lineInfo = true): string {
-		return `${this._left.toString(lineInfo)} in ${this._right.toString(lineInfo)}`;
-	}
+export class ConditionalInNode extends TwoPartNode<Expression> {
+	protected _separator = 'in';
 }
 
-export class ConditionalAndNode extends TwoPartNode<Expression, Expression> {
-	public toString(lineInfo = true): string {
-		return `${this._left.toString(lineInfo)} && ${this._right.toString(lineInfo)}`;
-	}
+export class ConditionalAndNode extends TwoPartNode<Expression> {
+	protected _separator = '&&';
 }
 
-export class ConditionalOrNode extends TwoPartNode<Expression, Expression> {
-	public toString(lineInfo = true): string {
-		return `${this._left.toString(lineInfo)} || ${this._right.toString(lineInfo)}`;
-	}
+export class ConditionalOrNode extends TwoPartNode<Expression> {
+	protected _separator = '||';
 }
 
-export class BitwiseAndNode extends TwoPartNode<Expression, Expression> {
-	public toString(lineInfo = true): string {
-		return `${this._left.toString(lineInfo)} &. ${this._right.toString(lineInfo)}`;
-	}
+export class BitwiseAndNode extends TwoPartNode<Expression> {
+	protected _separator = '&.';
 }
 
-export class BitwiseInclusiveOrNode extends TwoPartNode<Expression, Expression> {
-	public toString(lineInfo = true): string {
-		return `${this._left.toString(lineInfo)} |. ${this._right.toString(lineInfo)}`;
-	}
+export class BitwiseInclusiveOrNode extends TwoPartNode<Expression> {
+	protected _separator = '|.';
 }
 
-export class BitwiseExclusiveOrNode extends TwoPartNode<Expression, Expression> {
-	public toString(lineInfo = true): string {
-		return `${this._left.toString(lineInfo)} ^. ${this._right.toString(lineInfo)}`;
-	}
+export class BitwiseExclusiveOrNode extends TwoPartNode<Expression> {
+	protected _separator = '^.';
 }
 
-export class EqualNode extends TwoPartNode<Expression, Expression> {
-	public toString(lineInfo = true): string {
-		return `${this._left.toString(lineInfo)} == ${this._right.toString(lineInfo)}`;
-	}
+export class EqualsNode extends TwoPartNode<Expression> {
+	protected _separator = '==';
 }
 
-export class UnequalNode extends TwoPartNode<Expression, Expression> {
-	public toString(lineInfo = true): string {
-		return `${this._left.toString(lineInfo)} != ${this._right.toString(lineInfo)}`;
-	}
+export class UnequalsNode extends TwoPartNode<Expression> {
+	protected _separator = '!=';
 }
 
-export class GreaterThanNode extends TwoPartNode<Expression, Expression> {
-	public toString(lineInfo = true): string {
-		return `${this._left.toString(lineInfo)} > ${this._right.toString(lineInfo)}`;
-	}
+export class LessThanNode extends TwoPartNode<Expression> {
+	protected _separator = '<';
 }
 
-export class LessThanNode extends TwoPartNode<Expression, Expression> {
-	public toString(lineInfo = true): string {
-		return `${this._left.toString(lineInfo)} < ${this._right.toString(lineInfo)}`;
-	}
+export class GreaterThanNode extends TwoPartNode<Expression> {
+	protected _separator = '>';
 }
 
-export class GreaterOrEqualNode extends TwoPartNode<Expression, Expression> {
-	public toString(lineInfo = true): string {
-		return `${this._left.toString(lineInfo)} >= ${this._right.toString(lineInfo)}`;
-	}
+export class LessOrEqualNode extends TwoPartNode<Expression> {
+	protected _separator = '<=';
 }
 
-export class LessOrEqualNode extends TwoPartNode<Expression, Expression> {
-	public toString(lineInfo = true): string {
-		return `${this._left.toString(lineInfo)} <= ${this._right.toString(lineInfo)}`;
-	}
+export class GreaterOrEqualNode extends TwoPartNode<Expression> {
+	protected _separator = '>=';
 }
 
-export class ShiftLeftNode extends TwoPartNode<Expression, Expression> {
-	public toString(lineInfo = true): string {
-		return `${this._left.toString(lineInfo)} << ${this._right.toString(lineInfo)}`;
-	}
+export class ShiftLeftNode extends TwoPartNode<Expression> {
+	protected _separator = '<<';
 }
 
-export class ShiftRightNode extends TwoPartNode<Expression, Expression> {
-	public toString(lineInfo = true): string {
-		return `${this._left.toString(lineInfo)} >> ${this._right.toString(lineInfo)}`;
-	}
+export class ShiftRightNode extends TwoPartNode<Expression> {
+	protected _separator = '>>';
 }
 
-export class AdditionNode extends TwoPartNode<Expression, Expression> {
-	public toString(lineInfo = true): string {
-		return `${this._left.toString(lineInfo)} + ${this._right.toString(lineInfo)}`;
-	}
+export class AdditionNode extends TwoPartNode<Expression> {
+	protected _separator = '+';
 }
 
-export class SubtractionNode extends TwoPartNode<Expression, Expression> {
-	public toString(lineInfo = true): string {
-		return `${this._left.toString(lineInfo)} - ${this._right.toString(lineInfo)}`;
-	}
+export class SubtractionNode extends TwoPartNode<Expression> {
+	protected _separator = '-';
 }
 
-export class MultiplicationNode extends TwoPartNode<Expression, Expression> {
-	public toString(lineInfo = true): string {
-		return `${this._left.toString(lineInfo)} * ${this._right.toString(lineInfo)}`;
-	}
+export class MultiplicationNode extends TwoPartNode<Expression> {
+	protected _separator = '*';
 }
 
-export class DivisionNode extends TwoPartNode<Expression, Expression> {
-	public toString(lineInfo = true): string {
-		return `${this._left.toString(lineInfo)} / ${this._right.toString(lineInfo)}`;
-	}
+export class DivisionNode extends TwoPartNode<Expression> {
+	protected _separator = '/';
 }
 
-export class ModulationNode extends TwoPartNode<Expression, Expression> {
-	public toString(lineInfo = true): string {
-		return `${this._left.toString(lineInfo)} % ${this._right.toString(lineInfo)}`;
-	}
+export class ModulationNode extends TwoPartNode<Expression> {
+	protected _separator = '%';
 }
 
 export class NegativeNode extends WrappedNode<Expression> {

@@ -1,5 +1,5 @@
-import { suite, test } from 'mocha';
 import { expect } from 'chai';
+import { suite, test } from 'mocha';
 
 import CommonHelpers from '../../test-utils/common';
 import ExpectHelpers from '../../test-utils/expectations';
@@ -27,8 +27,10 @@ suite('conditional expression tests', () => {
 
         const conditionalInExpression = ParsingHelpers.getConditionalIn(result);
 
-        ExpectHelpers.expectInteger(conditionalInExpression?._left, '1');
-        ExpectHelpers.expectIdentifier(conditionalInExpression?._right, 'my_list');
+        expect(conditionalInExpression?.conditional_or_expression_list()).to.have.length(2);
+
+        ExpectHelpers.expectInteger(conditionalInExpression?.conditional_or_expression(0), '1');
+        ExpectHelpers.expectIdentifier(conditionalInExpression?.conditional_or_expression(1), 'my_list');
     });
 
     test('should parse a conditional or', () => {

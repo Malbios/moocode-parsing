@@ -67,34 +67,28 @@ export abstract class ReferenceNode extends BaseNode {
 	}
 }
 
-export abstract class TwoPartNode<T1 extends BaseNode, T2 extends BaseNode> extends BaseNode {
-	protected _left: T1;
-	protected _right: T2;
+export abstract class TwoPartNode<T extends BaseNode> extends BaseNode {
+	protected _separator = '';
 
-	public left(): T1 {
-		return this._left;
-	}
+	protected _left: T;
+	protected _right: T;
 
-	public right(): T2 {
-		return this._right;
-	}
-
-	public constructor(position: ContextPosition, left: T1, right: T2) {
+	public constructor(position: ContextPosition, left: T, right: T) {
 		super(position);
 
 		this._left = left;
 		this._right = right;
 	}
 
-	public toString(): string {
-		throw NotImplementedError.new();
+	public toString(lineInfo = true): string {
+		return `${this._left.toString(lineInfo)} ${this._separator} ${this._right.toString(lineInfo)}`;
 	}
 }
 
 export abstract class WrappedNode<T extends BaseNode> extends BaseNode {
 	protected _value: T;
 
-	public value(): T {
+	public get value(): T {
 		return this._value;
 	}
 

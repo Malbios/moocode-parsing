@@ -43,10 +43,9 @@ suite('return statement tests', () => {
         const nonEmptyReturn = ParsingHelpers.getNonEmptyReturn(result);
         const inConditional = ParsingHelpers.getConditionalIn(nonEmptyReturn?.expression());
 
-        ExpectHelpers.expectIdentifier(inConditional?._left, 'seek_obj');
-
         expect(inConditional?.conditional_or_expression_list()).to.have.length(2);
 
-        ExpectHelpers.expectIdentifier(inConditional?._right, 'list_of_objects');
+        ExpectHelpers.expectIdentifier(inConditional?.conditional_or_expression(0), 'seek_obj');
+        ExpectHelpers.expectIdentifier(inConditional?.conditional_or_expression(1), 'list_of_objects');
     });
 });

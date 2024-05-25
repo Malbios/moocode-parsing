@@ -27,10 +27,10 @@ import { Non_empty_breakContext } from "./MoocodeParser";
 import { While_loop_statementContext } from "./MoocodeParser";
 import { Try_statementContext } from "./MoocodeParser";
 import { Try_exceptContext } from "./MoocodeParser";
-import { Try_finallyContext } from "./MoocodeParser";
-import { Fork_statementContext } from "./MoocodeParser";
 import { Error_codesContext } from "./MoocodeParser";
 import { Any_errorContext } from "./MoocodeParser";
+import { Try_finallyContext } from "./MoocodeParser";
+import { Fork_statementContext } from "./MoocodeParser";
 import { ExpressionContext } from "./MoocodeParser";
 import { AssignmentContext } from "./MoocodeParser";
 import { Assignment_operatorContext } from "./MoocodeParser";
@@ -231,18 +231,6 @@ export default class MoocodeParserVisitor<Result> extends ParseTreeVisitor<Resul
 	 */
 	visitTry_except?: (ctx: Try_exceptContext) => Result;
 	/**
-	 * Visit a parse tree produced by `MoocodeParser.try_finally`.
-	 * @param ctx the parse tree
-	 * @return the visitor result
-	 */
-	visitTry_finally?: (ctx: Try_finallyContext) => Result;
-	/**
-	 * Visit a parse tree produced by `MoocodeParser.fork_statement`.
-	 * @param ctx the parse tree
-	 * @return the visitor result
-	 */
-	visitFork_statement?: (ctx: Fork_statementContext) => Result;
-	/**
 	 * Visit a parse tree produced by `MoocodeParser.error_codes`.
 	 * @param ctx the parse tree
 	 * @return the visitor result
@@ -254,6 +242,18 @@ export default class MoocodeParserVisitor<Result> extends ParseTreeVisitor<Resul
 	 * @return the visitor result
 	 */
 	visitAny_error?: (ctx: Any_errorContext) => Result;
+	/**
+	 * Visit a parse tree produced by `MoocodeParser.try_finally`.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	visitTry_finally?: (ctx: Try_finallyContext) => Result;
+	/**
+	 * Visit a parse tree produced by `MoocodeParser.fork_statement`.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	visitFork_statement?: (ctx: Fork_statementContext) => Result;
 	/**
 	 * Visit a parse tree produced by `MoocodeParser.expression`.
 	 * @param ctx the parse tree

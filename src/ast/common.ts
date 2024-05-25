@@ -1,4 +1,4 @@
-import { ParserRuleContext, Token } from 'antlr4';
+import { ParserRuleContext, TerminalNode, Token } from 'antlr4';
 
 import { InvalidOperationError } from './error';
 
@@ -101,4 +101,13 @@ export function getContextAsText<T extends ParserRuleContext>(context: T): strin
 	const stop = context.stop?.stop ?? input.size;
 
 	return input.getText(context.start.start, stop);
+}
+
+export function is(context: ParserRuleContext, tokenType: number): boolean {
+	const terminalNode = context as unknown as TerminalNode;
+	if (!terminalNode) {
+		return false;
+	}
+
+	return terminalNode.symbol.type == tokenType;
 }
