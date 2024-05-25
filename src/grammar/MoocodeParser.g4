@@ -79,14 +79,14 @@ try_statement:
 try_except:
 	EXCEPT identifier OPEN_PARENS error_codes CLOSE_PARENS statements;
 
+error_codes: any_error | (expression (COMMA expression)*);
+
+any_error: ANY_ERROR;
+
 try_finally: FINALLY statements;
 
 fork_statement:
 	FORK (name = identifier)? OPEN_PARENS schedule = expression CLOSE_PARENS statements ENDFORK;
-
-error_codes: any_error | (expression (COMMA expression)*);
-
-any_error: ANY_ERROR;
 
 expression: assignment | non_assignment;
 
@@ -102,9 +102,7 @@ conditional_expression:
 	)?;
 
 conditional_in_expression:
-	left = conditional_or_expression (
-		IN right = conditional_or_expression
-	)?;
+	conditional_or_expression (IN conditional_or_expression)*;
 
 conditional_or_expression:
 	conditional_and_expression (OP_OR conditional_and_expression)*;
