@@ -72,6 +72,8 @@ import { Bool_literalContext } from "./MoocodeParser";
 import { String_literalContext } from "./MoocodeParser";
 import { Integer_literalContext } from "./MoocodeParser";
 import { Float_literalContext } from "./MoocodeParser";
+import { CaretContext } from "./MoocodeParser";
+import { DollarContext } from "./MoocodeParser";
 import { Error_codeContext } from "./MoocodeParser";
 import { IdentifierContext } from "./MoocodeParser";
 
@@ -771,6 +773,26 @@ export default class MoocodeParserListener extends ParseTreeListener {
 	 * @param ctx the parse tree
 	 */
 	exitFloat_literal?: (ctx: Float_literalContext) => void;
+	/**
+	 * Enter a parse tree produced by `MoocodeParser.caret`.
+	 * @param ctx the parse tree
+	 */
+	enterCaret?: (ctx: CaretContext) => void;
+	/**
+	 * Exit a parse tree produced by `MoocodeParser.caret`.
+	 * @param ctx the parse tree
+	 */
+	exitCaret?: (ctx: CaretContext) => void;
+	/**
+	 * Enter a parse tree produced by `MoocodeParser.dollar`.
+	 * @param ctx the parse tree
+	 */
+	enterDollar?: (ctx: DollarContext) => void;
+	/**
+	 * Exit a parse tree produced by `MoocodeParser.dollar`.
+	 * @param ctx the parse tree
+	 */
+	exitDollar?: (ctx: DollarContext) => void;
 	/**
 	 * Enter a parse tree produced by `MoocodeParser.error_code`.
 	 * @param ctx the parse tree

@@ -110,14 +110,18 @@ export abstract class WrappedNode<T extends BaseNode> extends BaseNode {
 }
 
 export class FlowControlStatementNode<T extends BaseNode> extends BaseNode {
+	protected _depth: number;
+
 	private _value: T | undefined;
 
 	public get value(): T | undefined {
 		return this._value;
 	}
 
-	public constructor(position: ContextPosition, value?: T) {
+	public constructor(depth: number, position: ContextPosition, value?: T) {
 		super(position);
+
+		this._depth = depth;
 
 		this._value = value;
 	}

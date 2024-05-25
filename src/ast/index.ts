@@ -21,5 +21,5 @@ export default function generateAst(code: string): Statement[] {
         throw new ParsingError(code, syntaxErrorListener.errors);
     }
 
-    return StatementGenerator.generateStatements(statementContexts);
+    return StatementGenerator.generateStatements(statementContexts, 0);
 }

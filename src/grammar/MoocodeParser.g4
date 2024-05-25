@@ -222,8 +222,8 @@ literal:
 	| string_literal
 	| integer_literal
 	| float_literal
-	| CARET
-	| DOLLAR;
+	| caret
+	| dollar;
 
 bool_literal: TRUE | FALSE;
 
@@ -232,6 +232,10 @@ string_literal: STRING_LITERAL;
 integer_literal: INTEGER_LITERAL;
 
 float_literal: FLOAT_LITERAL;
+
+caret: CARET;
+
+dollar: DOLLAR;
 
 error_code:
 	E_NONE

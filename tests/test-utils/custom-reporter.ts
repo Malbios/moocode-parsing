@@ -1,6 +1,17 @@
 import { reporters, Runner, Test } from 'mocha';
 
-// This reporter outputs test results, indenting two spaces per suite
+const green_color = '\x1b[32m';
+const red_color = '\x1b[31m';
+const color_reset = '\x1b[0m';
+
+function getDuration(speed?: string, duration?: number): string {
+	if (speed === 'fast' || !duration) {
+		return '';
+	}
+
+	return ` (${red_color}${duration}ms${color_reset})`;
+}
+
 class CustomReporter extends reporters.Base {
 	private indents = 0;
 
@@ -8,14 +19,10 @@ class CustomReporter extends reporters.Base {
 		super(runner);
 		const stats = runner.stats;
 
-		const pass_color_on = '\x1b[32m';
-		const fail_color_on = '\x1b[31m';
-		const color_off = '\x1b[0m';
-
 		runner
-			// .once(Runner.constants.EVENT_RUN_BEGIN, () => {
-			// 	console.info('start');
-			// })
+			.once(Runner.constants.EVENT_RUN_BEGIN, () => {
+				console.log();
+			})
 			.on(Runner.constants.EVENT_SUITE_BEGIN, () => {
 				this.increaseIndent();
 			})
@@ -23,13 +30,12 @@ class CustomReporter extends reporters.Base {
 				this.decreaseIndent();
 			})
 			.on(Runner.constants.EVENT_TEST_PASS, (test: Test) => {
-
 				console.log();
-				console.log(`${pass_color_on}${this.indent()}PASSED: ${test.fullTitle()}${color_off}`);
+				console.log(`${green_color}${this.indent()}PASSED: ${test.fullTitle()}${color_reset}${getDuration(test.speed, test.duration)}`);
 			})
 			.on(Runner.constants.EVENT_TEST_FAIL, (test: Test, error: Error) => {
 				console.log();
-				console.log(`${fail_color_on}${this.indent()}FAILED: ${test.fullTitle()}${color_off}`);
+				console.log(`${red_color}${this.indent()}FAILED: ${test.fullTitle()}${color_reset}${getDuration(test.speed, test.duration)}`);
 				console.log(`${this.indent()}Error: ${error.message}`);
 				if (error.stack) {
 					let stack = error.stack.split('\n');
@@ -37,7 +43,7 @@ class CustomReporter extends reporters.Base {
 						stack = stack.slice(1);
 					}
 					for (const line of stack.slice(0, Math.min(stack.length, 5))) {
-						console.log(line);
+						console.log(`${this.indent()}${line}`);
 					}
 				}
 			})
@@ -46,7 +52,7 @@ class CustomReporter extends reporters.Base {
 				const failures = stats?.failures ?? 0;
 				const all = passes + failures;
 
-				const message = `${passes < all ? fail_color_on : pass_color_on}end: ${passes}/${all} tests passed${color_off}`;
+				const message = `${passes < all ? red_color : green_color}end: ${passes}/${all} tests passed${color_reset}`;
 
 				console.log();
 				console.log(message);

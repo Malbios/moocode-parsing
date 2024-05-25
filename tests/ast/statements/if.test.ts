@@ -8,7 +8,7 @@ suite('AST tests for if statements', () => {
 	test('should throw error if there are no conditions', () => {
 		const code = `
 if ()
-	return;
+  return;
 endif
 `;
 		expectParsingError(() => generateAst(code));
@@ -17,7 +17,7 @@ endif
 	test('should throw error if semicolon is missing in if-body', () => {
 		const code = `
 if (true)
-	return
+  return
 endif
 `;
 		expectParsingError(() => generateAst(code));
@@ -26,7 +26,7 @@ endif
 	test('should handle if-conditions and if-body', () => {
 		const code = `
 if (true)
-	return;
+  return;
 endif
 `;
 		const result = generateAst(code);
@@ -64,7 +64,7 @@ endif
 		const code = `
 if (true)
 else
-	return
+  return
 endif
 `;
 		expectParsingError(() => generateAst(code));
@@ -74,7 +74,7 @@ endif
 		const code = `
 if (true)
 else
-	return false;
+  return false;
 endif
 `;
 		const result = generateAst(code);
@@ -115,7 +115,7 @@ endif
 		const code = `
 if (true)
 elseif (false)
-	return true;
+  return true;
 endif
 `;
 		const result = generateAst(code);
@@ -192,11 +192,11 @@ endif
 	test('should handle if, elseif and else', () => {
 		const code = `
 if (true)
-	return;
+  return;
 elseif (false)
-	return;
+  return;
 else
-	return;
+  return;
 endif
 `;
 		const result = generateAst(code);
@@ -228,5 +228,29 @@ endif
 		const elseReturn = elseNode.body.at(0) as ReturnStatementNode;
 		expect(elseReturn).to.exist;
 		expect(elseReturn.value).to.not.exist;
+	});
+
+	test('should handle nested if', () => {
+		const code = `
+if (true)
+  if (false)
+	return;
+  endif
+endif
+`;
+		const result = generateAst(code);
+		expect(result).to.have.length(1);
+
+		const ifStatementNode = result.at(0) as IfStatementNode;
+		expect(ifStatementNode.if.conditions).to.exist;
+		expect(ifStatementNode.if.body).to.have.length(1);
+
+		const innerIfStatementNode = ifStatementNode.if.body.at(0) as IfStatementNode;
+		expect(innerIfStatementNode.if.conditions).to.exist;
+		expect(innerIfStatementNode.if.body).to.have.length(1);
+
+		const ifReturn = innerIfStatementNode.if.body.at(0) as ReturnStatementNode;
+		expect(ifReturn).to.exist;
+		expect(ifReturn.value).to.not.exist;
 	});
 });

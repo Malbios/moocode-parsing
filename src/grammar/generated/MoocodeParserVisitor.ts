@@ -72,6 +72,8 @@ import { Bool_literalContext } from "./MoocodeParser";
 import { String_literalContext } from "./MoocodeParser";
 import { Integer_literalContext } from "./MoocodeParser";
 import { Float_literalContext } from "./MoocodeParser";
+import { CaretContext } from "./MoocodeParser";
+import { DollarContext } from "./MoocodeParser";
 import { Error_codeContext } from "./MoocodeParser";
 import { IdentifierContext } from "./MoocodeParser";
 
@@ -498,6 +500,18 @@ export default class MoocodeParserVisitor<Result> extends ParseTreeVisitor<Resul
 	 * @return the visitor result
 	 */
 	visitFloat_literal?: (ctx: Float_literalContext) => Result;
+	/**
+	 * Visit a parse tree produced by `MoocodeParser.caret`.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	visitCaret?: (ctx: CaretContext) => Result;
+	/**
+	 * Visit a parse tree produced by `MoocodeParser.dollar`.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	visitDollar?: (ctx: DollarContext) => Result;
 	/**
 	 * Visit a parse tree produced by `MoocodeParser.error_code`.
 	 * @param ctx the parse tree

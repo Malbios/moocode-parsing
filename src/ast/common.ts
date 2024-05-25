@@ -3,6 +3,7 @@ import { ParserRuleContext, Token } from 'antlr4';
 import { InvalidOperationError } from './error';
 
 export enum ErrorCode {
+	ANY,
 	E_NONE,
 	E_TYPE,
 	E_DIV,
