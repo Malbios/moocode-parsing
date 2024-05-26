@@ -1,7 +1,7 @@
 import { expect } from 'chai';
 import { suite, test } from 'mocha';
 import { generateAst } from '../../../src';
-import { BooleanNode, ExpressionStatementNode, FloatNode, IntegerNode, ListAssignmentNode, PropertyAccessor, PropertyAccessorNode, PropertyAssignmentNode, StringNode, VariableAssignmentNode, VariableNode } from '../../../src/ast/nodes';
+import { BooleanNode, ExpressionStatementNode, FloatNode, IntegerNode, ListAssignmentNode, OptionalTargetAssignmentNode, PropertyAccessor, PropertyAccessorNode, PropertyAssignmentNode, StringNode, VariableAssignmentNode, VariableNode } from '../../../src/ast/nodes';
 import { expectParsingError } from '../../test-utils/expectations';
 
 suite('AST tests for assignments', () => {
@@ -70,6 +70,28 @@ suite('AST tests for assignments', () => {
 		expect(variableAssignmentNode.variable.name).to.equal('x');
 
 		const valueNode = variableAssignmentNode.value as VariableNode;
+		expect(valueNode.name).to.equal('tree');
+	});
+
+	test('should throw error for statement that assigns a variable to an optional target', () => {
+		expectParsingError(() => generateAst('?x = tree;'));
+	});
+
+	test('should generate OptionalTargetAssignmentNode for variable to list assignment with optional target default value', () => {
+		const result = generateAst('{?x = 1} = tree;');
+		expect(result).to.have.length(1);
+
+		const statementNode = result.at(0) as ExpressionStatementNode;
+		const listAssignmentNode = statementNode.expression as ListAssignmentNode;
+		expect(listAssignmentNode.list.elements).to.have.length(1);
+
+		const optionalTargetAssignmentNode = listAssignmentNode.list.elements[0] as OptionalTargetAssignmentNode;
+		expect(optionalTargetAssignmentNode.variable.value.name).to.equal('x');
+
+		const integerNode = optionalTargetAssignmentNode.value as IntegerNode;
+		expect(integerNode.value).to.equal(1);
+
+		const valueNode = listAssignmentNode.value as VariableNode;
 		expect(valueNode.name).to.equal('tree');
 	});
 

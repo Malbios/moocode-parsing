@@ -1,11 +1,24 @@
-import { expect } from 'chai';
 import { suite, test } from 'mocha';
-import { generateAst } from '../../../src';
+import { runAstTest } from '../../test-utils/common';
 
-suite('AST tests for error catcher', () => {
-	test('should handle ANY error and no on error expression', async () => {
-		const result = generateAst('`move(object, player) ! ANY\';');
+suite('AST tests for error catcher expressions', () => {
+	test('should handle default', () => {
+		runAstTest('`x:y() ! E_INVIND => z()\';');
+	});
 
-		expect(result).to.exist;
+	test('should handle multiple error codes', () => {
+		runAstTest('`x:y() ! E_INVIND, E_ARGS => z()\';');
+	});
+
+	test('should handle ANY error and no on error expression', () => {
+		runAstTest('`move(object, player) ! ANY\';');
+	});
+
+	test('should handle chained in try part', () => {
+		runAstTest('``me.names ! ANY => me.nume\' ! ANY => "bob"\';');
+	});
+
+	test('should handle chained in on-error part', () => {
+		runAstTest('`me.names ! ANY => `me.name ! ANY => "yup"\'\';');
 	});
 });

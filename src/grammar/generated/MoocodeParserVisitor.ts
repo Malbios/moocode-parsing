@@ -28,7 +28,6 @@ import { While_loop_statementContext } from "./MoocodeParser";
 import { Try_statementContext } from "./MoocodeParser";
 import { Try_exceptContext } from "./MoocodeParser";
 import { Error_codesContext } from "./MoocodeParser";
-import { Any_errorContext } from "./MoocodeParser";
 import { Try_finallyContext } from "./MoocodeParser";
 import { Fork_statementContext } from "./MoocodeParser";
 import { ExpressionContext } from "./MoocodeParser";
@@ -63,10 +62,11 @@ import { ListContext } from "./MoocodeParser";
 import { MapContext } from "./MoocodeParser";
 import { Map_entryContext } from "./MoocodeParser";
 import { IndexerContext } from "./MoocodeParser";
-import { List_slicerContext } from "./MoocodeParser";
+import { List_splicerContext } from "./MoocodeParser";
 import { Object_referenceContext } from "./MoocodeParser";
 import { Object_idContext } from "./MoocodeParser";
 import { Corified_valueContext } from "./MoocodeParser";
+import { Optional_targetContext } from "./MoocodeParser";
 import { LiteralContext } from "./MoocodeParser";
 import { Bool_literalContext } from "./MoocodeParser";
 import { String_literalContext } from "./MoocodeParser";
@@ -236,12 +236,6 @@ export default class MoocodeParserVisitor<Result> extends ParseTreeVisitor<Resul
 	 * @return the visitor result
 	 */
 	visitError_codes?: (ctx: Error_codesContext) => Result;
-	/**
-	 * Visit a parse tree produced by `MoocodeParser.any_error`.
-	 * @param ctx the parse tree
-	 * @return the visitor result
-	 */
-	visitAny_error?: (ctx: Any_errorContext) => Result;
 	/**
 	 * Visit a parse tree produced by `MoocodeParser.try_finally`.
 	 * @param ctx the parse tree
@@ -447,11 +441,11 @@ export default class MoocodeParserVisitor<Result> extends ParseTreeVisitor<Resul
 	 */
 	visitIndexer?: (ctx: IndexerContext) => Result;
 	/**
-	 * Visit a parse tree produced by `MoocodeParser.list_slicer`.
+	 * Visit a parse tree produced by `MoocodeParser.list_splicer`.
 	 * @param ctx the parse tree
 	 * @return the visitor result
 	 */
-	visitList_slicer?: (ctx: List_slicerContext) => Result;
+	visitList_splicer?: (ctx: List_splicerContext) => Result;
 	/**
 	 * Visit a parse tree produced by `MoocodeParser.object_reference`.
 	 * @param ctx the parse tree
@@ -470,6 +464,12 @@ export default class MoocodeParserVisitor<Result> extends ParseTreeVisitor<Resul
 	 * @return the visitor result
 	 */
 	visitCorified_value?: (ctx: Corified_valueContext) => Result;
+	/**
+	 * Visit a parse tree produced by `MoocodeParser.optional_target`.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	visitOptional_target?: (ctx: Optional_targetContext) => Result;
 	/**
 	 * Visit a parse tree produced by `MoocodeParser.literal`.
 	 * @param ctx the parse tree

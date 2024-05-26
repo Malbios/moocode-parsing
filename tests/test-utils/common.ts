@@ -1,6 +1,7 @@
 import { CharStream, CommonTokenStream, ParserRuleContext } from 'antlr4';
+import { expect } from 'chai';
 import { inspect as utilInspect } from 'util';
-
+import { generateAst } from '../../src';
 import MoocodeLexer from '../../src/grammar/generated/MoocodeLexer';
 import MoocodeParser from '../../src/grammar/generated/MoocodeParser';
 
@@ -54,4 +55,16 @@ export function getContextName(context: ParserRuleContext): string {
 
 export function logContext(context: ParserRuleContext) {
     console.log(getContextName(context));
+}
+
+export function runAstTest(code: string, expected?: string) {
+    const ast = generateAst(code);
+
+    const result = ast.map(x => x.toString(false)).join('\n');
+
+    if (expected) {
+        expect(result).to.equal(expected);
+    } else {
+        expect(result).to.equal(code);
+    }
 }

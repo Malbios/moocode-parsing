@@ -1,5 +1,7 @@
 import { reporters, Runner, Test } from 'mocha';
 
+const error_stack_max = 5;
+
 const green_color = '\x1b[32m';
 const red_color = '\x1b[31m';
 const color_reset = '\x1b[0m';
@@ -42,7 +44,7 @@ class CustomReporter extends reporters.Base {
 					while (!stack.at(0)?.trimStart().startsWith('at')) {
 						stack = stack.slice(1);
 					}
-					for (const line of stack.slice(0, Math.min(stack.length, 5))) {
+					for (const line of stack.slice(0, Math.min(stack.length, error_stack_max))) {
 						console.log(`${this.indent()}${line}`);
 					}
 				}

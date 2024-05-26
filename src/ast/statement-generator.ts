@@ -5,7 +5,7 @@ import { SingleValueVisitor } from './abstract';
 import { ContextPosition } from './common';
 import { NodeGenerationError } from './error';
 import { ExpressionGenerator } from './expression-generator';
-import { BreakStatementNode, CommentStatementNode, ContinueStatementNode, ElseIfNode, ElseNode, EmptyStatementNode, ErrorCodeNode, ExceptNode, Expression, ExpressionStatementNode, FinallyNode, ForStatementNode, ForkStatementNode, IfNode, IfStatementNode, RangedForStatementNode, ReturnStatementNode, Statement, TryStatementNode, VariableNode, WhileStatementNode } from './nodes';
+import { BreakStatementNode, CommentStatementNode, ContinueStatementNode, ElseIfNode, ElseNode, EmptyStatementNode, ErrorCodeNode, ExceptNode, Expression, ExpressionStatementNode, FinallyNode, ForStatementNode, ForkStatementNode, IfNode, IfStatementNode, RangedForStatementNode, ReturnStatementNode, Statement, StringNode, TryStatementNode, VariableNode, WhileStatementNode } from './nodes';
 import { ValueGenerator } from './value-generator';
 
 function handleErrors(action: Action<void>) {
@@ -188,7 +188,9 @@ export class StatementGenerator extends SingleValueVisitor<Statement> {
 	}
 
 	public override visitComment = (context: CommentContext): CommentStatementNode => {
-		return new CommentStatementNode(this._depth, ContextPosition.fromContext(context), JSON.parse(context.STRING_LITERAL().getText()));
+		const value = ValueGenerator.generate<StringNode>(context.string_literal());
+
+		return new CommentStatementNode(this._depth, ContextPosition.fromContext(context), value);
 	}
 
 	public override visitEmpty_statement = (context: Empty_statementContext): EmptyStatementNode => {

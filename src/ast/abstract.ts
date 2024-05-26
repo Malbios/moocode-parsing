@@ -27,21 +27,25 @@ export abstract class BaseNode {
 }
 
 export abstract class LiteralNode<T> extends BaseNode {
+	private _valueText: string;
+
 	protected _value: T;
 
 	public get value(): T {
 		return this._value;
 	}
 
-	public constructor(position: ContextPosition, value: T) {
+	public constructor(position: ContextPosition, value: T, valueText: string) {
 		super(position);
+
+		this._valueText = valueText;
 
 		this._value = value;
 	}
 
 	// eslint-disable-next-line @typescript-eslint/no-unused-vars
 	public toString(lineInfo = true): string {
-		return `${JSON.stringify(this._value)}`;
+		return this._valueText;
 	}
 }
 
