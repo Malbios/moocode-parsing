@@ -9,9 +9,7 @@
         "src/**/*.ts"
     ],
     "exclude": [
-        "tests/**/*",
-        "src/grammar/generated/moocodeParserVisitor.ts",
-        "src/grammar/generated/moocodeParserListener.ts"
+        "tests/**/*"
     ],
     "report-dir": "reports",
     "reporter": [
