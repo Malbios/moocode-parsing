@@ -13,7 +13,7 @@ function runTest(filePath: string) {
     ExpectHelpers.expectSyntaxErrors(parser, 0);
 }
 
-suite('moo file tests', () => {
+suite('CST tests for moo files', () => {
     test('should parse file 1', () => {
         runTest('./tests/moo-files/1.moo');
     });

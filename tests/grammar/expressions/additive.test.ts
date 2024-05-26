@@ -1,11 +1,11 @@
-import { suite, test } from 'mocha';
 import { expect } from 'chai';
+import { suite, test } from 'mocha';
 
 import CommonHelpers from '../../test-utils/common';
 import ExpectHelpers from '../../test-utils/expectations';
 import ParsingHelpers from '../../test-utils/parsing';
 
-suite('additive expression tests', () => {
+suite('CST tests for additive expressions', () => {
     test('should parse an addition', () => {
         const parser = CommonHelpers.getParser('var + 5');
         const result = parser.expression();

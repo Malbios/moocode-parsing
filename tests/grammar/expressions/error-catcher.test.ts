@@ -5,7 +5,7 @@ import CommonHelpers from '../../test-utils/common';
 import ExpectHelpers from '../../test-utils/expectations';
 import ParsingHelpers from '../../test-utils/parsing';
 
-suite('error catcher expression tests', () => {
+suite('CST tests for error catcher expressions', () => {
     test('should parse an error catcher', () => {
         const parser = CommonHelpers.getParser('`stuff(1) ! E_VARNF => "yes"\'');
         const result = parser.expression();

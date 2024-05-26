@@ -5,7 +5,7 @@ import CommonHelpers from '../../test-utils/common';
 import ExpectHelpers from '../../test-utils/expectations';
 import ParsingHelpers from '../../test-utils/parsing';
 
-suite('for statement tests', () => {
+suite('CST tests for for statements', () => {
   test('should parse a for loop', () => {
     const code = `
 for n in ({1, 2, 3})

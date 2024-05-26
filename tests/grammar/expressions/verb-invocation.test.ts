@@ -1,11 +1,11 @@
-import { suite, test } from 'mocha';
 import { expect } from 'chai';
+import { suite, test } from 'mocha';
 
 import CommonHelpers from '../../test-utils/common';
 import ExpectHelpers from '../../test-utils/expectations';
 import ParsingHelpers from '../../test-utils/parsing';
 
-suite('verb invocation tests', () => {
+suite('CST tests for verb invocation expressions', () => {
     test('should parse a verb invocation with one argument', () => {
         const parser = CommonHelpers.getParser('obj:x(y)');
         const result = parser.expression();

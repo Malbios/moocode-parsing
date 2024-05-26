@@ -5,7 +5,7 @@ import CommonHelpers from '../../test-utils/common';
 import ExpectHelpers from '../../test-utils/expectations';
 import ParsingHelpers from '../../test-utils/parsing';
 
-suite('return statement tests', () => {
+suite('CST tests for return statements', () => {
     test('should parse a return with no expression', () => {
         const parser = CommonHelpers.getParser('return;');
         const result = parser.statement();

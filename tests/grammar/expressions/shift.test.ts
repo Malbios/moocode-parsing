@@ -1,11 +1,11 @@
-import { suite, test } from 'mocha';
 import { expect } from 'chai';
+import { suite, test } from 'mocha';
 
 import CommonHelpers from '../../test-utils/common';
 import ExpectHelpers from '../../test-utils/expectations';
 import ParsingHelpers from '../../test-utils/parsing';
 
-suite('shift expression tests', () => {
+suite('CST tests for shift expressions', () => {
     test('should parse a shift left', () => {
         const parser = CommonHelpers.getParser('4 << 6');
         const result = parser.expression();

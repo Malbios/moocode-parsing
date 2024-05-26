@@ -12,7 +12,7 @@ const testCaseData = [
     { description: 'should parse true in mixed case', code: 'tRuE', expectedValue: 'tRuE' }
 ];
 
-suite('boolean value tests', () => {
+suite('CST tests for boolean values', () => {
     testCaseData.forEach(testCaseData => {
         test(testCaseData.description, () => {
             const parser = CommonHelpers.getParser(testCaseData.code);

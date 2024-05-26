@@ -10,7 +10,7 @@ const testCaseData = [
     { description: 'should parse a negative integer', code: '-128', expectedValue: '-128' }
 ];
 
-suite('integer value tests', () => {
+suite('CST tests for integer values', () => {
     testCaseData.forEach(testCaseData => {
         test(testCaseData.description, () => {
             const parser = CommonHelpers.getParser(testCaseData.code);

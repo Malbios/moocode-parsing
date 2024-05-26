@@ -5,7 +5,7 @@ import CommonHelpers from '../../test-utils/common';
 import ExpectHelpers from '../../test-utils/expectations';
 import ParsingHelpers from '../../test-utils/parsing';
 
-suite('indexer tests', () => {
+suite('CST tests for indexer expressions', () => {
     test('should parse an identifier indexer with a literal index', () => {
         const parser = CommonHelpers.getParser('some_var[1]');
         const result = parser.expression();

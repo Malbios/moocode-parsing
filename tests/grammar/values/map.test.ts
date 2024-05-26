@@ -1,12 +1,12 @@
-import { suite, test } from 'mocha';
-import { expect } from 'chai';
 import { ParserRuleContext } from 'antlr4';
+import { expect } from 'chai';
+import { suite, test } from 'mocha';
 
 import { MapContext } from '../../../src/grammar/generated/MoocodeParser';
 
 import CommonHelpers from '../../test-utils/common';
-import ParsingHelpers from '../../test-utils/parsing';
 import ExpectHelpers from '../../test-utils/expectations';
+import ParsingHelpers from '../../test-utils/parsing';
 
 interface ExpectedData {
     // eslint-disable-next-line no-unused-vars
@@ -37,7 +37,7 @@ function testMapEntries(context: ParserRuleContext | undefined, expectedData: Ex
     }
 }
 
-suite('map value tests', () => {
+suite('CST tests for map values', () => {
     test('should parse an empty map', () => {
         runTest('[]', []);
     });

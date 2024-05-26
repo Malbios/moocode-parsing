@@ -1,10 +1,10 @@
-import { suite, test } from 'mocha';
 import { expect } from 'chai';
+import { suite, test } from 'mocha';
 
 import CommonHelpers from '../../test-utils/common';
 import ExpectHelpers from '../../test-utils/expectations';
 
-suite('empty statement tests', () => {
+suite('CST tests for empty statements', () => {
     test('should parse an empty statement', () => {
         const parser = CommonHelpers.getParser(';');
         const result = parser.statement();
