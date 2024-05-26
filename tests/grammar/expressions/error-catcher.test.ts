@@ -78,8 +78,8 @@ suite('error catcher expression tests', () => {
         expect(primaryExpression?.bf_invocation_list()).to.have.length(1);
         ExpectHelpers.expectInteger(primaryExpression?.bf_invocation(0), '1');
 
-        expect(errorCatcher?.error_codes().any_error()).to.exist;
-        expect(errorCatcher?.error_codes().expression_list()).to.have.length(0);
+        expect(errorCatcher?.error_codes().expression_list()).to.have.length(1);
+        expect(errorCatcher?.error_codes().expression(0).getText()).to.equal('ANY');
 
         ExpectHelpers.expectString(errorCatcher?._on_error, '"yes"');
     });
@@ -97,8 +97,8 @@ suite('error catcher expression tests', () => {
         expect(primaryExpression?.bf_invocation_list()).to.have.length(1);
         ExpectHelpers.expectInteger(primaryExpression?.bf_invocation(0), '1');
 
-        expect(errorCatcher?.error_codes().any_error()).to.exist;
-        expect(errorCatcher?.error_codes().expression_list()).to.have.length(0);
+        expect(errorCatcher?.error_codes().expression_list()).to.have.length(1);
+        expect(errorCatcher?.error_codes().expression(0).getText()).to.equal('ANY');
 
         expect(errorCatcher?._on_error).to.not.exist;
     });

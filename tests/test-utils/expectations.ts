@@ -11,6 +11,7 @@ import moocodeParser, {
     LiteralContext,
     Object_idContext,
     Object_referenceContext,
+    Optional_targetContext,
     String_literalContext
 } from '../../src/grammar/generated/MoocodeParser';
 
@@ -57,6 +58,10 @@ export default class ExpectHelpers {
 
     public static expectIdentifier(context: ParserRuleContext | undefined, expectedValue: string) {
         this.expectValue<IdentifierContext>(context, IdentifierContext, expectedValue);
+    }
+
+    public static expectOptionalTarget(context: ParserRuleContext | undefined, expectedValue: string) {
+        this.expectValue<Optional_targetContext>(context, Optional_targetContext, expectedValue);
     }
 
     public static expectObjectReference(context: ParserRuleContext | undefined, expectedValue: string) {

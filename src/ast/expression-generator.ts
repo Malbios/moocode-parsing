@@ -4,7 +4,7 @@ import { Additive_expressionContext, And_expressionContext, AssignmentContext, B
 import { BaseNode, SingleValueVisitor } from './abstract';
 import { ContextPosition, getContextAsText, is } from './common';
 import { NodeGenerationError } from './error';
-import { AdditionNode, ArgumentIndexerNode, BitwiseAndNode, BitwiseExclusiveOrNode, BitwiseInclusiveOrNode, BuiltInFunctionInvocationNode, ComplementNode, ComputedPropertyAccessorNode, ComputedVerbInvocationNode, ConditionalAndNode, ConditionalInNode, ConditionalNode, ConditionalOrNode, CorifiedVerbInvocationNode, DivisionNode, EqualsNode, Expression, GreaterOrEqualNode, GreaterThanNode, Indexer, Invocation, LessOrEqualNode, LessThanNode, ListAssignmentNode, ListNode, ModulationNode, MultiplicationNode, NegatedNode, NegativeNode, PropertyAccessor, PropertyAccessorNode, PropertyAssignmentNode, RangeIndexerNode, ShiftLeftNode, ShiftRightNode, SubtractionNode, UnequalsNode, Value, VariableAssignmentNode, VariableNode, VerbInvocationNode } from './nodes';
+import { AdditionNode, ArgumentIndexerNode, BitwiseAndNode, BitwiseExclusiveOrNode, BitwiseInclusiveOrNode, BuiltInFunctionInvocationNode, ComplementNode, ComputedPropertyAccessorNode, ComputedVerbInvocationNode, ConditionalAndNode, ConditionalInNode, ConditionalNode, ConditionalOrNode, CorifiedVerbInvocationNode, DivisionNode, EqualsNode, Expression, GreaterOrEqualNode, GreaterThanNode, Indexer, Invocation, LessOrEqualNode, LessThanNode, ListAssignmentNode, ListNode, ModulationNode, MultiplicationNode, NegatedNode, NegativeNode, OptionalTargetAssignmentNode, OptionalTargetNode, PropertyAccessor, PropertyAccessorNode, PropertyAssignmentNode, RangeIndexerNode, ShiftLeftNode, ShiftRightNode, SubtractionNode, UnequalsNode, Value, VariableAssignmentNode, VariableNode, VerbInvocationNode } from './nodes';
 import { ValueGenerator } from './value-generator';
 
 function hasNoIndexerAccessorOrInvocation(context: Primary_expressionContext): boolean {
@@ -68,12 +68,16 @@ function generateMultiPartNode<T extends BaseNode>(context: ParserRuleContext, c
 }
 
 export class ExpressionGenerator extends SingleValueVisitor<Expression> {
-	public override visitAssignment = (context: AssignmentContext): VariableAssignmentNode | ListAssignmentNode | PropertyAssignmentNode => {
+	public override visitAssignment = (context: AssignmentContext): VariableAssignmentNode | OptionalTargetAssignmentNode | ListAssignmentNode | PropertyAssignmentNode => {
 		const leftNode = ExpressionGenerator.generateExpression(context.unary_expression());
 		const rightNode = ExpressionGenerator.generateExpression(context.expression());
 
 		if (leftNode instanceof VariableNode) {
 			return new VariableAssignmentNode(ContextPosition.fromContext(context), leftNode, rightNode);
+		}
+
+		if (leftNode instanceof OptionalTargetNode) {
+			return new OptionalTargetAssignmentNode(ContextPosition.fromContext(context), leftNode, rightNode);
 		}
 
 		if (leftNode instanceof ListNode) {

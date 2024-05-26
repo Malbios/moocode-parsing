@@ -4,6 +4,7 @@ import CommonHelpers from '../../test-utils/common';
 import ExpectHelpers from '../../test-utils/expectations';
 
 const errorCodes = [
+    'ANY',
     'E_NONE',
     'E_TYPE',
     'E_DIV',

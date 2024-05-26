@@ -24,7 +24,7 @@ statements: statement*;
 
 empty_statement: SEMICOLON;
 
-comment: STRING_LITERAL SEMICOLON;
+comment: string_literal SEMICOLON;
 
 if_statement:
 	if_expression elseif_expression* else_expression? ENDIF;
@@ -79,9 +79,7 @@ try_statement:
 try_except:
 	EXCEPT identifier OPEN_PARENS error_codes CLOSE_PARENS statements;
 
-error_codes: any_error | (expression (COMMA expression)*);
-
-any_error: ANY_ERROR;
+error_codes: expression (COMMA expression)*;
 
 try_finally: FINALLY statements;
 
@@ -179,11 +177,12 @@ bf_invocation: OPEN_PARENS arguments = expressions CLOSE_PARENS;
 primary_expression_start:
 	identifier
 	| literal
-	| error_code
 	| object_reference
-	| list_slicer
 	| list
 	| map
+	| error_code
+	| optional_target
+	| list_splicer
 	| error_catcher
 	| parenthesis_expression;
 
@@ -207,13 +206,15 @@ indexer:
 		| start = expression OP_RANGE end = expression
 	) CLOSE_BRACKET;
 
-list_slicer: AT identifier;
+list_splicer: AT identifier;
 
 object_reference: object_id | corified_value;
 
 object_id: SHARP MINUS? integer_literal;
 
 corified_value: DOLLAR identifier;
+
+optional_target: QUESTION_MARK identifier;
 
 literal:
 	bool_literal
@@ -236,7 +237,8 @@ caret: CARET;
 dollar: DOLLAR;
 
 error_code:
-	E_NONE
+	ANY_ERROR
+	| E_NONE
 	| E_TYPE
 	| E_DIV
 	| E_PERM

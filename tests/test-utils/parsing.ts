@@ -19,7 +19,7 @@ import {
     If_statementContext,
     Inclusive_or_expressionContext,
     ListContext,
-    List_slicerContext,
+    List_splicerContext,
     Multiplicative_expressionContext,
     Non_empty_breakContext,
     Non_empty_continueContext,
@@ -162,9 +162,9 @@ export default class ParsingHelpers {
         return this.getContext<Non_empty_continueContext>(context, Non_empty_continueContext);
     }
 
-    public static getListSlicer(context: ParserRuleContext | undefined)
-        : List_slicerContext | undefined {
-        return this.getContext<List_slicerContext>(context, List_slicerContext);
+    public static getListSplicer(context: ParserRuleContext | undefined)
+        : List_splicerContext | undefined {
+        return this.getContext<List_splicerContext>(context, List_splicerContext);
     }
 
     public static getErrorCatcher(context: ParserRuleContext | undefined)

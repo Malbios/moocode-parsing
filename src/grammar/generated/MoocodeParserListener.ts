@@ -28,7 +28,6 @@ import { While_loop_statementContext } from "./MoocodeParser";
 import { Try_statementContext } from "./MoocodeParser";
 import { Try_exceptContext } from "./MoocodeParser";
 import { Error_codesContext } from "./MoocodeParser";
-import { Any_errorContext } from "./MoocodeParser";
 import { Try_finallyContext } from "./MoocodeParser";
 import { Fork_statementContext } from "./MoocodeParser";
 import { ExpressionContext } from "./MoocodeParser";
@@ -63,10 +62,11 @@ import { ListContext } from "./MoocodeParser";
 import { MapContext } from "./MoocodeParser";
 import { Map_entryContext } from "./MoocodeParser";
 import { IndexerContext } from "./MoocodeParser";
-import { List_slicerContext } from "./MoocodeParser";
+import { List_splicerContext } from "./MoocodeParser";
 import { Object_referenceContext } from "./MoocodeParser";
 import { Object_idContext } from "./MoocodeParser";
 import { Corified_valueContext } from "./MoocodeParser";
+import { Optional_targetContext } from "./MoocodeParser";
 import { LiteralContext } from "./MoocodeParser";
 import { Bool_literalContext } from "./MoocodeParser";
 import { String_literalContext } from "./MoocodeParser";
@@ -333,16 +333,6 @@ export default class MoocodeParserListener extends ParseTreeListener {
 	 * @param ctx the parse tree
 	 */
 	exitError_codes?: (ctx: Error_codesContext) => void;
-	/**
-	 * Enter a parse tree produced by `MoocodeParser.any_error`.
-	 * @param ctx the parse tree
-	 */
-	enterAny_error?: (ctx: Any_errorContext) => void;
-	/**
-	 * Exit a parse tree produced by `MoocodeParser.any_error`.
-	 * @param ctx the parse tree
-	 */
-	exitAny_error?: (ctx: Any_errorContext) => void;
 	/**
 	 * Enter a parse tree produced by `MoocodeParser.try_finally`.
 	 * @param ctx the parse tree
@@ -684,15 +674,15 @@ export default class MoocodeParserListener extends ParseTreeListener {
 	 */
 	exitIndexer?: (ctx: IndexerContext) => void;
 	/**
-	 * Enter a parse tree produced by `MoocodeParser.list_slicer`.
+	 * Enter a parse tree produced by `MoocodeParser.list_splicer`.
 	 * @param ctx the parse tree
 	 */
-	enterList_slicer?: (ctx: List_slicerContext) => void;
+	enterList_splicer?: (ctx: List_splicerContext) => void;
 	/**
-	 * Exit a parse tree produced by `MoocodeParser.list_slicer`.
+	 * Exit a parse tree produced by `MoocodeParser.list_splicer`.
 	 * @param ctx the parse tree
 	 */
-	exitList_slicer?: (ctx: List_slicerContext) => void;
+	exitList_splicer?: (ctx: List_splicerContext) => void;
 	/**
 	 * Enter a parse tree produced by `MoocodeParser.object_reference`.
 	 * @param ctx the parse tree
@@ -723,6 +713,16 @@ export default class MoocodeParserListener extends ParseTreeListener {
 	 * @param ctx the parse tree
 	 */
 	exitCorified_value?: (ctx: Corified_valueContext) => void;
+	/**
+	 * Enter a parse tree produced by `MoocodeParser.optional_target`.
+	 * @param ctx the parse tree
+	 */
+	enterOptional_target?: (ctx: Optional_targetContext) => void;
+	/**
+	 * Exit a parse tree produced by `MoocodeParser.optional_target`.
+	 * @param ctx the parse tree
+	 */
+	exitOptional_target?: (ctx: Optional_targetContext) => void;
 	/**
 	 * Enter a parse tree produced by `MoocodeParser.literal`.
 	 * @param ctx the parse tree

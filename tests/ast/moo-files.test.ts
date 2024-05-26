@@ -1,3 +1,4 @@
+import { expect } from 'chai';
 import { readFileSync } from 'fs';
 import { suite, test } from 'mocha';
 import { generateAst } from '../../src';
@@ -6,8 +7,10 @@ function runTest(filePath: string) {
 	const fileContent = readFileSync(filePath, 'utf8');
 	const result = generateAst(fileContent);
 
-	console.log();
-	console.log(result.map(x => x.toString(false)).join('\n'));
+	expect(result).to.exist;
+
+	// console.log();
+	// console.log(result.map(x => x.toString(false)).join('\n'));
 }
 
 suite('AST tests for moo files', () => {
