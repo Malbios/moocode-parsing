@@ -14,7 +14,7 @@ const testCases = [
     { description: 'should parse a string with various special characters', code: '"x;§%$§& y z !! nope 1_2 \\"abc?\\""', expectedValue: '"x;§%$§& y z !! nope 1_2 \\"abc?\\""' }
 ];
 
-suite('string value tests', () => {
+suite('CST tests for string values', () => {
     testCases.forEach(testCaseData => {
         test(testCaseData.description, () => {
             const parser = CommonHelpers.getParser(testCaseData.code);

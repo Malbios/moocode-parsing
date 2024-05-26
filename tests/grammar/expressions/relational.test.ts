@@ -1,11 +1,11 @@
-import { suite, test } from 'mocha';
 import { expect } from 'chai';
+import { suite, test } from 'mocha';
 
 import CommonHelpers from '../../test-utils/common';
 import ExpectHelpers from '../../test-utils/expectations';
 import ParsingHelpers from '../../test-utils/parsing';
 
-suite('relational expression tests', () => {
+suite('CST tests for relational expressions', () => {
     test('should parse a less than relation', () => {
         const parser = CommonHelpers.getParser('my_var < other_var');
         const result = parser.expression();

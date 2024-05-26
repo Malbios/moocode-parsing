@@ -26,7 +26,7 @@ const errorCodes = [
     'E_INTRPT'
 ]
 
-suite('error value tests', () => {
+suite('CST tests for error values', () => {
     errorCodes.forEach(errorCode => {
         test(`should parse the error code ${errorCode}`, () => {
             const parser = CommonHelpers.getParser(errorCode);

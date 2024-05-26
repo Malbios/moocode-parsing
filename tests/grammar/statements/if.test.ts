@@ -5,7 +5,7 @@ import CommonHelpers from '../../test-utils/common';
 import ExpectHelpers from '../../test-utils/expectations';
 import ParsingHelpers from '../../test-utils/parsing';
 
-suite('if statement tests', () => {
+suite('CST tests for if statements', () => {
     test('should parse an if statement', () => {
         const code = `
 if (1)

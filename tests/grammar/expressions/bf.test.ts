@@ -1,11 +1,11 @@
-import { suite, test } from 'mocha';
 import { expect } from 'chai';
+import { suite, test } from 'mocha';
 
 import CommonHelpers from '../../test-utils/common';
 import ExpectHelpers from '../../test-utils/expectations';
 import ParsingHelpers from '../../test-utils/parsing';
 
-suite('built-in function invocation tests', () => {
+suite('CST tests for built-in function invocations', () => {
     test('should parse a bf invocation with one argument', () => {
         const parser = CommonHelpers.getParser('valid(me)');
         const result = parser.expression();

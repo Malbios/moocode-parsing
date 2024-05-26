@@ -1,5 +1,5 @@
-import { suite, test } from 'mocha';
 import { ParserRuleContext } from 'antlr4';
+import { suite, test } from 'mocha';
 
 import CommonHelpers from '../../test-utils/common';
 import ExpectHelpers from '../../test-utils/expectations';
@@ -11,7 +11,7 @@ const testCaseData = [
     { description: 'should parse a corified object reference', code: '$mystuff', expectedValue: '$mystuff', expectInnerValue: (context: ParserRuleContext, expectedValue: string) => ExpectHelpers.expectCorifiedObject(context, expectedValue) }
 ];
 
-suite('object reference tests', () => {
+suite('CST tests for object reference values', () => {
     testCaseData.forEach(testCaseData => {
         test(testCaseData.description, () => {
             const parser = CommonHelpers.getParser(testCaseData.code);

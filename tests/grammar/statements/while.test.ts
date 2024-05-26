@@ -5,7 +5,7 @@ import CommonHelpers from '../../test-utils/common';
 import ExpectHelpers from '../../test-utils/expectations';
 import ParsingHelpers from '../../test-utils/parsing';
 
-suite('while statement tests', () => {
+suite('CST tests for while statements', () => {
   test('should parse a while loop', () => {
     const code = `
 while (true)

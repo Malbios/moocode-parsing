@@ -5,7 +5,7 @@ import CommonHelpers from '../../test-utils/common';
 import ExpectHelpers from '../../test-utils/expectations';
 import ParsingHelpers from '../../test-utils/parsing';
 
-suite('property access tests', () => {
+suite('CST tests for property access expressions', () => {
     test('should parse a property access', () => {
         const parser = CommonHelpers.getParser('obj.prop');
         const result = parser.expression();

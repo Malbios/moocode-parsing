@@ -1,11 +1,11 @@
-import { suite, test } from 'mocha';
 import { expect } from 'chai';
+import { suite, test } from 'mocha';
 
 import CommonHelpers from '../../test-utils/common';
 import ExpectHelpers from '../../test-utils/expectations';
 import ParsingHelpers from '../../test-utils/parsing';
 
-suite('bitwise expression tests', () => {
+suite('CST tests for bitwise expressions', () => {
     test('should parse an inclusive or', () => {
         const parser = CommonHelpers.getParser('my_var |. other_var');
         const result = parser.expression();

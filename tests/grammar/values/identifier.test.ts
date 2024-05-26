@@ -11,7 +11,7 @@ const testCaseData = [
     { description: 'should parse an identifier with leading underscores', code: '__abc', expectedValue: '__abc' }
 ];
 
-suite('identifier value tests', () => {
+suite('CST tests for identifier values', () => {
     testCaseData.forEach(testCaseData => {
         test(testCaseData.description, () => {
             const parser = CommonHelpers.getParser(testCaseData.code);

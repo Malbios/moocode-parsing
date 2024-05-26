@@ -16,7 +16,7 @@ const testCaseData = [
     { description: 'should parse a negative float', code: '-56.12345', expectedValue: '-56.12345' }
 ];
 
-suite('float value tests', () => {
+suite('CST tests for float values', () => {
     testCaseData.forEach(testCaseData => {
         test(testCaseData.description, () => {
             const parser = CommonHelpers.getParser(testCaseData.code);
