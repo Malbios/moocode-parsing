@@ -1,7 +1,7 @@
 import { ParserRuleContext } from 'antlr4';
 import MoocodeLexer from '../grammar/generated/MoocodeLexer';
 import { Additive_expressionContext, And_expressionContext, AssignmentContext, Bf_invocationContext, Complement_unary_expressionContext, Conditional_and_expressionContext, Conditional_expressionContext, Conditional_in_expressionContext, Conditional_or_expressionContext, Equality_expressionContext, Exclusive_or_expressionContext, ExpressionsContext, Inclusive_or_expressionContext, IndexerContext, Multiplicative_expressionContext, Negated_unary_expressionContext, Negative_unary_expressionContext, Primary_expressionContext, Primary_expression_startContext, Property_accessorContext, Relational_expressionContext, Shift_expressionContext, Verb_invocationContext } from '../grammar/generated/MoocodeParser';
-import { BaseNode, SingleValueVisitor } from './abstract';
+import { BaseNode, MoocodeVisitor } from './abstract';
 import { ContextPosition, getContextAsText, is } from './common';
 import { NodeGenerationError } from './error';
 import { AdditionNode, ArgumentIndexerNode, BitwiseAndNode, BitwiseExclusiveOrNode, BitwiseInclusiveOrNode, BuiltInFunctionInvocationNode, ComplementNode, ComputedPropertyAccessorNode, ComputedVerbInvocationNode, ConditionalAndNode, ConditionalInNode, ConditionalNode, ConditionalOrNode, CorifiedVerbInvocationNode, DivisionNode, EqualsNode, Expression, GreaterOrEqualNode, GreaterThanNode, Indexer, Invocation, LessOrEqualNode, LessThanNode, ListAssignmentNode, ListNode, ModulationNode, MultiplicationNode, NegatedNode, NegativeNode, OptionalTargetAssignmentNode, OptionalTargetNode, PropertyAccessor, PropertyAccessorNode, PropertyAssignmentNode, RangeIndexerNode, ShiftLeftNode, ShiftRightNode, SubtractionNode, UnequalsNode, Value, VariableAssignmentNode, VariableNode, VerbInvocationNode } from './nodes';
@@ -11,8 +11,12 @@ function hasNoIndexerAccessorOrInvocation(context: Primary_expressionContext): b
 	return (context.indexer_list().length === 0 && context.property_accessor_list().length === 0 && context.verb_invocation_list().length === 0 && context.bf_invocation_list().length === 0);
 }
 
-function generateNodeFromInfo(context: ParserRuleContext, object: Expression, info: InfoNode): Indexer | PropertyAccessor | Invocation {
-	const position = ContextPosition.fromValues(object.position.startToken, info.position.stopToken);
+function generateNodeFromInfo(context: ParserRuleContext, object: Expression | undefined, info: InfoNode | undefined): Indexer | PropertyAccessor | Invocation | undefined {
+	if (!object) {
+		return undefined;
+	}
+
+	const position = ContextPosition.fromValues(object.position.startToken, info?.position.stopToken);
 
 	if (info instanceof ArgumentIndexerNodeInfo) {
 		return new ArgumentIndexerNode(position, object, info.argument);
@@ -37,7 +41,7 @@ function generateNodeFromInfo(context: ParserRuleContext, object: Expression, in
 	throw NodeGenerationError.fromContext(context);
 }
 
-function generateMultiPartNode<T extends BaseNode>(context: ParserRuleContext, create: (position: ContextPosition, left: Expression, operator: ParserRuleContext, right: Expression) => T): T | Expression {
+function generateMultiPartNode<T extends BaseNode>(context: ParserRuleContext, create: (position: ContextPosition, left: Expression | undefined, operator: ParserRuleContext | undefined, right: Expression | undefined) => T | undefined): T | Expression | undefined {
 	const children = (context.children ?? []) as ParserRuleContext[];
 
 	if (children.length === 0) {
@@ -60,15 +64,18 @@ function generateMultiPartNode<T extends BaseNode>(context: ParserRuleContext, c
 
 	for (let i = 3; i < (children.length - 1); i += 2) {
 		const rightExpression = ExpressionGenerator.generateExpression(children[i + 1]);
-		const position = ContextPosition.fromValues(result.position.startToken, rightExpression.position.stopToken);
-		result = create(position, result, children[i], rightExpression);
+
+		if (result) {
+			const position = ContextPosition.fromValues(result.position.startToken, rightExpression?.position.stopToken);
+			result = create(position, result, children[i], rightExpression);
+		}
 	}
 
 	return result;
 }
 
-export class ExpressionGenerator extends SingleValueVisitor<Expression> {
-	public override visitAssignment = (context: AssignmentContext): VariableAssignmentNode | OptionalTargetAssignmentNode | ListAssignmentNode | PropertyAssignmentNode => {
+export class ExpressionGenerator extends MoocodeVisitor<Expression> {
+	public override visitAssignment = (context: AssignmentContext): VariableAssignmentNode | OptionalTargetAssignmentNode | ListAssignmentNode | PropertyAssignmentNode | undefined => {
 		const leftNode = ExpressionGenerator.generateExpression(context.unary_expression());
 		const rightNode = ExpressionGenerator.generateExpression(context.expression());
 
@@ -91,11 +98,11 @@ export class ExpressionGenerator extends SingleValueVisitor<Expression> {
 		throw NodeGenerationError.fromContext(context);
 	}
 
-	public override visitConditional_expression = (context: Conditional_expressionContext): ConditionalNode | Expression => {
+	public override visitConditional_expression = (context: Conditional_expressionContext): ConditionalNode | Expression | undefined => {
 		const conditionalIn = context.conditional_in_expression();
 
 		if (!context._true_ex && !context._false_ex) {
-			return this.visit(conditionalIn);
+			return ExpressionGenerator.generateExpression(conditionalIn);
 		}
 
 		if (!context._true_ex) {
@@ -114,31 +121,31 @@ export class ExpressionGenerator extends SingleValueVisitor<Expression> {
 		return new ConditionalNode(position, conditions, ifTrue, ifFalse);
 	}
 
-	public override visitConditional_in_expression = (context: Conditional_in_expressionContext): ConditionalInNode | Expression => {
+	public override visitConditional_in_expression = (context: Conditional_in_expressionContext): ConditionalInNode | Expression | undefined => {
 		return generateMultiPartNode(context, (position, left, _, right) => new ConditionalInNode(position, left, right));
 	}
 
-	public override visitConditional_or_expression = (context: Conditional_or_expressionContext): ConditionalOrNode | Expression => {
+	public override visitConditional_or_expression = (context: Conditional_or_expressionContext): ConditionalOrNode | Expression | undefined => {
 		return generateMultiPartNode(context, (position, left, _, right) => new ConditionalOrNode(position, left, right));
 	}
 
-	public override visitConditional_and_expression = (context: Conditional_and_expressionContext): ConditionalAndNode | Expression => {
+	public override visitConditional_and_expression = (context: Conditional_and_expressionContext): ConditionalAndNode | Expression | undefined => {
 		return generateMultiPartNode(context, (position, left, _, right) => new ConditionalAndNode(position, left, right));
 	}
 
-	public override visitInclusive_or_expression = (context: Inclusive_or_expressionContext): BitwiseInclusiveOrNode | Expression => {
+	public override visitInclusive_or_expression = (context: Inclusive_or_expressionContext): BitwiseInclusiveOrNode | Expression | undefined => {
 		return generateMultiPartNode(context, (position, left, _, right) => new BitwiseInclusiveOrNode(position, left, right));
 	}
 
-	public override visitExclusive_or_expression = (context: Exclusive_or_expressionContext): BitwiseExclusiveOrNode | Expression => {
+	public override visitExclusive_or_expression = (context: Exclusive_or_expressionContext): BitwiseExclusiveOrNode | Expression | undefined => {
 		return generateMultiPartNode(context, (position, left, _, right) => new BitwiseExclusiveOrNode(position, left, right));
 	}
 
-	public override visitAnd_expression = (context: And_expressionContext): BitwiseAndNode | Expression => {
+	public override visitAnd_expression = (context: And_expressionContext): BitwiseAndNode | Expression | undefined => {
 		return generateMultiPartNode(context, (position, left, _, right) => new BitwiseAndNode(position, left, right));
 	}
 
-	public override visitEquality_expression = (context: Equality_expressionContext): EqualsNode | UnequalsNode | Expression => {
+	public override visitEquality_expression = (context: Equality_expressionContext): EqualsNode | UnequalsNode | Expression | undefined => {
 		return generateMultiPartNode(context, (position, left, operator, right) => {
 			if (is(operator, MoocodeLexer.OP_EQ)) {
 				return new EqualsNode(position, left, right);
@@ -152,7 +159,7 @@ export class ExpressionGenerator extends SingleValueVisitor<Expression> {
 		});
 	}
 
-	public override visitRelational_expression = (context: Relational_expressionContext): LessThanNode | GreaterThanNode | LessOrEqualNode | GreaterOrEqualNode | Expression => {
+	public override visitRelational_expression = (context: Relational_expressionContext): LessThanNode | GreaterThanNode | LessOrEqualNode | GreaterOrEqualNode | Expression | undefined => {
 		return generateMultiPartNode(context, (position, left, operator, right) => {
 			if (is(operator, MoocodeLexer.OP_LT)) {
 				return new LessThanNode(position, left, right);
@@ -174,7 +181,7 @@ export class ExpressionGenerator extends SingleValueVisitor<Expression> {
 		});
 	}
 
-	public override visitShift_expression = (context: Shift_expressionContext): ShiftLeftNode | ShiftRightNode | Expression => {
+	public override visitShift_expression = (context: Shift_expressionContext): ShiftLeftNode | ShiftRightNode | Expression | undefined => {
 		return generateMultiPartNode(context, (position, left, operator, right) => {
 			if (is(operator, MoocodeLexer.LOG_SHIFT_LEFT)) {
 				return new ShiftLeftNode(position, left, right);
@@ -188,7 +195,7 @@ export class ExpressionGenerator extends SingleValueVisitor<Expression> {
 		});
 	}
 
-	public override visitAdditive_expression = (context: Additive_expressionContext): AdditionNode | SubtractionNode | Expression => {
+	public override visitAdditive_expression = (context: Additive_expressionContext): AdditionNode | SubtractionNode | Expression | undefined => {
 		return generateMultiPartNode(context, (position, left, operator, right) => {
 			if (is(operator, MoocodeLexer.PLUS)) {
 				return new AdditionNode(position, left, right);
@@ -202,7 +209,7 @@ export class ExpressionGenerator extends SingleValueVisitor<Expression> {
 		});
 	}
 
-	public override visitMultiplicative_expression = (context: Multiplicative_expressionContext): MultiplicationNode | DivisionNode | ModulationNode | Expression => {
+	public override visitMultiplicative_expression = (context: Multiplicative_expressionContext): MultiplicationNode | DivisionNode | ModulationNode | Expression | undefined => {
 		return generateMultiPartNode(context, (position, left, operator, right) => {
 			if (is(operator, MoocodeLexer.STAR)) {
 				return new MultiplicationNode(position, left, right);
@@ -220,13 +227,13 @@ export class ExpressionGenerator extends SingleValueVisitor<Expression> {
 		});
 	}
 
-	public override visitPrimary_expression = (context: Primary_expressionContext): Value | Indexer | PropertyAccessor | Invocation => {
+	public override visitPrimary_expression = (context: Primary_expressionContext): Value | Indexer | PropertyAccessor | Invocation | undefined => {
 		if (hasNoIndexerAccessorOrInvocation(context)) {
 			return ValueGenerator.generateValue(context._pe);
 		}
 
 		const children = context.children as ParserRuleContext[];
-		let expression: Value | Indexer | PropertyAccessor | Invocation;
+		let expression: Value | Indexer | PropertyAccessor | Invocation | undefined;
 		expression = ValueGenerator.generateValue(context._pe);
 
 		for (let i = 1; i < children.length; i++) {
@@ -237,21 +244,21 @@ export class ExpressionGenerator extends SingleValueVisitor<Expression> {
 		return expression;
 	}
 
-	public override visitPrimary_expression_start = (context: Primary_expression_startContext): Value => {
+	public override visitPrimary_expression_start = (context: Primary_expression_startContext): Value | undefined => {
 		return ValueGenerator.generateValue(context);
 	}
 
-	public override visitNegated_unary_expression = (context: Negated_unary_expressionContext): NegatedNode => {
+	public override visitNegated_unary_expression = (context: Negated_unary_expressionContext): NegatedNode | undefined => {
 		const innerExpression = ExpressionGenerator.generateExpression(context.unary_expression());
 		return new NegatedNode(ContextPosition.fromContext(context), innerExpression);
 	}
 
-	public override visitNegative_unary_expression = (context: Negative_unary_expressionContext): NegativeNode => {
+	public override visitNegative_unary_expression = (context: Negative_unary_expressionContext): NegativeNode | undefined => {
 		const innerExpression = ExpressionGenerator.generateExpression(context.unary_expression());
 		return new NegativeNode(ContextPosition.fromContext(context), innerExpression);
 	}
 
-	public override visitComplement_unary_expression = (context: Complement_unary_expressionContext): ComplementNode => {
+	public override visitComplement_unary_expression = (context: Complement_unary_expressionContext): ComplementNode | undefined => {
 		const innerExpression = ExpressionGenerator.generateExpression(context.unary_expression());
 		return new ComplementNode(ContextPosition.fromContext(context), innerExpression);
 	}
@@ -260,22 +267,23 @@ export class ExpressionGenerator extends SingleValueVisitor<Expression> {
 		super();
 	}
 
-	public static generate<T extends Expression>(context: ParserRuleContext): T {
+	public static generate<T extends Expression>(context: ParserRuleContext): T | undefined {
 		const generator = new ExpressionGenerator();
 		const result = generator.visit(context) as T;
 
 		if (!result) {
-			throw NodeGenerationError.fromContext(context);
+			// TODO: log?
+			return undefined;
 		}
 
 		return result;
 	}
 
-	public static generateExpression(context: ParserRuleContext): Expression {
+	public static generateExpression(context: ParserRuleContext): Expression | undefined {
 		return ExpressionGenerator.generate<Expression>(context);
 	}
 
-	public static generateExpressions(context: ExpressionsContext): Expression[] {
+	public static generateExpressions(context: ExpressionsContext): (Expression | undefined)[] {
 		const expressions = [];
 
 		for (const subcontext of context.expression_list()) {
@@ -287,8 +295,8 @@ export class ExpressionGenerator extends SingleValueVisitor<Expression> {
 	}
 }
 
-class InfoNodeGenerator extends SingleValueVisitor<InfoNode> {
-	public override visitIndexer = (context: IndexerContext): ArgumentIndexerNodeInfo | RangeIndexerNodeInfo => {
+class InfoNodeGenerator extends MoocodeVisitor<InfoNode> {
+	public override visitIndexer = (context: IndexerContext): ArgumentIndexerNodeInfo | RangeIndexerNodeInfo | undefined => {
 		if (context._argument) {
 			const argument = ExpressionGenerator.generateExpression(context._argument);
 			return new ArgumentIndexerNodeInfo(ContextPosition.fromContext(context), argument);
@@ -301,7 +309,7 @@ class InfoNodeGenerator extends SingleValueVisitor<InfoNode> {
 		}
 	}
 
-	public override visitProperty_accessor = (context: Property_accessorContext): PropertyAccessorNodeInfo | ComputedPropertyAccessorNodeInfo => {
+	public override visitProperty_accessor = (context: Property_accessorContext): PropertyAccessorNodeInfo | ComputedPropertyAccessorNodeInfo | undefined => {
 		const position = ContextPosition.fromContext(context);
 
 		if (context.identifier()) {
@@ -313,7 +321,7 @@ class InfoNodeGenerator extends SingleValueVisitor<InfoNode> {
 		return new ComputedPropertyAccessorNodeInfo(position, nameExpression);
 	}
 
-	public override visitVerb_invocation = (context: Verb_invocationContext): VerbInvocationNodeInfo | ComputedVerbInvocationNodeInfo => {
+	public override visitVerb_invocation = (context: Verb_invocationContext): VerbInvocationNodeInfo | ComputedVerbInvocationNodeInfo | undefined => {
 		const position = ContextPosition.fromContext(context);
 		const argumentExpressions = ExpressionGenerator.generateExpressions(context._arguments);
 
@@ -326,7 +334,7 @@ class InfoNodeGenerator extends SingleValueVisitor<InfoNode> {
 		return new ComputedVerbInvocationNodeInfo(position, nameExpression, argumentExpressions);
 	}
 
-	public override visitBf_invocation = (context: Bf_invocationContext): CallInfo => {
+	public override visitBf_invocation = (context: Bf_invocationContext): CallInfo | undefined => {
 		const position = ContextPosition.fromContext(context);
 		const argumentExpressions = ExpressionGenerator.generateExpressions(context._arguments);
 
@@ -337,7 +345,7 @@ class InfoNodeGenerator extends SingleValueVisitor<InfoNode> {
 		super();
 	}
 
-	public static generate<T extends InfoNode>(context: ParserRuleContext): T {
+	public static generate<T extends InfoNode>(context: ParserRuleContext): T | undefined {
 		const generator = new InfoNodeGenerator();
 		const result = generator.visit(context) as T;
 
@@ -348,7 +356,7 @@ class InfoNodeGenerator extends SingleValueVisitor<InfoNode> {
 		return result;
 	}
 
-	public static generateInfoNode(context: ParserRuleContext): InfoNode {
+	public static generateInfoNode(context: ParserRuleContext): InfoNode | undefined {
 		return InfoNodeGenerator.generate<InfoNode>(context);
 	}
 }
@@ -356,13 +364,13 @@ class InfoNodeGenerator extends SingleValueVisitor<InfoNode> {
 type InfoNode = (ArgumentIndexerNodeInfo | RangeIndexerNodeInfo | PropertyAccessorNodeInfo | ComputedPropertyAccessorNodeInfo | VerbInvocationNodeInfo | ComputedVerbInvocationNodeInfo | CallInfo);
 
 class ArgumentIndexerNodeInfo extends BaseNode {
-	private _argument: Expression;
+	private _argument: Expression | undefined;
 
-	public get argument(): Expression {
+	public get argument() {
 		return this._argument;
 	}
 
-	public constructor(position: ContextPosition, argument: Expression) {
+	public constructor(position: ContextPosition, argument: Expression | undefined) {
 		super(position);
 
 		this._argument = argument;
@@ -370,18 +378,18 @@ class ArgumentIndexerNodeInfo extends BaseNode {
 }
 
 class RangeIndexerNodeInfo extends BaseNode {
-	private _start: Expression;
-	private _end: Expression;
+	private _start: Expression | undefined;
+	private _end: Expression | undefined;
 
-	public get start(): Expression {
+	public get start() {
 		return this._start
 	}
 
-	public get end(): Expression {
+	public get end() {
 		return this._end
 	}
 
-	public constructor(position: ContextPosition, start: Expression, end: Expression) {
+	public constructor(position: ContextPosition, start: Expression | undefined, end: Expression | undefined) {
 		super(position);
 
 		this._start = start;
@@ -390,13 +398,13 @@ class RangeIndexerNodeInfo extends BaseNode {
 }
 
 class PropertyAccessorNodeInfo extends BaseNode {
-	private _name: string;
+	private _name: string | undefined;
 
-	public get name(): string {
+	public get name() {
 		return this._name
 	}
 
-	public constructor(position: ContextPosition, name: string) {
+	public constructor(position: ContextPosition, name: string | undefined) {
 		super(position);
 
 		this._name = name;
@@ -404,13 +412,13 @@ class PropertyAccessorNodeInfo extends BaseNode {
 }
 
 class ComputedPropertyAccessorNodeInfo extends BaseNode {
-	private _name: Expression;
+	private _name: Expression | undefined;
 
-	public get name(): Expression {
+	public get name() {
 		return this._name
 	}
 
-	public constructor(position: ContextPosition, name: Expression) {
+	public constructor(position: ContextPosition, name: Expression | undefined) {
 		super(position);
 
 		this._name = name;
@@ -418,18 +426,18 @@ class ComputedPropertyAccessorNodeInfo extends BaseNode {
 }
 
 class VerbInvocationNodeInfo extends BaseNode {
-	private _name: string;
-	private _arguments: Expression[];
+	private _name: string | undefined;
+	private _arguments: (Expression | undefined)[];
 
-	public get name(): string {
+	public get name() {
 		return this._name
 	}
 
-	public get arguments(): Expression[] {
+	public get arguments() {
 		return this._arguments;
 	}
 
-	public constructor(position: ContextPosition, name: string, functionArguments: Expression[]) {
+	public constructor(position: ContextPosition, name: string | undefined, functionArguments: (Expression | undefined)[]) {
 		super(position);
 
 		this._name = name;
@@ -438,18 +446,18 @@ class VerbInvocationNodeInfo extends BaseNode {
 }
 
 class ComputedVerbInvocationNodeInfo extends BaseNode {
-	private _name: Expression;
-	private _arguments: Expression[];
+	private _name: Expression | undefined;
+	private _arguments: (Expression | undefined)[];
 
-	public get name(): Expression {
+	public get name() {
 		return this._name
 	}
 
-	public get arguments(): Expression[] {
+	public get arguments() {
 		return this._arguments;
 	}
 
-	public constructor(position: ContextPosition, name: Expression, functionArguments: Expression[]) {
+	public constructor(position: ContextPosition, name: Expression | undefined, functionArguments: (Expression | undefined)[]) {
 		super(position);
 
 		this._name = name;
@@ -458,13 +466,13 @@ class ComputedVerbInvocationNodeInfo extends BaseNode {
 }
 
 class CallInfo extends BaseNode {
-	private _arguments: Expression[];
+	private _arguments: (Expression | undefined)[];
 
-	public get arguments(): Expression[] {
+	public get arguments() {
 		return this._arguments;
 	}
 
-	public constructor(position: ContextPosition, functionArguments: Expression[]) {
+	public constructor(position: ContextPosition, functionArguments: (Expression | undefined)[]) {
 		super(position);
 
 		this._arguments = functionArguments;

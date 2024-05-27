@@ -15,9 +15,6 @@ import moocodeParser, {
     String_literalContext
 } from '../../src/grammar/generated/MoocodeParser';
 
-import { fail } from 'assert';
-import { ParsingError } from '../../src/ast/error';
-import { Action } from '../../src/interfaces';
 import ParsingHelpers from './parsing';
 
 // eslint-disable-next-line @typescript-eslint/no-extraneous-class
@@ -108,17 +105,5 @@ export default class ExpectHelpers {
     public static expectNonEmptyContinue(context: ParserRuleContext | undefined) {
         const foundContext = ParsingHelpers.getNonEmptyContinue(context);
         expect(foundContext).to.exist;
-    }
-}
-
-export function expectParsingError(action: Action<void>) {
-    try {
-        action();
-        fail();
-    } catch (error: unknown) {
-        const parsingError = error as ParsingError;
-        if (!parsingError) {
-            fail();
-        }
     }
 }

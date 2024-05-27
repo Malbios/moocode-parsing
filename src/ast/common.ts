@@ -26,6 +26,8 @@ export enum ErrorCode {
 };
 
 export class ContextPosition {
+	private static _default = new ContextPosition(new Token(), undefined);
+
 	private _start: Token;
 	private _stop: Token | undefined;
 
@@ -68,13 +70,17 @@ export class ContextPosition {
 		return this.range;
 	}
 
+	public static get default() {
+		return ContextPosition._default;
+	}
+
 	public static fromContext(context: ParserRuleContext): ContextPosition {
 		const start = context.start;
 		const stop = context.stop;
 
-		if ((stop?.stop ?? 0) < start.start) {
-			throw new InvalidOperationError('stop cannot be before start');
-		}
+		// if ((stop?.stop ?? 0) < start.start) {
+		// 	throw new InvalidOperationError('stop cannot be before start');
+		// }
 
 		return new ContextPosition(start, stop);
 	}
@@ -103,7 +109,7 @@ export function getContextAsText<T extends ParserRuleContext>(context: T): strin
 	return input.getText(context.start.start, stop);
 }
 
-export function is(context: ParserRuleContext, tokenType: number): boolean {
+export function is(context: ParserRuleContext | undefined, tokenType: number): boolean {
 	const terminalNode = context as unknown as TerminalNode;
 	if (!terminalNode) {
 		return false;
