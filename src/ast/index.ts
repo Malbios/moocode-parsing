@@ -96,28 +96,10 @@ function getSanitizedAst(nodes: (Statement | undefined)[]): Statement[] {
     return sanitizedNodes;
 }
 
-// function getText(node: Statement | InvalidStatement | undefined): string {
-//     if (!node) {
-//         return '<undefined>';
-//     }
-
-//     if (node instanceof InvalidStatement) {
-//         return `InvalidStatement: ${node.toString(false)}`;
-//     }
-
-//     return `Statement: ${node.toString(false)}`;
-// }
-
 export default function generateAst(input: string): Statement[] {
     const cst = generateCst(input, parser => parser.moocode().statement_list());
 
-    // console.log(cst.map(x => x ? `Statement Context: ${x.getText()}` : '').join('\n'));
-    // console.log();
-
     const ast = getSanitizedCst(cst).map(x => generateStatementNode(x));
-
-    // console.log(ast.map(x => getText(x)).join('\n'));
-    // console.log();
 
     return getSanitizedAst(ast);
 }
