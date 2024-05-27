@@ -49,23 +49,6 @@ export class InvalidOperationError extends Error {
 	}
 }
 
-export class ParsingError extends Error {
-	public constructor(code: string, errors: SyntaxError[]) {
-		super(`${codeToString(code)}\n\n${errors.map(x => x.toString()).join('\n')}`);
-	}
-}
-
-function codeToString(code: string): string {
-	const lines = code.split('\n');
-	const result = new Array<string>();
-
-	for (let i = 0; i < lines.length; i++) {
-		result.push(`${i + 1}: ${lines[i]}`);
-	}
-
-	return result.join('\n');
-}
-
 export class NodeGenerationError extends Error {
 	private constructor(message: string) {
 		super(message);
@@ -83,14 +66,14 @@ function nameOf(object: object): string {
 	return object?.constructor?.name ?? '<unknown>';
 }
 
-export class SyntaxError {
-	private _offendingSymbol: Token;
+export class SyntaxError<T> {
+	private _offendingSymbol: T;
 	private _line: number;
 	private _column: number;
 	private _message: string;
 	private _error: RecognitionException | undefined;
 
-	public constructor(offendingSymbol: Token, line: number, column: number, message: string, error?: RecognitionException) {
+	public constructor(offendingSymbol: T, line: number, column: number, message: string, error?: RecognitionException) {
 		this._offendingSymbol = offendingSymbol;
 		this._line = line;
 		this._column = column;
@@ -103,14 +86,46 @@ export class SyntaxError {
 	}
 }
 
-export class SyntaxErrorListener extends ErrorListener<Token> {
-	private _errors = new Array<SyntaxError>();
+export class ParserErrorListener extends ErrorListener<Token> {
+	private _errors = new Array<SyntaxError<Token>>();
 
-	public get errors(): SyntaxError[] {
+	public get errors() {
 		return this._errors;
 	}
 
 	public syntaxError(recognizer: Recognizer<Token>, offendingSymbol: Token, line: number, column: number, msg: string, e: RecognitionException | undefined): void {
 		this._errors.push(new SyntaxError(offendingSymbol, line, column, msg, e));
+	}
+}
+
+export class LexerErrorListener extends ErrorListener<number> {
+	private _errors = new Array<SyntaxError<number>>();
+
+	public get errors() {
+		return this._errors;
+	}
+
+	public syntaxError(recognizer: Recognizer<number>, offendingSymbol: number, line: number, column: number, msg: string, e: RecognitionException | undefined): void {
+		this._errors.push(new SyntaxError(offendingSymbol, line, column, msg, e));
+	}
+}
+
+export class ContextWithError extends ParserRuleContext {
+	private _contexts: ParserRuleContext[] = [];
+
+	public get position(): ContextPosition {
+		if (this._contexts.length < 1) {
+			return ContextPosition.default;
+		}
+
+		return ContextPosition.fromValues(this._contexts[0].start, this._contexts[this._contexts.length - 1].stop);
+	}
+
+	public get text(): string {
+		return this._contexts[0].start.getInputStream().getText(this.position.start, this.position.stop);
+	}
+
+	public add(context: ParserRuleContext) {
+		this._contexts.push(context);
 	}
 }

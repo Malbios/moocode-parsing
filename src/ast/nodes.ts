@@ -1,7 +1,7 @@
 import { BaseNode, FlowControlStatementNode, LiteralNode, ReferenceNode, TwoPartNode, WrappedNode } from './abstract';
 import { ContextPosition, ErrorCode } from './common';
 
-export type Statement = (IfStatementNode | Loop | ForkStatementNode | TryStatementNode | FlowControlStatement | ExpressionStatementNode | CommentStatementNode | EmptyStatementNode);
+export type Statement = (IfStatementNode | Loop | ForkStatementNode | TryStatementNode | FlowControlStatement | ExpressionStatementNode | CommentStatementNode | EmptyStatementNode | InvalidStatement);
 export type Loop = (For | WhileStatementNode);
 export type For = (ForStatementNode | RangedForStatementNode);
 export type FlowControlStatement = (ReturnStatementNode | ContinueStatementNode | BreakStatementNode);
@@ -29,26 +29,41 @@ function getDepthIndent(depth: number): string {
 	return ''.padStart(depth * 2, ' ');
 }
 
+export class InvalidStatement extends BaseNode {
+	private _data: string;
+
+	public constructor(position: ContextPosition, data: string) {
+		super(position);
+
+		this._data = data;
+	}
+
+	// eslint-disable-next-line @typescript-eslint/no-unused-vars
+	public toString(lineInfo?: boolean): string {
+		return `${this._data}`;
+	}
+}
+
 export class IfStatementNode extends BaseNode {
 	private _depth: number;
 
-	private _if: IfNode;
-	private _elseIfs: ElseIfNode[];
+	private _if: IfNode | undefined;
+	private _elseIfs: (ElseIfNode | undefined)[];
 	private _else: ElseNode | undefined;
 
-	public get if(): IfNode {
+	public get if() {
 		return this._if;
 	}
 
-	public get elseifs(): ElseIfNode[] {
+	public get elseifs() {
 		return this._elseIfs;
 	}
 
-	public get else(): ElseNode | undefined {
+	public get else() {
 		return this._else;
 	}
 
-	public constructor(depth: number, position: ContextPosition, ifNode: IfNode, elseIfNodes?: ElseIfNode[], elseNode?: ElseNode) {
+	public constructor(depth: number, position: ContextPosition, ifNode: IfNode | undefined, elseIfNodes?: (ElseIfNode | undefined)[], elseNode?: ElseNode | undefined) {
 		super(position);
 
 		this._depth = depth;
@@ -61,12 +76,12 @@ export class IfStatementNode extends BaseNode {
 	public toString(lineInfo = true): string {
 		const base = lineInfo ? ` (${super.toString(lineInfo)})` : '';
 
-		const ifPart = `${this._if.toString(lineInfo)}\n`;
+		const ifPart = `${this._if?.toString(lineInfo)}\n`;
 		let elseIfParts = '';
 		let elsePart = '';
 
 		if (this._elseIfs.length > 0) {
-			elseIfParts = `${this._elseIfs.map(x => `${x.toString(lineInfo)}`).join('\n')}${this._elseIfs.length > 0 ? '\n' : ''}`;
+			elseIfParts = `${this._elseIfs.map(x => `${x?.toString(lineInfo)}`).join('\n')}${this._elseIfs.length > 0 ? '\n' : ''}`;
 		}
 
 		if (this._else) {
@@ -82,8 +97,8 @@ export class IfStatementNode extends BaseNode {
 export class IfNode extends BaseNode {
 	protected _depth: number;
 
-	private _conditions: Expression;
-	private _body: Statement[];
+	private _conditions: Expression | undefined;
+	private _body: (Statement | undefined)[];
 
 	public get conditions() {
 		return this._conditions;
@@ -93,7 +108,7 @@ export class IfNode extends BaseNode {
 		return this._body;
 	}
 
-	public constructor(depth: number, position: ContextPosition, conditions: Expression, body?: Statement[]) {
+	public constructor(depth: number, position: ContextPosition, conditions: Expression | undefined, body?: (Statement | undefined)[]) {
 		super(position);
 
 		this._depth = depth;
@@ -103,13 +118,13 @@ export class IfNode extends BaseNode {
 	}
 
 	public toString(lineInfo = true): string {
-		const start = `${getDepthIndent(this._depth)}if (${this._conditions.toString(lineInfo)})`;
+		const start = `${getDepthIndent(this._depth)}if (${this._conditions?.toString(lineInfo)})`;
 
 		if (this._body.length === 0) {
 			return start;
 		}
 
-		return `${start}\n${this._body.map(x => x.toString(lineInfo)).join('\n')}`;
+		return `${start}\n${this._body.map(x => x?.toString(lineInfo)).join('\n')}`;
 	}
 }
 
@@ -124,13 +139,13 @@ export class ElseIfNode extends IfNode {
 export class ElseNode extends BaseNode {
 	private _depth: number;
 
-	private _body: Statement[];
+	private _body: (Statement | undefined)[];
 
-	public get body(): Statement[] {
+	public get body() {
 		return this._body;
 	}
 
-	public constructor(depth: number, position: ContextPosition, body?: Statement[]) {
+	public constructor(depth: number, position: ContextPosition, body?: (Statement | undefined)[]) {
 		super(position);
 
 		this._depth = depth;
@@ -143,35 +158,35 @@ export class ElseNode extends BaseNode {
 			return `${getDepthIndent(this._depth)}else\n`;
 		}
 
-		return `${getDepthIndent(this._depth)}else\n${this._body.map(x => x.toString(lineInfo)).join('\n')}`;
+		return `${getDepthIndent(this._depth)}else\n${this._body.map(x => x?.toString(lineInfo)).join('\n')}`;
 	}
 }
 
 export class ForStatementNode extends BaseNode {
 	private _depth: number;
 
-	private _value: VariableNode;
+	private _value: VariableNode | undefined;
 	private _keyOrIndex: VariableNode | undefined;
-	private _rangeExpression: Expression;
-	private _statements: Statement[];
+	private _rangeExpression: Expression | undefined;
+	private _statements: (Statement | undefined)[];
 
-	public get value(): VariableNode {
+	public get value() {
 		return this._value;
 	}
 
-	public get keyOrIndex(): VariableNode | undefined {
+	public get keyOrIndex() {
 		return this._keyOrIndex;
 	}
 
-	public get rangeExpression(): Expression {
+	public get rangeExpression() {
 		return this._rangeExpression;
 	}
 
-	public get statements(): Statement[] {
+	public get statements() {
 		return this._statements;
 	}
 
-	private constructor(depth: number, position: ContextPosition, value: VariableNode, rangeExpression: Expression, statements: Statement[], keyOrIndex?: VariableNode) {
+	private constructor(depth: number, position: ContextPosition, value: VariableNode | undefined, rangeExpression: Expression | undefined, statements: (Statement | undefined)[], keyOrIndex?: VariableNode | undefined) {
 		super(position);
 
 		this._depth = depth;
@@ -182,11 +197,11 @@ export class ForStatementNode extends BaseNode {
 		this._statements = statements;
 	}
 
-	public static new(depth: number, position: ContextPosition, value: VariableNode, rangeExpression: Expression, statements: Statement[]): ForStatementNode {
+	public static new(depth: number, position: ContextPosition, value: VariableNode | undefined, rangeExpression: Expression | undefined, statements: (Statement | undefined)[]): ForStatementNode {
 		return new ForStatementNode(depth, position, value, rangeExpression, statements);
 	}
 
-	public static withKeyOrIndex(depth: number, position: ContextPosition, value: VariableNode, keyOrIndex: VariableNode, rangeExpression: Expression, statements: Statement[]): ForStatementNode {
+	public static withKeyOrIndex(depth: number, position: ContextPosition, value: VariableNode | undefined, keyOrIndex: VariableNode | undefined, rangeExpression: Expression | undefined, statements: (Statement | undefined)[]): ForStatementNode {
 		return new ForStatementNode(depth, position, value, rangeExpression, statements, keyOrIndex);
 	}
 
@@ -195,9 +210,9 @@ export class ForStatementNode extends BaseNode {
 
 		const keyOrIndex = this._keyOrIndex ? `, ${this._keyOrIndex.toString(lineInfo)}` : '';
 
-		const forPart = `${getDepthIndent(this._depth)}for ${this._value.toString(lineInfo)}${keyOrIndex} in (${this._rangeExpression.toString(lineInfo)})\n`;
+		const forPart = `${getDepthIndent(this._depth)}for ${this._value?.toString(lineInfo)}${keyOrIndex} in (${this._rangeExpression?.toString(lineInfo)})\n`;
 
-		const bodyPart = `${this._statements.map(x => x.toString(lineInfo)).join('\n')}${this._statements.length > 0 ? '\n' : ''}`;
+		const bodyPart = `${this._statements.map(x => x?.toString(lineInfo)).join('\n')}${this._statements.length > 0 ? '\n' : ''}`;
 
 		const endFor = `${getDepthIndent(this._depth)}endfor`;
 
@@ -208,28 +223,28 @@ export class ForStatementNode extends BaseNode {
 export class RangedForStatementNode extends BaseNode {
 	private _depth: number;
 
-	private _value: VariableNode;
-	private _rangeStart: Expression;
-	private _rangeEnd: Expression;
-	private _statements: Statement[];
+	private _value: VariableNode | undefined;
+	private _rangeStart: Expression | undefined;
+	private _rangeEnd: Expression | undefined;
+	private _statements: (Statement | undefined)[];
 
-	public get value(): VariableNode {
+	public get value() {
 		return this._value;
 	}
 
-	public get rangeStart(): Expression {
+	public get rangeStart() {
 		return this._rangeStart;
 	}
 
-	public get rangeEnd(): Expression {
+	public get rangeEnd() {
 		return this._rangeEnd;
 	}
 
-	public get statements(): Statement[] {
+	public get statements() {
 		return this._statements;
 	}
 
-	public constructor(depth: number, position: ContextPosition, value: VariableNode, rangeStart: Expression, rangeEnd: Expression, statements: Statement[]) {
+	public constructor(depth: number, position: ContextPosition, value: VariableNode | undefined, rangeStart: Expression | undefined, rangeEnd: Expression | undefined, statements: (Statement | undefined)[]) {
 		super(position);
 
 		this._depth = depth;
@@ -243,9 +258,9 @@ export class RangedForStatementNode extends BaseNode {
 	public toString(lineInfo = true): string {
 		const base = lineInfo ? ` (${super.toString(lineInfo)})` : '';
 
-		const forPart = `${getDepthIndent(this._depth)}for ${this._value.toString(lineInfo)} in [${this._rangeStart.toString(lineInfo)}..${this._rangeEnd.toString(lineInfo)}]\n`;
+		const forPart = `${getDepthIndent(this._depth)}for ${this._value?.toString(lineInfo)} in [${this._rangeStart?.toString(lineInfo)}..${this._rangeEnd?.toString(lineInfo)}]\n`;
 
-		const bodyPart = `${this._statements.map(x => x.toString(lineInfo)).join('\n')}${this._statements.length > 0 ? '\n' : ''}`;
+		const bodyPart = `${this._statements.map(x => x?.toString(lineInfo)).join('\n')}${this._statements.length > 0 ? '\n' : ''}`;
 
 		const endFor = `${getDepthIndent(this._depth)}endfor`;
 
@@ -257,22 +272,22 @@ export class WhileStatementNode extends BaseNode {
 	private _depth: number;
 
 	private _name: VariableNode | undefined;
-	private _conditions: Expression;
-	private _statements: Statement[];
+	private _conditions: Expression | undefined;
+	private _statements: (Statement | undefined)[];
 
-	public get name(): VariableNode | undefined {
+	public get name() {
 		return this._name;
 	}
 
-	public get conditions(): Expression {
+	public get conditions() {
 		return this._conditions;
 	}
 
-	public get statements(): Statement[] {
+	public get statements() {
 		return this._statements;
 	}
 
-	private constructor(depth: number, position: ContextPosition, conditions: Expression, statements: Statement[], name?: VariableNode) {
+	private constructor(depth: number, position: ContextPosition, conditions: Expression | undefined, statements: (Statement | undefined)[], name?: VariableNode | undefined) {
 		super(position);
 
 		this._depth = depth;
@@ -282,11 +297,11 @@ export class WhileStatementNode extends BaseNode {
 		this._name = name;
 	}
 
-	public static new(depth: number, position: ContextPosition, conditions: Expression, statements: Statement[]): WhileStatementNode {
+	public static new(depth: number, position: ContextPosition, conditions: Expression | undefined, statements: (Statement | undefined)[]): WhileStatementNode {
 		return new WhileStatementNode(depth, position, conditions, statements);
 	}
 
-	public static withName(depth: number, position: ContextPosition, conditions: Expression, statements: Statement[], name: VariableNode): WhileStatementNode {
+	public static withName(depth: number, position: ContextPosition, conditions: Expression | undefined, statements: (Statement | undefined)[], name: VariableNode | undefined): WhileStatementNode {
 		return new WhileStatementNode(depth, position, conditions, statements, name);
 	}
 
@@ -295,9 +310,9 @@ export class WhileStatementNode extends BaseNode {
 
 		const name = this._name ? `${this._name.toString(lineInfo)} ` : '';
 
-		const whilePart = `${getDepthIndent(this._depth)}while ${name}(${this._conditions.toString(lineInfo)})\n`;
+		const whilePart = `${getDepthIndent(this._depth)}while ${name}(${this._conditions?.toString(lineInfo)})\n`;
 
-		const bodyPart = `${this._statements.map(x => x.toString(lineInfo)).join('\n')}${this._statements.length > 0 ? '\n' : ''}`;
+		const bodyPart = `${this._statements.map(x => x?.toString(lineInfo)).join('\n')}${this._statements.length > 0 ? '\n' : ''}`;
 
 		const endWhile = `${getDepthIndent(this._depth)}endwhile`;
 
@@ -308,23 +323,23 @@ export class WhileStatementNode extends BaseNode {
 export class TryStatementNode extends BaseNode {
 	private _depth: number;
 
-	private _statements: Statement[];
-	private _excepts: ExceptNode[];
+	private _statements: (Statement | undefined)[];
+	private _excepts: (ExceptNode | undefined)[];
 	private _finally: FinallyNode | undefined;
 
-	public get statements(): Statement[] {
+	public get statements() {
 		return this._statements;
 	}
 
-	public get excepts(): ExceptNode[] {
+	public get excepts() {
 		return this._excepts;
 	}
 
-	public get finally(): FinallyNode | undefined {
+	public get finally() {
 		return this._finally;
 	}
 
-	public constructor(depth: number, position: ContextPosition, statements: Statement[], excepts: ExceptNode[], finallyNode?: FinallyNode) {
+	public constructor(depth: number, position: ContextPosition, statements: (Statement | undefined)[], excepts: (ExceptNode | undefined)[], finallyNode?: FinallyNode | undefined) {
 		super(position);
 
 		this._depth = depth;
@@ -339,9 +354,9 @@ export class TryStatementNode extends BaseNode {
 
 		const tryPart = `${getDepthIndent(this._depth)}try\n`;
 
-		const tryBodyPart = `${this._statements.map(x => x.toString(lineInfo)).join('\n')}${this._statements.length > 0 ? '\n' : ''}`;
+		const tryBodyPart = `${this._statements.map(x => x?.toString(lineInfo)).join('\n')}${this._statements.length > 0 ? '\n' : ''}`;
 
-		const excepts = `${this._excepts.map(x => x.toString(lineInfo)).join('\n')}${this._excepts.length > 0 ? '\n' : ''}`;
+		const excepts = `${this._excepts.map(x => x?.toString(lineInfo)).join('\n')}${this._excepts.length > 0 ? '\n' : ''}`;
 
 		const finallyBlock = this._finally ? `${this._finally.toString(lineInfo)}\n` : '';
 
@@ -354,25 +369,25 @@ export class TryStatementNode extends BaseNode {
 export class ExceptNode extends BaseNode {
 	private _depth: number;
 
-	private _errorInfo: VariableNode;
-	private _errorCodes: ErrorCodeNode[];
-	private _statements: Statement[];
+	private _errorInfo: VariableNode | undefined;
+	private _errorCodes: (ErrorCodeNode | undefined)[];
+	private _statements: (Statement | undefined)[];
 
 	// error info looks like this: {code, message, value, traceback}
 
-	public get errorInfo(): VariableNode {
+	public get errorInfo() {
 		return this._errorInfo;
 	}
 
-	public get errorCodes(): ErrorCodeNode[] {
+	public get errorCodes() {
 		return this._errorCodes;
 	}
 
-	public get statements(): Statement[] {
+	public get statements() {
 		return this._statements;
 	}
 
-	public constructor(depth: number, position: ContextPosition, errorInfo: VariableNode, errorCodes: ErrorCodeNode[], statements: Statement[]) {
+	public constructor(depth: number, position: ContextPosition, errorInfo: VariableNode | undefined, errorCodes: (ErrorCodeNode | undefined)[], statements: (Statement | undefined)[]) {
 		super(position);
 
 		this._depth = depth;
@@ -383,11 +398,11 @@ export class ExceptNode extends BaseNode {
 	}
 
 	public toString(lineInfo = true): string {
-		const errorCodes = this._errorCodes.map(x => x.toString(lineInfo)).join(', ');
+		const errorCodes = this._errorCodes.map(x => x?.toString(lineInfo)).join(', ');
 
-		const exceptPart = `${getDepthIndent(this._depth)}except ${this._errorInfo.toString(lineInfo)} (${errorCodes})${this._statements.length > 0 ? '\n' : ''}`;
+		const exceptPart = `${getDepthIndent(this._depth)}except ${this._errorInfo?.toString(lineInfo)} (${errorCodes})${this._statements.length > 0 ? '\n' : ''}`;
 
-		const bodyPart = this._statements.map(x => x.toString(lineInfo)).join('\n');
+		const bodyPart = this._statements.map(x => x?.toString(lineInfo)).join('\n');
 
 		return `${exceptPart}${bodyPart}`;
 	}
@@ -396,13 +411,13 @@ export class ExceptNode extends BaseNode {
 export class FinallyNode extends BaseNode {
 	private _depth: number;
 
-	private _statements: Statement[];
+	private _statements: (Statement | undefined)[];
 
-	public get statements(): Statement[] {
+	public get statements() {
 		return this._statements;
 	}
 
-	public constructor(depth: number, position: ContextPosition, statements: Statement[]) {
+	public constructor(depth: number, position: ContextPosition, statements: (Statement | undefined)[]) {
 		super(position);
 
 		this._depth = depth;
@@ -413,7 +428,7 @@ export class FinallyNode extends BaseNode {
 	public toString(lineInfo = true): string {
 		const finallyPart = `${getDepthIndent(this._depth)}finally${this._statements.length > 0 ? '\n' : ''}`;
 
-		const bodyPart = this._statements.map(x => x.toString(lineInfo)).join('\n');
+		const bodyPart = this._statements.map(x => x?.toString(lineInfo)).join('\n');
 
 		return `${finallyPart}${bodyPart}`;
 	}
@@ -423,22 +438,22 @@ export class ForkStatementNode extends BaseNode {
 	private _depth: number;
 
 	private _name: VariableNode | undefined;
-	private _expression: Expression;
-	private _statements: Statement[];
+	private _expression: Expression | undefined;
+	private _statements: (Statement | undefined)[];
 
-	public get name(): VariableNode | undefined {
+	public get name() {
 		return this._name;
 	}
 
-	public get expression(): Expression {
+	public get expression() {
 		return this._expression;
 	}
 
-	public get statements(): Statement[] {
+	public get statements() {
 		return this._statements;
 	}
 
-	private constructor(depth: number, position: ContextPosition, expression: Expression, statements: Statement[], nameVariable?: VariableNode) {
+	private constructor(depth: number, position: ContextPosition, expression: Expression | undefined, statements: (Statement | undefined)[], nameVariable?: VariableNode | undefined) {
 		super(position);
 
 		this._depth = depth;
@@ -448,11 +463,11 @@ export class ForkStatementNode extends BaseNode {
 		this._statements = statements;
 	}
 
-	public static new(depth: number, position: ContextPosition, expression: Expression, statements: Statement[]): ForkStatementNode {
+	public static new(depth: number, position: ContextPosition, expression: Expression | undefined, statements: (Statement | undefined)[]): ForkStatementNode {
 		return new ForkStatementNode(depth, position, expression, statements);
 	}
 
-	public static withName(depth: number, position: ContextPosition, expression: Expression, statements: Statement[], nameVariable: VariableNode): ForkStatementNode {
+	public static withName(depth: number, position: ContextPosition, expression: Expression | undefined, statements: (Statement | undefined)[], nameVariable: VariableNode | undefined): ForkStatementNode {
 		return new ForkStatementNode(depth, position, expression, statements, nameVariable);
 	}
 
@@ -461,9 +476,9 @@ export class ForkStatementNode extends BaseNode {
 
 		const name = this._name ? `${this._name.toString(lineInfo)} ` : '';
 
-		const forkPart = `${getDepthIndent(this._depth)}fork ${name}(${this._expression.toString(lineInfo)})\n`;
+		const forkPart = `${getDepthIndent(this._depth)}fork ${name}(${this._expression?.toString(lineInfo)})\n`;
 
-		const bodyPart = `${this._statements.map(x => x.toString(lineInfo)).join('\n')}${this._statements.length > 0 ? '\n' : ''}`;
+		const bodyPart = `${this._statements.map(x => x?.toString(lineInfo)).join('\n')}${this._statements.length > 0 ? '\n' : ''}`;
 
 		const endFork = `${getDepthIndent(this._depth)}endfork`;
 
@@ -498,13 +513,13 @@ export class BreakStatementNode extends FlowControlStatementNode<Expression> {
 export class CommentStatementNode extends BaseNode {
 	private _depth: number;
 
-	private _comment: StringNode;
+	private _comment: StringNode | undefined;
 
-	public get text(): StringNode {
+	public get text() {
 		return this._comment;
 	}
 
-	public constructor(depth: number, position: ContextPosition, comment: StringNode) {
+	public constructor(depth: number, position: ContextPosition, comment: StringNode | undefined) {
 		super(position);
 
 		this._depth = depth;
@@ -515,7 +530,7 @@ export class CommentStatementNode extends BaseNode {
 	public toString(lineInfo = true): string {
 		const base = lineInfo ? ` (${super.toString(lineInfo)})` : '';
 
-		return `${getDepthIndent(this._depth)}${this._comment.toString(lineInfo)};${base}`;
+		return `${getDepthIndent(this._depth)}${this._comment?.toString(lineInfo)};${base}`;
 	}
 }
 
@@ -538,13 +553,13 @@ export class EmptyStatementNode extends BaseNode {
 export class ExpressionStatementNode extends BaseNode {
 	private _depth: number;
 
-	private _expression: Expression;
+	private _expression: Expression | undefined;
 
-	public get expression(): Expression {
+	public get expression() {
 		return this._expression;
 	}
 
-	public constructor(depth: number, position: ContextPosition, expression: Expression) {
+	public constructor(depth: number, position: ContextPosition, expression: Expression | undefined) {
 		super(position);
 
 		this._depth = depth;
@@ -555,23 +570,23 @@ export class ExpressionStatementNode extends BaseNode {
 	public toString(lineInfo = true): string {
 		const base = lineInfo ? ` (${super.toString(lineInfo)})` : '';
 
-		return `${getDepthIndent(this._depth)}${this._expression.toString(lineInfo)};${base}`;
+		return `${getDepthIndent(this._depth)}${this._expression?.toString(lineInfo)};${base}`;
 	}
 }
 
 export class VariableAssignmentNode extends BaseNode {
-	private _variable: VariableNode;
-	private _value: Expression;
+	private _variable: VariableNode | undefined;
+	private _value: Expression | undefined;
 
-	public get variable(): VariableNode {
+	public get variable() {
 		return this._variable;
 	}
 
-	public get value(): Expression {
+	public get value() {
 		return this._value;
 	}
 
-	public constructor(position: ContextPosition, variable: VariableNode, value: Expression) {
+	public constructor(position: ContextPosition, variable: VariableNode | undefined, value: Expression | undefined) {
 		super(position);
 
 		this._variable = variable;
@@ -579,23 +594,23 @@ export class VariableAssignmentNode extends BaseNode {
 	}
 
 	public toString(lineInfo = true): string {
-		return `${this._variable.toString(lineInfo)} = ${this._value.toString(lineInfo)}`;
+		return `${this._variable?.toString(lineInfo)} = ${this._value?.toString(lineInfo)}`;
 	}
 }
 
 export class OptionalTargetAssignmentNode extends BaseNode {
-	private _variable: OptionalTargetNode;
-	private _value: Expression;
+	private _variable: OptionalTargetNode | undefined;
+	private _value: Expression | undefined;
 
-	public get variable(): OptionalTargetNode {
+	public get variable() {
 		return this._variable;
 	}
 
-	public get value(): Expression {
+	public get value() {
 		return this._value;
 	}
 
-	public constructor(position: ContextPosition, variable: OptionalTargetNode, value: Expression) {
+	public constructor(position: ContextPosition, variable: OptionalTargetNode | undefined, value: Expression | undefined) {
 		super(position);
 
 		this._variable = variable;
@@ -603,23 +618,23 @@ export class OptionalTargetAssignmentNode extends BaseNode {
 	}
 
 	public toString(lineInfo = true): string {
-		return `${this._variable.toString(lineInfo)} = ${this._value.toString(lineInfo)}`;
+		return `${this._variable?.toString(lineInfo)} = ${this._value?.toString(lineInfo)}`;
 	}
 }
 
 export class PropertyAssignmentNode extends BaseNode {
-	private _property: PropertyAccessor;
-	private _value: Expression;
+	private _property: PropertyAccessor | undefined;
+	private _value: Expression | undefined;
 
-	public get property(): PropertyAccessor {
+	public get property() {
 		return this._property;
 	}
 
-	public get value(): Expression {
+	public get value() {
 		return this._value;
 	}
 
-	public constructor(position: ContextPosition, property: PropertyAccessor, value: Expression) {
+	public constructor(position: ContextPosition, property: PropertyAccessor | undefined, value: Expression | undefined) {
 		super(position);
 
 		this._property = property;
@@ -627,23 +642,23 @@ export class PropertyAssignmentNode extends BaseNode {
 	}
 
 	public toString(lineInfo = true): string {
-		return `${this._property.toString(lineInfo)} = ${this._value.toString(lineInfo)}`;
+		return `${this._property?.toString(lineInfo)} = ${this._value?.toString(lineInfo)}`;
 	}
 }
 
 export class ListAssignmentNode extends BaseNode {
-	private _list: ListNode;
-	private _value: Expression;
+	private _list: ListNode | undefined;
+	private _value: Expression | undefined;
 
-	public get list(): ListNode {
+	public get list() {
 		return this._list;
 	}
 
-	public get value(): Expression {
+	public get value() {
 		return this._value;
 	}
 
-	public constructor(position: ContextPosition, list: ListNode, value: Expression) {
+	public constructor(position: ContextPosition, list: ListNode | undefined, value: Expression | undefined) {
 		super(position);
 
 		this._list = list;
@@ -651,28 +666,28 @@ export class ListAssignmentNode extends BaseNode {
 	}
 
 	public toString(lineInfo = true): string {
-		return `${this._list.toString(lineInfo)} = ${this._value.toString(lineInfo)}`;
+		return `${this._list?.toString(lineInfo)} = ${this._value?.toString(lineInfo)}`;
 	}
 }
 
 export class ConditionalNode extends BaseNode {
-	private _conditions: Expression;
-	private _ifTrue: Expression;
-	private _ifFalse: Expression;
+	private _conditions: Expression | undefined;
+	private _ifTrue: Expression | undefined;
+	private _ifFalse: Expression | undefined;
 
-	public get conditions(): Expression {
+	public get conditions() {
 		return this._conditions;
 	}
 
-	public get ifTrue(): Expression {
+	public get ifTrue() {
 		return this._ifTrue;
 	}
 
-	public get ifFalse(): Expression {
+	public get ifFalse() {
 		return this._ifFalse;
 	}
 
-	public constructor(position: ContextPosition, conditions: Expression, ifTrue: Expression, ifFalse: Expression) {
+	public constructor(position: ContextPosition, conditions: Expression | undefined, ifTrue: Expression | undefined, ifFalse: Expression | undefined) {
 		super(position);
 
 		this._conditions = conditions;
@@ -681,7 +696,7 @@ export class ConditionalNode extends BaseNode {
 	}
 
 	public toString(lineInfo = true): string {
-		return `${this._conditions.toString(lineInfo)} ? ${this._ifTrue.toString(lineInfo)} | ${this._ifFalse.toString(lineInfo)}`;
+		return `${this._conditions?.toString(lineInfo)} ? ${this._ifTrue?.toString(lineInfo)} | ${this._ifFalse?.toString(lineInfo)}`;
 	}
 }
 
@@ -763,41 +778,41 @@ export class ModulationNode extends TwoPartNode<Expression> {
 
 export class NegativeNode extends WrappedNode<Expression> {
 	public toString(lineInfo = true): string {
-		return `-${this._value.toString(lineInfo)}`;
+		return `-${this._value?.toString(lineInfo)}`;
 	}
 }
 
 export class NegatedNode extends WrappedNode<Expression> {
 	public toString(lineInfo = true): string {
-		return `!${this._value.toString(lineInfo)}`;
+		return `!${this._value?.toString(lineInfo)}`;
 	}
 }
 
 export class ComplementNode extends WrappedNode<Expression> {
 	public toString(lineInfo = true): string {
-		return `~${this._value.toString(lineInfo)}`;
+		return `~${this._value?.toString(lineInfo)}`;
 	}
 }
 
 export class ParenthesisNode extends WrappedNode<Expression> {
 	public toString(lineInfo = true): string {
-		return `(${this._value.toString(lineInfo)})`;
+		return `(${this._value?.toString(lineInfo)})`;
 	}
 }
 
 export class ArgumentIndexerNode extends BaseNode {
-	private _indexedEntity: Expression;
-	private _argument: Expression;
+	private _indexedEntity: Expression | undefined;
+	private _argument: Expression | undefined;
 
-	public get indexedEntity(): Expression {
+	public get indexedEntity() {
 		return this._indexedEntity;
 	}
 
-	public get argument(): Expression {
+	public get argument() {
 		return this._argument;
 	}
 
-	public constructor(position: ContextPosition, indexedEntity: Expression, argument: Expression) {
+	public constructor(position: ContextPosition, indexedEntity: Expression | undefined, argument: Expression | undefined) {
 		super(position);
 
 		this._indexedEntity = indexedEntity;
@@ -805,28 +820,28 @@ export class ArgumentIndexerNode extends BaseNode {
 	}
 
 	public toString(lineInfo = true): string {
-		return `${this._indexedEntity.toString(lineInfo)}[${this._argument.toString(lineInfo)}]`;
+		return `${this._indexedEntity?.toString(lineInfo)}[${this._argument?.toString(lineInfo)}]`;
 	}
 }
 
 export class RangeIndexerNode extends BaseNode {
-	private _indexedEntity: Expression;
-	private _start: Expression;
-	private _end: Expression;
+	private _indexedEntity: Expression | undefined;
+	private _start: Expression | undefined;
+	private _end: Expression | undefined;
 
-	public get indexedEntity(): Expression {
+	public get indexedEntity() {
 		return this._indexedEntity;
 	}
 
-	public get start(): Expression {
+	public get start() {
 		return this._start
 	}
 
-	public get end(): Expression {
+	public get end() {
 		return this._end
 	}
 
-	public constructor(position: ContextPosition, object: Expression, start: Expression, end: Expression) {
+	public constructor(position: ContextPosition, object: Expression | undefined, start: Expression | undefined, end: Expression | undefined) {
 		super(position);
 
 		this._indexedEntity = object;
@@ -835,23 +850,23 @@ export class RangeIndexerNode extends BaseNode {
 	}
 
 	public toString(lineInfo = true): string {
-		return `${this._indexedEntity.toString(lineInfo)}[${this._start.toString(lineInfo)}..${this._end.toString(lineInfo)}]`;
+		return `${this._indexedEntity?.toString(lineInfo)}[${this._start?.toString(lineInfo)}..${this._end?.toString(lineInfo)}]`;
 	}
 }
 
 export class PropertyAccessorNode extends BaseNode {
-	private _accessedEntity: Expression;
-	private _propertyName: string;
+	private _accessedEntity: Expression | undefined;
+	private _propertyName: string | undefined;
 
-	public get accessedEntity(): Expression {
+	public get accessedEntity() {
 		return this._accessedEntity;
 	}
 
-	public get propertyName(): string {
+	public get propertyName() {
 		return this._propertyName
 	}
 
-	public constructor(position: ContextPosition, accessedEntity: Expression, propertyName: string) {
+	public constructor(position: ContextPosition, accessedEntity: Expression | undefined, propertyName: string | undefined) {
 		super(position);
 
 		this._accessedEntity = accessedEntity;
@@ -859,23 +874,23 @@ export class PropertyAccessorNode extends BaseNode {
 	}
 
 	public toString(lineInfo = true): string {
-		return `${this._accessedEntity.toString(lineInfo)}.${this._propertyName}`;
+		return `${this._accessedEntity?.toString(lineInfo)}.${this._propertyName}`;
 	}
 }
 
 export class ComputedPropertyAccessorNode extends BaseNode {
-	private _accessedEntity: Expression;
-	private _propertyName: Expression;
+	private _accessedEntity: Expression | undefined;
+	private _propertyName: Expression | undefined;
 
-	public get accessedEntity(): Expression {
+	public get accessedEntity() {
 		return this._accessedEntity;
 	}
 
-	public get propertyName(): Expression {
+	public get propertyName() {
 		return this._propertyName
 	}
 
-	public constructor(position: ContextPosition, accessedEntity: Expression, propertyName: Expression) {
+	public constructor(position: ContextPosition, accessedEntity: Expression | undefined, propertyName: Expression | undefined) {
 		super(position);
 
 		this._accessedEntity = accessedEntity;
@@ -883,28 +898,28 @@ export class ComputedPropertyAccessorNode extends BaseNode {
 	}
 
 	public toString(lineInfo = true): string {
-		return `${this._accessedEntity.toString(lineInfo)}.(${this._propertyName.toString(lineInfo)})`;
+		return `${this._accessedEntity?.toString(lineInfo)}.(${this._propertyName?.toString(lineInfo)})`;
 	}
 }
 
 export class VerbInvocationNode extends BaseNode {
-	private _invokedEntity: Expression;
-	private _verbName: string;
-	private _verbArguments: Expression[];
+	private _invokedEntity: Expression | undefined;
+	private _verbName: string | undefined;
+	private _verbArguments: (Expression | undefined)[];
 
-	public get invokedEntity(): Expression {
+	public get invokedEntity() {
 		return this._invokedEntity;
 	}
 
-	public get verbName(): string {
+	public get verbName() {
 		return this._verbName
 	}
 
-	public get verbArguments(): Expression[] {
+	public get verbArguments() {
 		return this._verbArguments;
 	}
 
-	public constructor(position: ContextPosition, invokedEntity: Expression, verbName: string, verbArguments: Expression[]) {
+	public constructor(position: ContextPosition, invokedEntity: Expression | undefined, verbName: string | undefined, verbArguments: (Expression | undefined)[]) {
 		super(position);
 
 		this._invokedEntity = invokedEntity;
@@ -913,28 +928,28 @@ export class VerbInvocationNode extends BaseNode {
 	}
 
 	public toString(lineInfo = true): string {
-		return `${this._invokedEntity.toString(lineInfo)}:${this._verbName}(${this._verbArguments.map(x => x.toString(lineInfo)).join(', ')})`;
+		return `${this._invokedEntity?.toString(lineInfo)}:${this._verbName}(${this._verbArguments.map(x => x?.toString(lineInfo)).join(', ')})`;
 	}
 }
 
 export class ComputedVerbInvocationNode extends BaseNode {
-	private _invokedEntity: Expression;
-	private _verbName: Expression;
-	private _verbArguments: Expression[];
+	private _invokedEntity: Expression | undefined;
+	private _verbName: Expression | undefined;
+	private _verbArguments: (Expression | undefined)[];
 
-	public get invokedEntity(): Expression {
+	public get invokedEntity() {
 		return this._invokedEntity;
 	}
 
-	public get verbName(): Expression {
+	public get verbName() {
 		return this._verbName
 	}
 
-	public get verbArguments(): Expression[] {
+	public get verbArguments() {
 		return this._verbArguments;
 	}
 
-	public constructor(position: ContextPosition, invokedEntity: Expression, verbName: Expression, verbArguments: Expression[]) {
+	public constructor(position: ContextPosition, invokedEntity: Expression | undefined, verbName: Expression | undefined, verbArguments: (Expression | undefined)[]) {
 		super(position);
 
 		this._invokedEntity = invokedEntity;
@@ -943,23 +958,23 @@ export class ComputedVerbInvocationNode extends BaseNode {
 	}
 
 	public toString(lineInfo = true): string {
-		return `${this._invokedEntity.toString(lineInfo)}:(${this._verbName.toString(lineInfo)})(${this._verbArguments.map(x => x.toString(lineInfo)).join(', ')})`;
+		return `${this._invokedEntity?.toString(lineInfo)}:(${this._verbName?.toString(lineInfo)})(${this._verbArguments.map(x => x?.toString(lineInfo)).join(', ')})`;
 	}
 }
 
 export class CorifiedVerbInvocationNode extends BaseNode {
-	private _invokedEntity: Expression;
-	private _verbArguments: Expression[];
+	private _invokedEntity: Expression | undefined;
+	private _verbArguments: (Expression | undefined)[];
 
-	public get invokedEntity(): Expression {
+	public get invokedEntity() {
 		return this._invokedEntity;
 	}
 
-	public get verbArguments(): Expression[] {
+	public get verbArguments() {
 		return this._verbArguments;
 	}
 
-	public constructor(position: ContextPosition, invokedEntity: Expression, verbArguments: Expression[]) {
+	public constructor(position: ContextPosition, invokedEntity: Expression | undefined, verbArguments: (Expression | undefined)[]) {
 		super(position);
 
 		this._invokedEntity = invokedEntity;
@@ -967,23 +982,23 @@ export class CorifiedVerbInvocationNode extends BaseNode {
 	}
 
 	public toString(lineInfo = true): string {
-		return `${this._invokedEntity.toString(lineInfo)}(${this._verbArguments.map(x => x.toString(lineInfo)).join(', ')})`;
+		return `${this._invokedEntity?.toString(lineInfo)}(${this._verbArguments.map(x => x?.toString(lineInfo)).join(', ')})`;
 	}
 }
 
 export class BuiltInFunctionInvocationNode extends BaseNode {
-	private _functionName: string;
-	private _functionArguments: Expression[];
+	private _functionName: string | undefined;
+	private _functionArguments: (Expression | undefined)[];
 
-	public get functionName(): string {
+	public get functionName() {
 		return this._functionName
 	}
 
-	public get functionArguments(): Expression[] {
+	public get functionArguments() {
 		return this._functionArguments;
 	}
 
-	public constructor(position: ContextPosition, functionName: string, functionArguments: Expression[]) {
+	public constructor(position: ContextPosition, functionName: string | undefined, functionArguments: (Expression | undefined)[]) {
 		super(position);
 
 		this._functionName = functionName;
@@ -991,46 +1006,46 @@ export class BuiltInFunctionInvocationNode extends BaseNode {
 	}
 
 	public toString(lineInfo = true): string {
-		return `${this._functionName}(${this._functionArguments.map(x => x.toString(lineInfo)).join(', ')})`;
+		return `${this._functionName}(${this._functionArguments.map(x => x?.toString(lineInfo)).join(', ')})`;
 	}
 }
 
 export class ListSplicerNode extends BaseNode {
-	private _value: Expression;
+	private _value: Expression | undefined;
 
-	public get value(): Expression {
+	public get value() {
 		return this._value;
 	}
 
-	public constructor(contextPosition: ContextPosition, value: Expression) {
+	public constructor(contextPosition: ContextPosition, value: Expression | undefined) {
 		super(contextPosition);
 
 		this._value = value;
 	}
 
 	public toString(lineInfo = true): string {
-		return `@${this._value.toString(lineInfo)}`;
+		return `@${this._value?.toString(lineInfo)}`;
 	}
 }
 
 export class ErrorCatcherNode extends BaseNode {
-	private _try: Expression;
-	private _errorCodes: Expression[];
+	private _try: Expression | undefined;
+	private _errorCodes: (Expression | undefined)[];
 	private _onError: Expression | undefined;
 
-	public get try(): Expression {
+	public get try() {
 		return this._try;
 	}
 
-	public get errorCodes(): Expression[] {
+	public get errorCodes() {
 		return this._errorCodes;
 	}
 
-	public get onError(): Expression | undefined {
+	public get onError() {
 		return this._onError;
 	}
 
-	public constructor(position: ContextPosition, tryExpression: Expression, errorCodes: Expression[], onError?: Expression) {
+	public constructor(position: ContextPosition, tryExpression: Expression | undefined, errorCodes: (Expression | undefined)[], onError?: Expression | undefined) {
 		super(position);
 
 		this._try = tryExpression;
@@ -1040,7 +1055,7 @@ export class ErrorCatcherNode extends BaseNode {
 
 	public toString(lineInfo = true): string {
 		const onError = this._onError ? ` => ${this._onError.toString(lineInfo)}` : '';
-		return `\`${this._try.toString(lineInfo)} ! ${this._errorCodes.map(x => x.toString(lineInfo)).join(', ')}${onError}'`;
+		return `\`${this._try?.toString(lineInfo)} ! ${this._errorCodes.map(x => x?.toString(lineInfo)).join(', ')}${onError}'`;
 	}
 }
 
@@ -1055,58 +1070,54 @@ export class StringNode extends LiteralNode<string> { }
 export class ErrorCodeNode extends LiteralNode<ErrorCode> { }
 
 export class ListNode extends BaseNode {
-	private _elements: Expression[];
+	private _elements: (Expression | undefined)[];
 
-	public get elements(): Expression[] {
+	public get elements() {
 		return this._elements;
 	}
 
-	public at(index: number): Expression | undefined {
-		return this._elements.at(index);
-	}
-
-	public constructor(contextPosition: ContextPosition, elements: Expression[]) {
+	public constructor(contextPosition: ContextPosition, elements: (Expression | undefined)[]) {
 		super(contextPosition);
 
 		this._elements = elements;
 	}
 
 	public toString(lineInfo = true): string {
-		return `{${this._elements.map(x => x.toString(lineInfo)).join(', ')}}`;
+		return `{${this._elements.map(x => x?.toString(lineInfo)).join(', ')}}`;
 	}
 }
 
 export class MapNode extends BaseNode {
-	private _elements: MapEntryNode[];
+	private _elements: (MapEntryNode | undefined)[];
 
-	public get elements(): MapEntryNode[] {
+	public get elements() {
 		return this._elements;
 	}
 
-	public constructor(position: ContextPosition, elements: MapEntryNode[]) {
+	public constructor(position: ContextPosition, elements: (MapEntryNode | undefined)[]) {
 		super(position);
 
 		this._elements = elements;
 	}
 
 	public toString(lineInfo = true): string {
-		return `[${this._elements.map(x => x.toString(lineInfo)).join(', ')}]`;
+		return `[${this._elements.map(x => x?.toString(lineInfo)).join(', ')}]`;
 	}
 }
 
 export class MapEntryNode extends BaseNode {
-	private _key: Expression;
-	private _value: Expression;
+	private _key: Expression | undefined;
+	private _value: Expression | undefined;
 
-	public get key(): Expression {
+	public get key() {
 		return this._key;
 	}
 
-	public get value(): Expression {
+	public get value() {
 		return this._value;
 	}
 
-	public constructor(position: ContextPosition, key: Expression, value: Expression) {
+	public constructor(position: ContextPosition, key: Expression | undefined, value: Expression | undefined) {
 		super(position);
 
 		this._key = key;
@@ -1115,7 +1126,7 @@ export class MapEntryNode extends BaseNode {
 
 	// eslint-disable-next-line @typescript-eslint/no-unused-vars
 	public toString(lineInfo = true): string {
-		return `${this._key.toString(lineInfo)} -> ${this._value.toString(lineInfo)}`;
+		return `${this._key?.toString(lineInfo)} -> ${this._value?.toString(lineInfo)}`;
 	}
 }
 
@@ -1128,7 +1139,7 @@ export class VariableNode extends ReferenceNode {
 
 export class OptionalTargetNode extends WrappedNode<VariableNode> {
 	public toString(lineInfo = true): string {
-		return `?${this._value.toString(lineInfo)}`;
+		return `?${this._value?.toString(lineInfo)}`;
 	}
 }
 

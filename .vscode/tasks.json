@@ -23,10 +23,10 @@
 				"revealProblems": "onProblem"
 			},
 			"type": "npm",
-			"script": "test:partial",
+			"script": "test:custom",
 			"group": "test",
 			"problemMatcher": [],
-			"label": "npm: test:partial",
+			"label": "npm: test:custom",
 			"detail": "mocha -g <test-name(s)>"
 		},
 		{

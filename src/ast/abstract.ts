@@ -1,14 +1,14 @@
+
+
 import { ParseTree } from 'antlr4';
-
 import MoocodeParserVisitor from '../grammar/generated/MoocodeParserVisitor';
-
 import { ContextPosition } from './common';
-import { ArgumentError, NotImplementedError } from './error';
+import { ArgumentError, InvalidOperationError, NotImplementedError } from './error';
 
 export abstract class BaseNode {
 	protected _position: ContextPosition;
 
-	public get position(): ContextPosition {
+	public get position() {
 		return this._position;
 	}
 
@@ -27,15 +27,15 @@ export abstract class BaseNode {
 }
 
 export abstract class LiteralNode<T> extends BaseNode {
-	private _valueText: string;
+	private _valueText: string | undefined;
 
-	protected _value: T;
+	protected _value: T | undefined;
 
-	public get value(): T {
+	public get value() {
 		return this._value;
 	}
 
-	public constructor(position: ContextPosition, value: T, valueText: string) {
+	public constructor(position: ContextPosition, value: T, valueText: string | undefined) {
 		super(position);
 
 		this._valueText = valueText;
@@ -45,23 +45,19 @@ export abstract class LiteralNode<T> extends BaseNode {
 
 	// eslint-disable-next-line @typescript-eslint/no-unused-vars
 	public toString(lineInfo = true): string {
-		return this._valueText;
+		return this._valueText ?? '';
 	}
 }
 
 export abstract class ReferenceNode extends BaseNode {
-	protected _name: string;
+	protected _name: string | undefined;
 
-	public get name(): string {
+	public get name() {
 		return this._name;
 	}
 
-	public constructor(position: ContextPosition, name: string) {
+	public constructor(position: ContextPosition, name: string | undefined) {
 		super(position);
-
-		if (!name) {
-			throw new ArgumentError('name', position);
-		}
 
 		this._name = name;
 	}
@@ -74,10 +70,18 @@ export abstract class ReferenceNode extends BaseNode {
 export abstract class TwoPartNode<T extends BaseNode> extends BaseNode {
 	protected _separator = '';
 
-	protected _left: T;
-	protected _right: T;
+	protected _left: T | undefined;
+	protected _right: T | undefined;
 
-	public constructor(position: ContextPosition, left: T, right: T) {
+	public get left() {
+		return this._left;
+	}
+
+	public get right() {
+		return this._right;
+	}
+
+	public constructor(position: ContextPosition, left: T | undefined, right: T | undefined) {
 		super(position);
 
 		this._left = left;
@@ -85,18 +89,18 @@ export abstract class TwoPartNode<T extends BaseNode> extends BaseNode {
 	}
 
 	public toString(lineInfo = true): string {
-		return `${this._left.toString(lineInfo)} ${this._separator} ${this._right.toString(lineInfo)}`;
+		return `${this._left?.toString(lineInfo)} ${this._separator} ${this._right?.toString(lineInfo)}`;
 	}
 }
 
 export abstract class WrappedNode<T extends BaseNode> extends BaseNode {
-	protected _value: T;
+	protected _value: T | undefined;
 
-	public get value(): T {
+	public get value() {
 		return this._value;
 	}
 
-	public constructor(position: ContextPosition, value: T) {
+	public constructor(position: ContextPosition, value: T | undefined) {
 		super(position);
 
 		this._value = value;
@@ -112,11 +116,11 @@ export class FlowControlStatementNode<T extends BaseNode> extends BaseNode {
 
 	private _value: T | undefined;
 
-	public get value(): T | undefined {
+	public get value() {
 		return this._value;
 	}
 
-	public constructor(depth: number, position: ContextPosition, value?: T) {
+	public constructor(depth: number, position: ContextPosition, value?: T | undefined) {
 		super(position);
 
 		this._depth = depth;
@@ -136,17 +140,22 @@ export class FlowControlStatementNode<T extends BaseNode> extends BaseNode {
 	}
 }
 
-export abstract class SingleValueVisitor<T extends BaseNode> extends MoocodeParserVisitor<T> {
-	public override visit(tree: ParseTree): T {
+export abstract class MoocodeVisitor<T extends BaseNode> extends MoocodeParserVisitor<T | undefined> {
+	public override visit(tree: ParseTree): T | undefined {
 		const result = super.visit(tree);
 
 		if (!Array.isArray(result)) {
 			return result;
 		}
 
-		const resultArray = result as T[];
-		const actualResult = resultArray.at(0);
+		if (result.length < 2) {
+			return result.at(0) as (T | undefined);
+		}
 
-		return actualResult as T;
+		if (result.length === 2 && result.at(1) === undefined) {
+			return result.at(0) as (T | undefined);
+		}
+
+		throw new InvalidOperationError('unexpected visitor result');
 	}
 }

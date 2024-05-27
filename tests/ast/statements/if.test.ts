@@ -2,27 +2,8 @@ import { expect } from 'chai';
 import { suite, test } from 'mocha';
 import { generateAst } from '../../../src';
 import { BooleanNode, ElseNode, IfStatementNode, ReturnStatementNode } from '../../../src/ast/nodes';
-import { expectParsingError } from '../../test-utils/expectations';
 
 suite('AST tests for if statements', () => {
-	test('should throw error if there are no conditions', () => {
-		const code = `
-if ()
-  return;
-endif
-`;
-		expectParsingError(() => generateAst(code));
-	});
-
-	test('should throw error if semicolon is missing in if-body', () => {
-		const code = `
-if (true)
-  return
-endif
-`;
-		expectParsingError(() => generateAst(code));
-	});
-
 	test('should handle if-conditions and if-body', () => {
 		const code = `
 if (true)
@@ -34,12 +15,12 @@ endif
 
 		const ifStatementNode = result.at(0) as IfStatementNode;
 
-		const booleanValueNode = ifStatementNode.if.conditions as BooleanNode;
+		const booleanValueNode = ifStatementNode.if?.conditions as BooleanNode;
 		expect(booleanValueNode.value).to.equal(true);
 
-		expect(ifStatementNode.if.body).to.have.length(1);
+		expect(ifStatementNode.if?.body).to.have.length(1);
 
-		const returnStatement = ifStatementNode.if.body.at(0) as ReturnStatementNode;
+		const returnStatement = ifStatementNode.if?.body.at(0) as ReturnStatementNode;
 		expect(returnStatement.value).not.to.exist;
 		expect(ifStatementNode.elseifs).to.have.length(0);
 		expect(ifStatementNode.else).not.to.exist;
@@ -54,20 +35,10 @@ endif
 		expect(result).to.have.length(1);
 
 		const ifStatementNode = result.at(0) as IfStatementNode;
-		expect(ifStatementNode.if.conditions).to.exist;
-		expect(ifStatementNode.if.body).to.have.length(0);
+		expect(ifStatementNode.if?.conditions).to.exist;
+		expect(ifStatementNode.if?.body).to.have.length(0);
 		expect(ifStatementNode.elseifs).to.have.length(0);
 		expect(ifStatementNode.else).not.to.exist;
-	});
-
-	test('should throw error if semicolon is missing in else-body', () => {
-		const code = `
-if (true)
-else
-  return
-endif
-`;
-		expectParsingError(() => generateAst(code));
 	});
 
 	test('should handle else-body', () => {
@@ -81,8 +52,8 @@ endif
 		expect(result).to.have.length(1);
 
 		const ifStatementNode = result.at(0) as IfStatementNode;
-		expect(ifStatementNode.if.conditions).to.exist;
-		expect(ifStatementNode.if.body).to.have.length(0);
+		expect(ifStatementNode.if?.conditions).to.exist;
+		expect(ifStatementNode.if?.body).to.have.length(0);
 		expect(ifStatementNode.elseifs).to.have.length(0);
 
 		const elseNode = ifStatementNode.else as ElseNode;
@@ -103,8 +74,8 @@ endif
 		expect(result).to.have.length(1);
 
 		const ifStatementNode = result.at(0) as IfStatementNode;
-		expect(ifStatementNode.if.conditions).to.exist;
-		expect(ifStatementNode.if.body).to.have.length(0);
+		expect(ifStatementNode.if?.conditions).to.exist;
+		expect(ifStatementNode.if?.body).to.have.length(0);
 		expect(ifStatementNode.elseifs).to.have.length(0);
 
 		const elseNode = ifStatementNode.else as ElseNode;
@@ -122,8 +93,8 @@ endif
 		expect(result).to.have.length(1);
 
 		const ifStatementNode = result.at(0) as IfStatementNode;
-		expect(ifStatementNode.if.conditions).to.exist;
-		expect(ifStatementNode.if.body).to.have.length(0);
+		expect(ifStatementNode.if?.conditions).to.exist;
+		expect(ifStatementNode.if?.body).to.have.length(0);
 		expect(ifStatementNode.elseifs).to.have.length(1);
 
 		const elseIfNode = ifStatementNode.elseifs.at(0);
@@ -147,8 +118,8 @@ endif
 		expect(result).to.have.length(1);
 
 		const ifStatementNode = result.at(0) as IfStatementNode;
-		expect(ifStatementNode.if.conditions).to.exist;
-		expect(ifStatementNode.if.body).to.have.length(0);
+		expect(ifStatementNode.if?.conditions).to.exist;
+		expect(ifStatementNode.if?.body).to.have.length(0);
 		expect(ifStatementNode.elseifs).to.have.length(1);
 
 		const elseIfNode = ifStatementNode.elseifs.at(0);
@@ -170,8 +141,8 @@ endif
 		expect(result).to.have.length(1);
 
 		const ifStatementNode = result.at(0) as IfStatementNode;
-		expect(ifStatementNode.if.conditions).to.exist;
-		expect(ifStatementNode.if.body).to.have.length(0);
+		expect(ifStatementNode.if?.conditions).to.exist;
+		expect(ifStatementNode.if?.body).to.have.length(0);
 		expect(ifStatementNode.elseifs).to.have.length(3);
 
 		const elseIfNodeA = ifStatementNode.elseifs.at(0);
@@ -203,10 +174,10 @@ endif
 		expect(result).to.have.length(1);
 
 		const ifStatementNode = result.at(0) as IfStatementNode;
-		expect(ifStatementNode.if.conditions).to.exist;
-		expect(ifStatementNode.if.body).to.have.length(1);
+		expect(ifStatementNode.if?.conditions).to.exist;
+		expect(ifStatementNode.if?.body).to.have.length(1);
 
-		const ifReturn = ifStatementNode.if.body.at(0) as ReturnStatementNode;
+		const ifReturn = ifStatementNode.if?.body.at(0) as ReturnStatementNode;
 		expect(ifReturn).to.exist;
 		expect(ifReturn.value).to.not.exist;
 
@@ -242,14 +213,14 @@ endif
 		expect(result).to.have.length(1);
 
 		const ifStatementNode = result.at(0) as IfStatementNode;
-		expect(ifStatementNode.if.conditions).to.exist;
-		expect(ifStatementNode.if.body).to.have.length(1);
+		expect(ifStatementNode.if?.conditions).to.exist;
+		expect(ifStatementNode.if?.body).to.have.length(1);
 
-		const innerIfStatementNode = ifStatementNode.if.body.at(0) as IfStatementNode;
-		expect(innerIfStatementNode.if.conditions).to.exist;
-		expect(innerIfStatementNode.if.body).to.have.length(1);
+		const innerIfStatementNode = ifStatementNode.if?.body.at(0) as IfStatementNode;
+		expect(innerIfStatementNode.if?.conditions).to.exist;
+		expect(innerIfStatementNode.if?.body).to.have.length(1);
 
-		const ifReturn = innerIfStatementNode.if.body.at(0) as ReturnStatementNode;
+		const ifReturn = innerIfStatementNode.if?.body.at(0) as ReturnStatementNode;
 		expect(ifReturn).to.exist;
 		expect(ifReturn.value).to.not.exist;
 	});

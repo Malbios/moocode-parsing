@@ -106,7 +106,7 @@ export default class MoocodeParser extends Parser {
 	public static readonly THIN_ARROW = 85;
 	public static readonly TICK = 86;
 	public static readonly WAVE = 87;
-	public static readonly ANY = 88;
+	public static readonly UNEXPECTED = 88;
 	public static readonly EOF = Token.EOF;
 	public static readonly RULE_moocode = 0;
 	public static readonly RULE_statement = 1;
@@ -295,7 +295,7 @@ export default class MoocodeParser extends Parser {
                                                              "SHARP", "SINGLE_QUOTE", 
                                                              "STAR", "THIN_ARROW", 
                                                              "TICK", "WAVE", 
-                                                             "ANY" ];
+                                                             "UNEXPECTED" ];
 	// tslint:disable:no-trailing-whitespace
 	public static readonly ruleNames: string[] = [
 		"moocode", "statement", "statements", "empty_statement", "comment", "if_statement", 
