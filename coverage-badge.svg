@@ -1,20 +1,20 @@
-<svg width="148.1" height="20" viewBox="0 0 1481 200" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Code Coverage: 69.64%">
-  <title>Code Coverage: 69.64%</title>
-  <linearGradient id="VPuTl" x2="0" y2="100%">
+<svg width="148.1" height="20" viewBox="0 0 1481 200" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Code Coverage: 49.23%">
+  <title>Code Coverage: 49.23%</title>
+  <linearGradient id="XnFUq" x2="0" y2="100%">
     <stop offset="0" stop-opacity=".1" stop-color="#EEE"/>
     <stop offset="1" stop-opacity=".1"/>
   </linearGradient>
-  <mask id="JNUnM"><rect width="1481" height="200" rx="30" fill="#FFF"/></mask>
-  <g mask="url(#JNUnM)">
+  <mask id="IvPqc"><rect width="1481" height="200" rx="30" fill="#FFF"/></mask>
+  <g mask="url(#IvPqc)">
     <rect width="941" height="200" fill="#555"/>
-    <rect width="540" height="200" fill="#cba317" x="941"/>
-    <rect width="1481" height="200" fill="url(#VPuTl)"/>
+    <rect width="540" height="200" fill="#ce0000" x="941"/>
+    <rect width="1481" height="200" fill="url(#XnFUq)"/>
   </g>
   <g aria-hidden="true" fill="#fff" text-anchor="start" font-family="Verdana,DejaVu Sans,sans-serif" font-size="110">
     <text x="60" y="148" textLength="841" fill="#000" opacity="0.25">Code Coverage</text>
     <text x="50" y="138" textLength="841">Code Coverage</text>
-    <text x="996" y="148" textLength="440" fill="#000" opacity="0.25">69.64%</text>
-    <text x="986" y="138" textLength="440">69.64%</text>
+    <text x="996" y="148" textLength="440" fill="#000" opacity="0.25">49.23%</text>
+    <text x="986" y="138" textLength="440">49.23%</text>
   </g>
   
 </svg>
