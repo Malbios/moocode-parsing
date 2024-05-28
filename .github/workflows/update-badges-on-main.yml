@@ -56,7 +56,7 @@ jobs:
       - name: Copy coverage report
         run: |
           cd repo
-          cp ./reports ./../gh-pages
+          cp -r ./reports ./../gh-pages
 
       - run: |
           cd gh-pages
