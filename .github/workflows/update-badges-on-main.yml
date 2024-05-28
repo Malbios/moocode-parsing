@@ -53,6 +53,11 @@ jobs:
           npm i coverage-badges-cli -g
           npx coverage-badges --source reports/coverage-summary.json --output ./../gh-pages/coverage-badge.svg --label="Code Coverage"
 
+      - name: Copy coverage report
+        run: |
+          cd repo
+          cp ./reports ./../gh-pages
+
       - run: |
           cd gh-pages
           git config user.name github-actions
