@@ -1,13 +1,22 @@
 import { CharStream, CommonTokenStream, ParserRuleContext } from 'antlr4';
 import MoocodeLexer from '../grammar/generated/MoocodeLexer';
 import MoocodeParser from '../grammar/generated/MoocodeParser';
-import { ContextWithError, LexerErrorListener, ParserErrorListener } from './error';
-import { InvalidStatement, Statement } from './nodes';
+import MoocodePartialParser from '../grammar/generated/MoocodePartialParser';
+import { Ast, ParsedExpression, SyntaxError } from '../interfaces';
+import { CustomErrorStrategy, InvalidOperationError, LexerErrorListener, MergedContext, ParserErrorListener } from './error';
+import { ExpressionGenerator } from './expression-generator';
+import { InvalidStatementNode, Statement } from './nodes';
 import { StatementGenerator } from './statement-generator';
 
-function generateCst(input: string, getResult: (parser: MoocodeParser) => ParserRuleContext[]): ParserRuleContext[] {
+interface Cst {
+    contexts: ParserRuleContext[];
+    lexerErrors: SyntaxError[];
+    parserErrors: SyntaxError[];
+}
+
+function internalGenerateCst<T extends (MoocodeParser | MoocodePartialParser)>(input: string, getParser: (lexer: MoocodeLexer) => T, getResult: (parser: T) => ParserRuleContext[]): Cst {
     const lexer = new MoocodeLexer(new CharStream(input));
-    const parser = new MoocodeParser(new CommonTokenStream(lexer));
+    const parser = getParser(lexer);
 
     const lexerErrorListener = new LexerErrorListener();
     lexer.removeErrorListeners();
@@ -17,25 +26,21 @@ function generateCst(input: string, getResult: (parser: MoocodeParser) => Parser
     parser.removeErrorListeners();
     parser.addErrorListener(parserErrorListener);
 
+    parser._errHandler = new CustomErrorStrategy();
+
     const result = getResult(parser);
 
-    for (const error of lexerErrorListener.errors) {
-        console.log(error.toString());
-    }
-
-    for (const error of parserErrorListener.errors) {
-        console.log(error.toString());
-    }
-
-    return result;
+    return { contexts: result, lexerErrors: lexerErrorListener.errors, parserErrors: parserErrorListener.errors };
 }
 
-function generateStatementNode(context: ParserRuleContext): Statement | InvalidStatement | undefined {
-    if (context instanceof ContextWithError) {
-        return new InvalidStatement(context.position, context.text);
-    }
+function generateCst(input: string, getResult: (parser: MoocodeParser) => ParserRuleContext[]): Cst {
+    return internalGenerateCst<MoocodeParser>(input,
+        lexer => new MoocodeParser(new CommonTokenStream(lexer)), getResult);
+}
 
-    return StatementGenerator.generateStatement(context, 0);
+function generatePartialCst(input: string, getResult: (parser: MoocodePartialParser) => ParserRuleContext[]): Cst {
+    return internalGenerateCst<MoocodePartialParser>(input,
+        lexer => new MoocodePartialParser(new CommonTokenStream(lexer)), getResult);
 }
 
 function hasError(context: ParserRuleContext): boolean {
@@ -53,53 +58,100 @@ function hasError(context: ParserRuleContext): boolean {
 }
 
 function getSanitizedCst(contexts: ParserRuleContext[]): ParserRuleContext[] {
-    const sanitizedContexts: ParserRuleContext[] = [];
+    const result: ParserRuleContext[] = [];
 
-    let contextWithError: ContextWithError | undefined = undefined;
+    let contextsWithError: ParserRuleContext[] = [];
 
     for (const context of contexts) {
         if (!hasError(context)) {
-            if (contextWithError) {
-                sanitizedContexts.push(contextWithError);
-                contextWithError = undefined;
+            if (contextsWithError.length > 0) {
+                result.push(new MergedContext(contextsWithError));
+                contextsWithError = [];
             }
 
-            sanitizedContexts.push(context);
+            result.push(context);
             continue;
         }
 
-        if (contextWithError) {
-            contextWithError.add(context);
+        contextsWithError.push(context);
+    }
+
+    if (contextsWithError.length > 0) {
+        result.push(new MergedContext(contextsWithError));
+    }
+
+    return result;
+}
+
+function internalGenerateAst(contexts: ParserRuleContext[]): (Statement | undefined)[] {
+    const results: (Statement | undefined)[] = [];
+
+    for (const context of contexts) {
+        if (context instanceof MergedContext) {
+            const cst = generatePartialCst(context.getText(), parser => parser.moocode().statement_list());
+
+            const newContext = cst.contexts.at(0);
+
+            if (newContext) {
+                results.push(StatementGenerator.generateStatement(newContext, 0));
+            }
+
             continue;
         }
 
-        contextWithError = new ContextWithError();
-        contextWithError.add(context);
+        results.push(StatementGenerator.generateStatement(context, 0));
     }
 
-    if (contextWithError) {
-        sanitizedContexts.push(contextWithError);
-    }
-
-    return sanitizedContexts;
+    return results;
 }
 
-function getSanitizedAst(nodes: (Statement | undefined)[]): Statement[] {
-    const sanitizedNodes: Statement[] = [];
+interface SanitizedAst {
+    valid: Statement[];
+    invalid: InvalidStatementNode[];
+}
 
-    for (const node of nodes) {
-        if (node) {
-            sanitizedNodes.push(node);
+function getSanitizedAst(statements: (Statement | undefined)[]): SanitizedAst {
+    const validStatements: Statement[] = [];
+    const invalidStatements: InvalidStatementNode[] = [];
+
+    for (const statement of statements) {
+        if (!statement) {
+            continue;
         }
+
+        if (statement instanceof InvalidStatementNode) {
+            invalidStatements.push(statement);
+            continue;
+        }
+
+        validStatements.push(statement);
     }
 
-    return sanitizedNodes;
+    return { valid: validStatements, invalid: invalidStatements };
 }
 
-export default function generateAst(input: string): Statement[] {
+export function generateAst(input: string): Ast {
     const cst = generateCst(input, parser => parser.moocode().statement_list());
 
-    const ast = getSanitizedCst(cst).map(x => generateStatementNode(x));
+    const sanitizedCst = getSanitizedCst(cst.contexts);
 
-    return getSanitizedAst(ast);
+    const ast = internalGenerateAst(sanitizedCst);
+
+    const sanitizedAst = getSanitizedAst(ast);
+
+    return { valid: sanitizedAst.valid, invalid: sanitizedAst.invalid, lexerErrors: cst.lexerErrors, parserErrors: cst.parserErrors };
+}
+
+export function parseExpression(input: string): ParsedExpression {
+    const cst = generateCst(input, parser => [parser.expression()]);
+
+    if (cst.contexts.length < 1) {
+        return { expression: undefined, lexerErrors: cst.lexerErrors, parserErrors: cst.parserErrors };
+    }
+
+    if (cst.contexts.length > 1) {
+        throw new InvalidOperationError(`found more than one expression in input; ${input}`);
+    }
+
+    return { expression: ExpressionGenerator.generateExpression(cst.contexts[0]), lexerErrors: cst.lexerErrors, parserErrors: cst.parserErrors };
 }

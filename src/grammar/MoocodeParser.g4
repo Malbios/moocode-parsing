@@ -165,14 +165,14 @@ property_accessor:
 	);
 
 verb_invocation:
-	COLON (
-		identifier
-		| OPEN_PARENS computed_verb_arguments = expression CLOSE_PARENS
-	) OPEN_PARENS arguments = expressions CLOSE_PARENS;
+	COLON identifier OPEN_PARENS arguments = expressions? CLOSE_PARENS
+	| COLON OPEN_PARENS computed_verb_arguments = expression CLOSE_PARENS OPEN_PARENS arguments =
+		expressions? CLOSE_PARENS;
 
-expressions: expression? (COMMA expression)*;
+expressions: expression (COMMA expression)*;
 
-bf_invocation: OPEN_PARENS arguments = expressions CLOSE_PARENS;
+bf_invocation:
+	OPEN_PARENS arguments = expressions? CLOSE_PARENS;
 
 primary_expression_start:
 	identifier

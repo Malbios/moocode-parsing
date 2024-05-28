@@ -1,5 +1,3 @@
-
-
 import { ParseTree } from 'antlr4';
 import MoocodeParserVisitor from '../grammar/generated/MoocodeParserVisitor';
 import { ContextPosition } from './common';
@@ -23,6 +21,10 @@ export abstract class BaseNode {
 	// eslint-disable-next-line @typescript-eslint/no-unused-vars
 	public toString(lineInfo = true): string {
 		return this.position.range;
+	}
+
+	public isPartial(): boolean {
+		return false;
 	}
 }
 

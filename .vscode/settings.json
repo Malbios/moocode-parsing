@@ -1,9 +1,10 @@
 {
     "files.exclude": {
-        "dist": true,
         ".nyc_output": true,
-        "src/grammar/.antlr": true,
-        "package-lock.json": true
+        "**/node_modules": true,
+        "dist": true,
+        "package-lock.json": true,
+        "src/grammar/.antlr": true
     },
     "editor.folding": false,
     "editor.codeActionsOnSave": {
@@ -79,5 +80,6 @@
     "mochaExplorer.exit": true,
     "mochaExplorer.globImplementation": "vscode",
     "mochaExplorer.ui": "tdd",
-    "mochaExplorer.configFile": ".mocharc.debugging.json"
+    "mochaExplorer.configFile": ".mocharc.debugging.json",
+    "testExplorer.errorDecoration": false
 }

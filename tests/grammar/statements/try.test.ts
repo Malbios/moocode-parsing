@@ -26,7 +26,7 @@ endtry
     const primaryExpression = ParsingHelpers.getPrimaryExpression(tryStatement?.statements().statement(0));
     ExpectHelpers.expectIdentifier(primaryExpression?._pe, 'x');
     expect(primaryExpression?.bf_invocation_list()).to.have.length(1);
-    expect(primaryExpression?.bf_invocation(0)._arguments.expression_list()).to.have.length(0);
+    expect(primaryExpression?.bf_invocation(0)._arguments).to.not.exist;
 
     expect(tryStatement?.try_except_list()).to.have.length(1);
 
@@ -41,7 +41,7 @@ endtry
     const exceptPrimaryExpression = ParsingHelpers.getPrimaryExpression(except?.statements().statement(0));
     ExpectHelpers.expectIdentifier(exceptPrimaryExpression?._pe, 'y');
     expect(exceptPrimaryExpression?.bf_invocation_list()).to.have.length(1);
-    expect(exceptPrimaryExpression?.bf_invocation(0)._arguments.expression_list()).to.have.length(0);
+    expect(exceptPrimaryExpression?.bf_invocation(0)._arguments).to.not.exist;
 
     expect(tryStatement?.try_finally()).not.to.exist;
   });
@@ -66,7 +66,7 @@ endtry
     const primaryExpression = ParsingHelpers.getPrimaryExpression(tryStatement?.statements().statement(0));
     ExpectHelpers.expectIdentifier(primaryExpression?._pe, 'x');
     expect(primaryExpression?.bf_invocation_list()).to.have.length(1);
-    expect(primaryExpression?.bf_invocation(0)._arguments.expression_list()).to.have.length(0);
+    expect(primaryExpression?.bf_invocation(0)._arguments).to.not.exist;
 
     expect(tryStatement?.try_except_list()).to.have.length(0);
 
@@ -77,7 +77,7 @@ endtry
     const finallyPrimaryExpression = ParsingHelpers.getPrimaryExpression(finallyPart?.statements().statement(0));
     ExpectHelpers.expectIdentifier(finallyPrimaryExpression?._pe, 'y');
     expect(finallyPrimaryExpression?.bf_invocation_list()).to.have.length(1);
-    expect(finallyPrimaryExpression?.bf_invocation(0)._arguments.expression_list()).to.have.length(0);
+    expect(finallyPrimaryExpression?.bf_invocation(0)._arguments).to.not.exist;
   });
 
   test('should parse a try except finally statement', () => {
@@ -102,7 +102,7 @@ endtry
     const primaryExpression = ParsingHelpers.getPrimaryExpression(tryStatement?.statements().statement(0));
     ExpectHelpers.expectIdentifier(primaryExpression?._pe, 'x');
     expect(primaryExpression?.bf_invocation_list()).to.have.length(1);
-    expect(primaryExpression?.bf_invocation(0)._arguments.expression_list()).to.have.length(0);
+    expect(primaryExpression?.bf_invocation(0)._arguments).to.not.exist;
 
     expect(tryStatement?.try_except_list()).to.have.length(1);
 
@@ -117,7 +117,7 @@ endtry
     const exceptPrimaryExpression = ParsingHelpers.getPrimaryExpression(except?.statements().statement(0));
     ExpectHelpers.expectIdentifier(exceptPrimaryExpression?._pe, 'y');
     expect(exceptPrimaryExpression?.bf_invocation_list()).to.have.length(1);
-    expect(exceptPrimaryExpression?.bf_invocation(0)._arguments.expression_list()).to.have.length(0);
+    expect(exceptPrimaryExpression?.bf_invocation(0)._arguments).to.not.exist;
 
     const finallyPart = tryStatement?.try_finally();
 
@@ -126,7 +126,7 @@ endtry
     const finallyPrimaryExpression = ParsingHelpers.getPrimaryExpression(finallyPart?.statements().statement(0));
     ExpectHelpers.expectIdentifier(finallyPrimaryExpression?._pe, 'z');
     expect(finallyPrimaryExpression?.bf_invocation_list()).to.have.length(1);
-    expect(finallyPrimaryExpression?.bf_invocation(0)._arguments.expression_list()).to.have.length(0);
+    expect(finallyPrimaryExpression?.bf_invocation(0)._arguments).to.not.exist;
   });
 
   test('should parse a try except statement with multiple error codes', () => {
@@ -149,7 +149,7 @@ endtry
     const primaryExpression = ParsingHelpers.getPrimaryExpression(tryStatement?.statements().statement(0));
     ExpectHelpers.expectIdentifier(primaryExpression?._pe, 'x');
     expect(primaryExpression?.bf_invocation_list()).to.have.length(1);
-    expect(primaryExpression?.bf_invocation(0)._arguments.expression_list()).to.have.length(0);
+    expect(primaryExpression?.bf_invocation(0)._arguments).to.not.exist;
 
     expect(tryStatement?.try_except_list()).to.have.length(1);
 
@@ -165,7 +165,7 @@ endtry
     const exceptPrimaryExpression = ParsingHelpers.getPrimaryExpression(except?.statements().statement(0));
     ExpectHelpers.expectIdentifier(exceptPrimaryExpression?._pe, 'y');
     expect(exceptPrimaryExpression?.bf_invocation_list()).to.have.length(1);
-    expect(exceptPrimaryExpression?.bf_invocation(0)._arguments.expression_list()).to.have.length(0);
+    expect(exceptPrimaryExpression?.bf_invocation(0)._arguments).to.not.exist;
 
     expect(tryStatement?.try_finally()).not.to.exist;
   });
@@ -190,7 +190,7 @@ endtry
     const primaryExpression = ParsingHelpers.getPrimaryExpression(tryStatement?.statements().statement(0));
     ExpectHelpers.expectIdentifier(primaryExpression?._pe, 'x');
     expect(primaryExpression?.bf_invocation_list()).to.have.length(1);
-    expect(primaryExpression?.bf_invocation(0)._arguments.expression_list()).to.have.length(0);
+    expect(primaryExpression?.bf_invocation(0)._arguments).to.not.exist;
 
     expect(tryStatement?.try_except_list()).to.have.length(1);
 
@@ -203,7 +203,7 @@ endtry
     const exceptPrimaryExpression = ParsingHelpers.getPrimaryExpression(except?.statements().statement(0));
     ExpectHelpers.expectIdentifier(exceptPrimaryExpression?._pe, 'y');
     expect(exceptPrimaryExpression?.bf_invocation_list()).to.have.length(1);
-    expect(exceptPrimaryExpression?.bf_invocation(0)._arguments.expression_list()).to.have.length(0);
+    expect(exceptPrimaryExpression?.bf_invocation(0)._arguments).to.not.exist;
 
     expect(tryStatement?.try_finally()).not.to.exist;
   });
@@ -261,7 +261,7 @@ endtry
     const primaryExpression = ParsingHelpers.getPrimaryExpression(tryStatement?.statements().statement(0));
     ExpectHelpers.expectIdentifier(primaryExpression?._pe, 'x');
     expect(primaryExpression?.bf_invocation_list()).to.have.length(1);
-    expect(primaryExpression?.bf_invocation(0)._arguments.expression_list()).to.have.length(0);
+    expect(primaryExpression?.bf_invocation(0)._arguments).to.not.exist;
 
     expect(tryStatement?.try_except_list()).to.have.length(2);
 
@@ -276,7 +276,7 @@ endtry
     const exceptAPrimaryExpression = ParsingHelpers.getPrimaryExpression(exceptA?.statements().statement(0));
     ExpectHelpers.expectIdentifier(exceptAPrimaryExpression?._pe, 'y');
     expect(exceptAPrimaryExpression?.bf_invocation_list()).to.have.length(1);
-    expect(exceptAPrimaryExpression?.bf_invocation(0)._arguments.expression_list()).to.have.length(0);
+    expect(exceptAPrimaryExpression?.bf_invocation(0)._arguments).to.not.exist;
 
     const exceptB = tryStatement?.try_except(1);
 
@@ -289,7 +289,7 @@ endtry
     const exceptBPrimaryExpression = ParsingHelpers.getPrimaryExpression(exceptB?.statements().statement(0));
     ExpectHelpers.expectIdentifier(exceptBPrimaryExpression?._pe, 'z');
     expect(exceptBPrimaryExpression?.bf_invocation_list()).to.have.length(1);
-    expect(exceptBPrimaryExpression?.bf_invocation(0)._arguments.expression_list()).to.have.length(0);
+    expect(exceptBPrimaryExpression?.bf_invocation(0)._arguments).to.not.exist;
 
     expect(tryStatement?.try_finally()).not.to.exist;
   });

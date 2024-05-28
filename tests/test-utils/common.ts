@@ -60,7 +60,7 @@ export function logContext(context: ParserRuleContext) {
 export function runAstTest(code: string, expected?: string) {
     const ast = generateAst(code);
 
-    const result = ast.map(x => x?.toString(false)).join('\n');
+    const result = ast.valid.map(x => x?.toString(false)).join('\n');
 
     if (expected) {
         expect(result).to.equal(expected);

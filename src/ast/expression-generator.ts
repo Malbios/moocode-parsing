@@ -4,7 +4,7 @@ import { Additive_expressionContext, And_expressionContext, AssignmentContext, B
 import { BaseNode, MoocodeVisitor } from './abstract';
 import { ContextPosition, getContextAsText, is } from './common';
 import { NodeGenerationError } from './error';
-import { AdditionNode, ArgumentIndexerNode, BitwiseAndNode, BitwiseExclusiveOrNode, BitwiseInclusiveOrNode, BuiltInFunctionInvocationNode, ComplementNode, ComputedPropertyAccessorNode, ComputedVerbInvocationNode, ConditionalAndNode, ConditionalInNode, ConditionalNode, ConditionalOrNode, CorifiedVerbInvocationNode, DivisionNode, EqualsNode, Expression, GreaterOrEqualNode, GreaterThanNode, Indexer, Invocation, LessOrEqualNode, LessThanNode, ListAssignmentNode, ListNode, ModulationNode, MultiplicationNode, NegatedNode, NegativeNode, OptionalTargetAssignmentNode, OptionalTargetNode, PropertyAccessor, PropertyAccessorNode, PropertyAssignmentNode, RangeIndexerNode, ShiftLeftNode, ShiftRightNode, SubtractionNode, UnequalsNode, Value, VariableAssignmentNode, VariableNode, VerbInvocationNode } from './nodes';
+import { AdditionNode, ArgumentIndexerNode, BitwiseAndNode, BitwiseExclusiveOrNode, BitwiseInclusiveOrNode, BuiltInFunctionInvocationNode, ComplementNode, ComputedPropertyAccessorNode, ComputedVerbInvocationNode, ConditionalAndNode, ConditionalInNode, ConditionalNode, ConditionalOrNode, CorifiedVerbInvocationNode, DivisionNode, EqualsNode, Expression, GreaterOrEqualNode, GreaterThanNode, Indexer, Invocation, LessOrEqualNode, LessThanNode, ListAssignmentNode, ListNode, ModulationNode, MultiplicationNode, NegatedNode, NegativeNode, OptionalTargetAssignmentNode, OptionalTargetNode, PartialVerbInvocationNode, PropertyAccessor, PropertyAccessorNode, PropertyAssignmentNode, RangeIndexerNode, ShiftLeftNode, ShiftRightNode, SubtractionNode, UnequalsNode, Value, VariableAssignmentNode, VariableNode, VerbInvocationNode } from './nodes';
 import { ValueGenerator } from './value-generator';
 
 function hasNoIndexerAccessorOrInvocation(context: Primary_expressionContext): boolean {
@@ -30,6 +30,8 @@ function generateNodeFromInfo(context: ParserRuleContext, object: Expression | u
 		return new VerbInvocationNode(position, object, info.name, info.arguments);
 	} else if (info instanceof ComputedVerbInvocationNodeInfo) {
 		return new ComputedVerbInvocationNode(position, object, info.name, info.arguments);
+	} else if (info instanceof PartialVerbInvocationNodeInfo) {
+		return new PartialVerbInvocationNode(position, object, info.name);
 	} else if (info instanceof CallInfo) {
 		if (object.toString().startsWith('$')) {
 			return new CorifiedVerbInvocationNode(position, object, info.arguments);
@@ -284,11 +286,18 @@ export class ExpressionGenerator extends MoocodeVisitor<Expression> {
 	}
 
 	public static generateExpressions(context: ExpressionsContext): (Expression | undefined)[] {
-		const expressions = [];
+		const expressions: (Expression | undefined)[] = [];
+
+		if (!context) {
+			return expressions;
+		}
 
 		for (const subcontext of context.expression_list()) {
 			const expression = ExpressionGenerator.generateExpression(subcontext);
-			expressions.push(expression);
+
+			if (expression) {
+				expressions.push(expression);
+			}
 		}
 
 		return expressions;
@@ -321,11 +330,15 @@ class InfoNodeGenerator extends MoocodeVisitor<InfoNode> {
 		return new ComputedPropertyAccessorNodeInfo(position, nameExpression);
 	}
 
-	public override visitVerb_invocation = (context: Verb_invocationContext): VerbInvocationNodeInfo | ComputedVerbInvocationNodeInfo | undefined => {
+	public override visitVerb_invocation = (context: Verb_invocationContext): VerbInvocationNodeInfo | ComputedVerbInvocationNodeInfo | PartialVerbInvocationNodeInfo | undefined => {
 		const position = ContextPosition.fromContext(context);
 		const argumentExpressions = ExpressionGenerator.generateExpressions(context._arguments);
 
 		if (context.identifier()) {
+			if (context.CLOSE_PARENS_list().length < 1) {
+				return new PartialVerbInvocationNodeInfo(position, getContextAsText(context.identifier()));
+			}
+
 			return new VerbInvocationNodeInfo(position, getContextAsText(context.identifier()), argumentExpressions);
 		}
 
@@ -361,7 +374,7 @@ class InfoNodeGenerator extends MoocodeVisitor<InfoNode> {
 	}
 }
 
-type InfoNode = (ArgumentIndexerNodeInfo | RangeIndexerNodeInfo | PropertyAccessorNodeInfo | ComputedPropertyAccessorNodeInfo | VerbInvocationNodeInfo | ComputedVerbInvocationNodeInfo | CallInfo);
+type InfoNode = (ArgumentIndexerNodeInfo | RangeIndexerNodeInfo | PropertyAccessorNodeInfo | ComputedPropertyAccessorNodeInfo | VerbInvocationNodeInfo | ComputedVerbInvocationNodeInfo | PartialVerbInvocationNodeInfo | CallInfo);
 
 class ArgumentIndexerNodeInfo extends BaseNode {
 	private _argument: Expression | undefined;
@@ -462,6 +475,20 @@ class ComputedVerbInvocationNodeInfo extends BaseNode {
 
 		this._name = name;
 		this._arguments = functionArguments;
+	}
+}
+
+class PartialVerbInvocationNodeInfo extends BaseNode {
+	private _name: string | undefined;
+
+	public get name() {
+		return this._name
+	}
+
+	public constructor(position: ContextPosition, name: string | undefined) {
+		super(position);
+
+		this._name = name;
 	}
 }
 

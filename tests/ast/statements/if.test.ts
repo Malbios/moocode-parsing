@@ -11,9 +11,9 @@ if (true)
 endif
 `;
 		const result = generateAst(code);
-		expect(result).to.have.length(1);
+		expect(result.valid).to.have.length(1);
 
-		const ifStatementNode = result.at(0) as IfStatementNode;
+		const ifStatementNode = result.valid.at(0) as IfStatementNode;
 
 		const booleanValueNode = ifStatementNode.if?.conditions as BooleanNode;
 		expect(booleanValueNode.value).to.equal(true);
@@ -32,9 +32,9 @@ if (true)
 endif
 `;
 		const result = generateAst(code);
-		expect(result).to.have.length(1);
+		expect(result.valid).to.have.length(1);
 
-		const ifStatementNode = result.at(0) as IfStatementNode;
+		const ifStatementNode = result.valid.at(0) as IfStatementNode;
 		expect(ifStatementNode.if?.conditions).to.exist;
 		expect(ifStatementNode.if?.body).to.have.length(0);
 		expect(ifStatementNode.elseifs).to.have.length(0);
@@ -49,9 +49,9 @@ else
 endif
 `;
 		const result = generateAst(code);
-		expect(result).to.have.length(1);
+		expect(result.valid).to.have.length(1);
 
-		const ifStatementNode = result.at(0) as IfStatementNode;
+		const ifStatementNode = result.valid.at(0) as IfStatementNode;
 		expect(ifStatementNode.if?.conditions).to.exist;
 		expect(ifStatementNode.if?.body).to.have.length(0);
 		expect(ifStatementNode.elseifs).to.have.length(0);
@@ -71,9 +71,9 @@ else
 endif
 `;
 		const result = generateAst(code);
-		expect(result).to.have.length(1);
+		expect(result.valid).to.have.length(1);
 
-		const ifStatementNode = result.at(0) as IfStatementNode;
+		const ifStatementNode = result.valid.at(0) as IfStatementNode;
 		expect(ifStatementNode.if?.conditions).to.exist;
 		expect(ifStatementNode.if?.body).to.have.length(0);
 		expect(ifStatementNode.elseifs).to.have.length(0);
@@ -90,9 +90,9 @@ elseif (false)
 endif
 `;
 		const result = generateAst(code);
-		expect(result).to.have.length(1);
+		expect(result.valid).to.have.length(1);
 
-		const ifStatementNode = result.at(0) as IfStatementNode;
+		const ifStatementNode = result.valid.at(0) as IfStatementNode;
 		expect(ifStatementNode.if?.conditions).to.exist;
 		expect(ifStatementNode.if?.body).to.have.length(0);
 		expect(ifStatementNode.elseifs).to.have.length(1);
@@ -115,9 +115,9 @@ elseif (false)
 endif
 `;
 		const result = generateAst(code);
-		expect(result).to.have.length(1);
+		expect(result.valid).to.have.length(1);
 
-		const ifStatementNode = result.at(0) as IfStatementNode;
+		const ifStatementNode = result.valid.at(0) as IfStatementNode;
 		expect(ifStatementNode.if?.conditions).to.exist;
 		expect(ifStatementNode.if?.body).to.have.length(0);
 		expect(ifStatementNode.elseifs).to.have.length(1);
@@ -138,9 +138,9 @@ elseif (false)
 endif
 `;
 		const result = generateAst(code);
-		expect(result).to.have.length(1);
+		expect(result.valid).to.have.length(1);
 
-		const ifStatementNode = result.at(0) as IfStatementNode;
+		const ifStatementNode = result.valid.at(0) as IfStatementNode;
 		expect(ifStatementNode.if?.conditions).to.exist;
 		expect(ifStatementNode.if?.body).to.have.length(0);
 		expect(ifStatementNode.elseifs).to.have.length(3);
@@ -171,9 +171,9 @@ else
 endif
 `;
 		const result = generateAst(code);
-		expect(result).to.have.length(1);
+		expect(result.valid).to.have.length(1);
 
-		const ifStatementNode = result.at(0) as IfStatementNode;
+		const ifStatementNode = result.valid.at(0) as IfStatementNode;
 		expect(ifStatementNode.if?.conditions).to.exist;
 		expect(ifStatementNode.if?.body).to.have.length(1);
 
@@ -210,9 +210,9 @@ if (true)
 endif
 `;
 		const result = generateAst(code);
-		expect(result).to.have.length(1);
+		expect(result.valid).to.have.length(1);
 
-		const ifStatementNode = result.at(0) as IfStatementNode;
+		const ifStatementNode = result.valid.at(0) as IfStatementNode;
 		expect(ifStatementNode.if?.conditions).to.exist;
 		expect(ifStatementNode.if?.body).to.have.length(1);
 
