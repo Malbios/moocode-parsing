@@ -4,7 +4,7 @@ import { MoocodeVisitor } from './abstract';
 import { ContextPosition } from './common';
 import { NodeGenerationError } from './error';
 import { ExpressionGenerator } from './expression-generator';
-import { BreakStatementNode, CommentStatementNode, ContinueStatementNode, ElseIfNode, ElseNode, EmptyStatementNode, ErrorCodeNode, ExceptNode, Expression, ExpressionStatementNode, FinallyNode, ForStatementNode, ForkStatementNode, IfNode, IfStatementNode, RangedForStatementNode, ReturnStatementNode, Statement, StringNode, TryStatementNode, VariableNode, WhileStatementNode } from './nodes';
+import { BreakStatementNode, CommentStatementNode, ContinueStatementNode, ElseIfNode, ElseNode, EmptyStatementNode, ErrorCodeNode, ExceptNode, Expression, ExpressionStatementNode, FinallyNode, ForStatementNode, ForkStatementNode, IfNode, IfStatementNode, PartialExpressionStatementNode, PartialVerbInvocationNode, RangedForStatementNode, ReturnStatementNode, Statement, StringNode, TryStatementNode, VariableNode, WhileStatementNode } from './nodes';
 import { ValueGenerator } from './value-generator';
 
 function generateIfNode(depth: number, context: If_expressionContext | Elseif_expressionContext): IfNode | ElseIfNode {
@@ -47,6 +47,11 @@ export class StatementGenerator extends MoocodeVisitor<Statement> {
 	public override visitStatement = (context: StatementContext): Statement | undefined => {
 		if (context.expression()) {
 			const expression = ExpressionGenerator.generateExpression(context.expression());
+
+			if (expression instanceof PartialVerbInvocationNode) {
+				return new PartialExpressionStatementNode(this._depth, ContextPosition.fromContext(context), expression);
+			}
+
 			return new ExpressionStatementNode(this._depth, ContextPosition.fromContext(context), expression);
 		}
 

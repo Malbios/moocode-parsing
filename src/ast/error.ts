@@ -1,4 +1,5 @@
-import { ErrorListener, ParserRuleContext, RecognitionException, Recognizer, Token } from 'antlr4';
+import { DefaultErrorStrategy, ErrorListener, Parser, ParserRuleContext, RecognitionException, Recognizer, Token } from 'antlr4';
+import { SyntaxError as ISyntaxError } from '../interfaces';
 import { ContextPosition, getContextAsText } from './common';
 
 export class NotImplementedError extends Error {
@@ -66,19 +67,27 @@ function nameOf(object: object): string {
 	return object?.constructor?.name ?? '<unknown>';
 }
 
-export class SyntaxError<T> {
-	private _offendingSymbol: T;
+export class SyntaxError implements ISyntaxError {
 	private _line: number;
 	private _column: number;
 	private _message: string;
-	private _error: RecognitionException | undefined;
 
-	public constructor(offendingSymbol: T, line: number, column: number, message: string, error?: RecognitionException) {
-		this._offendingSymbol = offendingSymbol;
+	public get line() {
+		return this._line;
+	}
+
+	public get column() {
+		return this._column;
+	}
+
+	public get message() {
+		return this._message;
+	}
+
+	public constructor(line: number, column: number, message: string) {
 		this._line = line;
 		this._column = column;
 		this._message = message;
-		this._error = error;
 	}
 
 	public toString(): string {
@@ -87,45 +96,59 @@ export class SyntaxError<T> {
 }
 
 export class ParserErrorListener extends ErrorListener<Token> {
-	private _errors = new Array<SyntaxError<Token>>();
+	private _errors = new Array<SyntaxError>();
 
 	public get errors() {
 		return this._errors;
 	}
 
+	// eslint-disable-next-line @typescript-eslint/no-unused-vars
 	public syntaxError(recognizer: Recognizer<Token>, offendingSymbol: Token, line: number, column: number, msg: string, e: RecognitionException | undefined): void {
-		this._errors.push(new SyntaxError(offendingSymbol, line, column, msg, e));
+		this._errors.push(new SyntaxError(line, column, msg));
 	}
 }
 
 export class LexerErrorListener extends ErrorListener<number> {
-	private _errors = new Array<SyntaxError<number>>();
+	private _errors = new Array<SyntaxError>();
 
 	public get errors() {
 		return this._errors;
 	}
 
+	// eslint-disable-next-line @typescript-eslint/no-unused-vars
 	public syntaxError(recognizer: Recognizer<number>, offendingSymbol: number, line: number, column: number, msg: string, e: RecognitionException | undefined): void {
-		this._errors.push(new SyntaxError(offendingSymbol, line, column, msg, e));
+		this._errors.push(new SyntaxError(line, column, msg));
 	}
 }
 
-export class ContextWithError extends ParserRuleContext {
-	private _contexts: ParserRuleContext[] = [];
-
-	public get position(): ContextPosition {
-		if (this._contexts.length < 1) {
-			return ContextPosition.default;
+export class MergedContext extends ParserRuleContext {
+	public constructor(contexts: ParserRuleContext[]) {
+		if (contexts.length < 1) {
+			throw new InvalidOperationError('cannot create merged context from no contexts');
 		}
 
-		return ContextPosition.fromValues(this._contexts[0].start, this._contexts[this._contexts.length - 1].stop);
+		super(undefined, contexts[0].invokingState);
+
+		this.children = contexts;
 	}
 
-	public get text(): string {
-		return this._contexts[0].start.getInputStream().getText(this.position.start, this.position.stop);
-	}
+	public getText(): string {
+		const firstChild = this.children?.at(0) as ParserRuleContext;
+		const lastChild = this.children?.at(this.children.length - 1) as ParserRuleContext;
 
-	public add(context: ParserRuleContext) {
-		this._contexts.push(context);
+		const inputStream = firstChild?.start.getInputStream();
+		if (!inputStream) {
+			return '';
+		}
+
+		const stop = lastChild.stop?.stop ?? inputStream.size;
+
+		return inputStream.getText(firstChild.start.start, stop);
+	}
+}
+
+export class CustomErrorStrategy extends DefaultErrorStrategy {
+	getMissingSymbol(recognizer: Parser): Token {
+		return recognizer.getCurrentToken();
 	}
 }

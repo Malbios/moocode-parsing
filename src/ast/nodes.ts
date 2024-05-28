@@ -1,7 +1,7 @@
 import { BaseNode, FlowControlStatementNode, LiteralNode, ReferenceNode, TwoPartNode, WrappedNode } from './abstract';
 import { ContextPosition, ErrorCode } from './common';
 
-export type Statement = (IfStatementNode | Loop | ForkStatementNode | TryStatementNode | FlowControlStatement | ExpressionStatementNode | CommentStatementNode | EmptyStatementNode | InvalidStatement);
+export type Statement = (IfStatementNode | Loop | ForkStatementNode | TryStatementNode | FlowControlStatement | CommentStatementNode | EmptyStatementNode | ExpressionStatementNode | PartialExpressionStatementNode | InvalidStatementNode);
 export type Loop = (For | WhileStatementNode);
 export type For = (ForStatementNode | RangedForStatementNode);
 export type FlowControlStatement = (ReturnStatementNode | ContinueStatementNode | BreakStatementNode);
@@ -14,7 +14,7 @@ export type Equality = (EqualsNode | UnequalsNode);
 export type Relational = (GreaterThanNode | LessThanNode | GreaterOrEqualNode | LessOrEqualNode);
 export type Shift = (ShiftLeftNode | ShiftRightNode);
 export type Arithmetic = (AdditionNode | SubtractionNode | MultiplicationNode | DivisionNode | ModulationNode | NegativeNode);
-export type Invocation = (VerbInvocationNode | ComputedVerbInvocationNode | CorifiedVerbInvocationNode | BuiltInFunctionInvocationNode);
+export type Invocation = (VerbInvocationNode | ComputedVerbInvocationNode | CorifiedVerbInvocationNode | BuiltInFunctionInvocationNode | PartialVerbInvocationNode);
 export type Value = (Literal | Reference | ListNode | MapNode | MapEntryNode | ListSplicerNode | ErrorCatcherNode | PropertyAccessor | Indexer | ParenthesisNode);
 export type PropertyAccessor = (PropertyAccessorNode | ComputedPropertyAccessorNode);
 export type Indexer = (ArgumentIndexerNode | RangeIndexerNode);
@@ -29,7 +29,7 @@ function getDepthIndent(depth: number): string {
 	return ''.padStart(depth * 2, ' ');
 }
 
-export class InvalidStatement extends BaseNode {
+export class InvalidStatementNode extends BaseNode {
 	private _data: string;
 
 	public constructor(position: ContextPosition, data: string) {
@@ -574,6 +574,34 @@ export class ExpressionStatementNode extends BaseNode {
 	}
 }
 
+export class PartialExpressionStatementNode extends BaseNode {
+	private _depth: number;
+
+	private _expression: Expression | undefined;
+
+	public get expression() {
+		return this._expression;
+	}
+
+	public constructor(depth: number, position: ContextPosition, expression: Expression | undefined) {
+		super(position);
+
+		this._depth = depth;
+
+		this._expression = expression;
+	}
+
+	public toString(lineInfo = true): string {
+		const base = lineInfo ? ` (${super.toString(lineInfo)})` : '';
+
+		return `${getDepthIndent(this._depth)}${this._expression?.toString(lineInfo)}${base}`;
+	}
+
+	public isPartial(): boolean {
+		return true;
+	}
+}
+
 export class VariableAssignmentNode extends BaseNode {
 	private _variable: VariableNode | undefined;
 	private _value: Expression | undefined;
@@ -929,6 +957,34 @@ export class VerbInvocationNode extends BaseNode {
 
 	public toString(lineInfo = true): string {
 		return `${this._invokedEntity?.toString(lineInfo)}:${this._verbName}(${this._verbArguments.map(x => x?.toString(lineInfo)).join(', ')})`;
+	}
+}
+
+export class PartialVerbInvocationNode extends BaseNode {
+	private _invokedEntity: Expression | undefined;
+	private _verbName: string | undefined;
+
+	public get invokedEntity() {
+		return this._invokedEntity;
+	}
+
+	public get verbName() {
+		return this._verbName
+	}
+
+	public constructor(position: ContextPosition, invokedEntity: Expression | undefined, verbName: string | undefined) {
+		super(position);
+
+		this._invokedEntity = invokedEntity;
+		this._verbName = verbName;
+	}
+
+	public toString(lineInfo = true): string {
+		return `${this._invokedEntity?.toString(lineInfo)}:${this._verbName}(`;
+	}
+
+	public isPartial(): boolean {
+		return true;
 	}
 }
 
