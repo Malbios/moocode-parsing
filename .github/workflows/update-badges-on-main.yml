@@ -42,16 +42,6 @@ jobs:
           cd repo
           npm ci
 
-      - run: |
-          cd repo
-          npm run clean:grammar
-          cp ./src/grammar/MoocodeLexer.g4 ./
-          cp ./src/grammar/MoocodeParser.g4 ./
-          java -jar ./bin/antlr-4.13.1-complete.jar -Dlanguage=TypeScript ./MoocodeLexer.g4
-          java -jar ./bin/antlr-4.13.1-complete.jar -Dlanguage=TypeScript -listener -visitor ./MoocodeParser.g4
-          mkdir ./src/grammar/generated
-          mv ./Moocode*.ts ./src/grammar/generated
-
       - name: Run tests with coverage
         run: |
           cd repo
