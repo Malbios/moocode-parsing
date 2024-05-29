@@ -5,7 +5,7 @@ export type Statement = (IfStatementNode | Loop | ForkStatementNode | TryStateme
 export type Loop = (For | WhileStatementNode);
 export type For = (ForStatementNode | RangedForStatementNode);
 export type FlowControlStatement = (ReturnStatementNode | ContinueStatementNode | BreakStatementNode);
-export type Expression = (Assignment | Computation | Invocation | Value);
+export type Expression = (Assignment | Computation | Invocation | Value | InvalidExpressionNode);
 export type Computation = (Bitwise | Logical | Equality | Relational | Shift | Arithmetic);
 export type Assignment = (VariableAssignmentNode | PropertyAssignmentNode | ListAssignmentNode);
 export type Logical = (ConditionalNode | ConditionalInNode | ConditionalAndNode | ConditionalOrNode | NegatedNode);
@@ -14,12 +14,12 @@ export type Equality = (EqualsNode | UnequalsNode);
 export type Relational = (GreaterThanNode | LessThanNode | GreaterOrEqualNode | LessOrEqualNode);
 export type Shift = (ShiftLeftNode | ShiftRightNode);
 export type Arithmetic = (AdditionNode | SubtractionNode | MultiplicationNode | DivisionNode | ModulationNode | NegativeNode);
-export type Invocation = (VerbInvocationNode | ComputedVerbInvocationNode | CorifiedVerbInvocationNode | BuiltInFunctionInvocationNode | PartialVerbInvocationNode);
+export type Invocation = (VerbInvocationNode | PartialVerbInvocationNode | ComputedVerbInvocationNode | PartialComputedVerbInvocationNode | CorifiedVerbInvocationNode | PartialCorifiedVerbInvocationNode | BuiltInFunctionInvocationNode | PartialBuiltInFunctionInvocationNode);
 export type Value = (Literal | Reference | ListNode | MapNode | MapEntryNode | ListSplicerNode | ErrorCatcherNode | PropertyAccessor | Indexer | ParenthesisNode);
-export type PropertyAccessor = (PropertyAccessorNode | ComputedPropertyAccessorNode);
-export type Indexer = (ArgumentIndexerNode | RangeIndexerNode);
+export type PropertyAccessor = (PropertyAccessorNode | PartialPropertyAccessorNode | ComputedPropertyAccessorNode | PartialComputedPropertyAccessorNode);
+export type Indexer = (IndexerNode | RangeIndexerNode);
 export type Reference = (Variable | ObjectIdNode);
-export type Variable = (VariableNode | OptionalTargetNode | CorifiedValueNode);
+export type Variable = (VariableNode | OptionalVariableNode | CorifiedValueNode);
 export type Literal = (BooleanNode | IntegerNode | FloatNode | StringNode | ErrorCodeNode | RangeStartNode | RangeEndNode);
 
 export type Int64 = number;
@@ -30,17 +30,42 @@ function getDepthIndent(depth: number): string {
 }
 
 export class InvalidStatementNode extends BaseNode {
-	private _data: string;
+	private _text: string;
 
-	public constructor(position: ContextPosition, data: string) {
-		super(position);
-
-		this._data = data;
+	public get text() {
+		return this._text;
 	}
 
-	// eslint-disable-next-line @typescript-eslint/no-unused-vars
+	public constructor(position: ContextPosition, text: string) {
+		super(position);
+
+		this._text = text;
+	}
+
 	public toString(lineInfo?: boolean): string {
-		return `${this._data}`;
+		const base = lineInfo ? ` (${super.toString(lineInfo)})` : '';
+
+		return `${this._text}${base}`;
+	}
+}
+
+export class InvalidExpressionNode extends BaseNode {
+	private _text: string;
+
+	public get text() {
+		return this._text;
+	}
+
+	public constructor(position: ContextPosition, text: string) {
+		super(position);
+
+		this._text = text;
+	}
+
+	public toString(lineInfo?: boolean): string {
+		const base = lineInfo ? ` (${super.toString(lineInfo)})` : '';
+
+		return `${this._text}${base}`;
 	}
 }
 
@@ -627,7 +652,7 @@ export class VariableAssignmentNode extends BaseNode {
 }
 
 export class OptionalTargetAssignmentNode extends BaseNode {
-	private _variable: OptionalTargetNode | undefined;
+	private _variable: OptionalVariableNode | undefined;
 	private _value: Expression | undefined;
 
 	public get variable() {
@@ -638,7 +663,7 @@ export class OptionalTargetAssignmentNode extends BaseNode {
 		return this._value;
 	}
 
-	public constructor(position: ContextPosition, variable: OptionalTargetNode | undefined, value: Expression | undefined) {
+	public constructor(position: ContextPosition, variable: OptionalVariableNode | undefined, value: Expression | undefined) {
 		super(position);
 
 		this._variable = variable;
@@ -828,7 +853,7 @@ export class ParenthesisNode extends WrappedNode<Expression> {
 	}
 }
 
-export class ArgumentIndexerNode extends BaseNode {
+export class IndexerNode extends BaseNode {
 	private _indexedEntity: Expression | undefined;
 	private _argument: Expression | undefined;
 
@@ -848,7 +873,26 @@ export class ArgumentIndexerNode extends BaseNode {
 	}
 
 	public toString(lineInfo = true): string {
-		return `${this._indexedEntity?.toString(lineInfo)}[${this._argument?.toString(lineInfo)}]`;
+		const indexedEntity = this._indexedEntity?.toString(lineInfo);
+		const indexerArgument = this._argument?.toString(lineInfo);
+
+		return `${indexedEntity}[${indexerArgument}]`;
+	}
+}
+
+export class PartialIndexerNode extends IndexerNode {
+	public toString(lineInfo = true): string {
+		const result = super.toString(lineInfo);
+
+		if (result.endsWith(']')) {
+			return result.slice(0, result.length - 1);
+		}
+
+		return result;
+	}
+
+	public isPartial(): boolean {
+		return true;
 	}
 }
 
@@ -862,11 +906,11 @@ export class RangeIndexerNode extends BaseNode {
 	}
 
 	public get start() {
-		return this._start
+		return this._start;
 	}
 
 	public get end() {
-		return this._end
+		return this._end;
 	}
 
 	public constructor(position: ContextPosition, object: Expression | undefined, start: Expression | undefined, end: Expression | undefined) {
@@ -883,104 +927,126 @@ export class RangeIndexerNode extends BaseNode {
 }
 
 export class PropertyAccessorNode extends BaseNode {
-	private _accessedEntity: Expression | undefined;
-	private _propertyName: string | undefined;
+	protected _accessedEntity: Expression | undefined;
+	private _name: string | undefined;
 
 	public get accessedEntity() {
 		return this._accessedEntity;
 	}
 
-	public get propertyName() {
-		return this._propertyName
+	public get name() {
+		return this._name;
 	}
 
 	public constructor(position: ContextPosition, accessedEntity: Expression | undefined, propertyName: string | undefined) {
 		super(position);
 
 		this._accessedEntity = accessedEntity;
-		this._propertyName = propertyName;
+		this._name = propertyName;
 	}
 
 	public toString(lineInfo = true): string {
-		return `${this._accessedEntity?.toString(lineInfo)}.${this._propertyName}`;
+		const object = this._accessedEntity?.toString(lineInfo);
+		const property = this._name ? this._name : '';
+
+		return `${object}.${property}`;
+	}
+
+}
+export class PartialPropertyAccessorNode extends PropertyAccessorNode {
+	public isPartial(): boolean {
+		return true;
 	}
 }
 
 export class ComputedPropertyAccessorNode extends BaseNode {
 	private _accessedEntity: Expression | undefined;
-	private _propertyName: Expression | undefined;
+	private _name: Expression | undefined;
 
 	public get accessedEntity() {
 		return this._accessedEntity;
 	}
 
-	public get propertyName() {
-		return this._propertyName
+	public get name() {
+		return this._name;
 	}
 
 	public constructor(position: ContextPosition, accessedEntity: Expression | undefined, propertyName: Expression | undefined) {
 		super(position);
 
 		this._accessedEntity = accessedEntity;
-		this._propertyName = propertyName;
+		this._name = propertyName;
 	}
 
 	public toString(lineInfo = true): string {
-		return `${this._accessedEntity?.toString(lineInfo)}.(${this._propertyName?.toString(lineInfo)})`;
+		const object = this._accessedEntity?.toString(lineInfo);
+		const property = this._name ? this._name : '';
+
+		return `${object}.(${property})`;
+	}
+}
+
+export class PartialComputedPropertyAccessorNode extends ComputedPropertyAccessorNode {
+	public toString(lineInfo = true): string {
+		const result = super.toString(lineInfo);
+
+		if (result.endsWith(')')) {
+			return result.slice(0, result.length - 1);
+		}
+
+		return result;
+	}
+
+	public isPartial(): boolean {
+		return true;
 	}
 }
 
 export class VerbInvocationNode extends BaseNode {
 	private _invokedEntity: Expression | undefined;
-	private _verbName: string | undefined;
-	private _verbArguments: (Expression | undefined)[];
+	private _name: string | undefined;
+	private _arguments: (Expression | undefined)[];
 
 	public get invokedEntity() {
 		return this._invokedEntity;
 	}
 
-	public get verbName() {
-		return this._verbName
+	public get name() {
+		return this._name;
 	}
 
-	public get verbArguments() {
-		return this._verbArguments;
+	public get arguments() {
+		return this._arguments;
 	}
 
 	public constructor(position: ContextPosition, invokedEntity: Expression | undefined, verbName: string | undefined, verbArguments: (Expression | undefined)[]) {
 		super(position);
 
 		this._invokedEntity = invokedEntity;
-		this._verbName = verbName;
-		this._verbArguments = verbArguments;
+		this._name = verbName;
+		this._arguments = verbArguments;
 	}
 
 	public toString(lineInfo = true): string {
-		return `${this._invokedEntity?.toString(lineInfo)}:${this._verbName}(${this._verbArguments.map(x => x?.toString(lineInfo)).join(', ')})`;
+		const object = this._invokedEntity?.toString(lineInfo);
+		const verbName = this._name ? this._name : '';
+		const openParens = verbName === '' ? '' : '(';
+		const verbArguments = this._arguments.map(x => x?.toString(lineInfo)).join(', ');
+		const closeParens = openParens === '' ? '' : ')';
+
+		return `${object}:${verbName}${openParens}${verbArguments}${closeParens}`;
 	}
 }
 
-export class PartialVerbInvocationNode extends BaseNode {
-	private _invokedEntity: Expression | undefined;
-	private _verbName: string | undefined;
-
-	public get invokedEntity() {
-		return this._invokedEntity;
-	}
-
-	public get verbName() {
-		return this._verbName
-	}
-
-	public constructor(position: ContextPosition, invokedEntity: Expression | undefined, verbName: string | undefined) {
-		super(position);
-
-		this._invokedEntity = invokedEntity;
-		this._verbName = verbName;
-	}
-
+export class PartialVerbInvocationNode extends VerbInvocationNode {
 	public toString(lineInfo = true): string {
-		return `${this._invokedEntity?.toString(lineInfo)}:${this._verbName}(`;
+		const result = super.toString(lineInfo);
+
+		if (result.endsWith(')')) {
+			return result.slice(0, result.length - 1);
+		}
+
+		return result;
 	}
 
 	public isPartial(): boolean {
@@ -990,79 +1056,141 @@ export class PartialVerbInvocationNode extends BaseNode {
 
 export class ComputedVerbInvocationNode extends BaseNode {
 	private _invokedEntity: Expression | undefined;
-	private _verbName: Expression | undefined;
-	private _verbArguments: (Expression | undefined)[];
+	private _name: Expression | undefined;
+	private _arguments: (Expression | undefined)[];
 
 	public get invokedEntity() {
 		return this._invokedEntity;
 	}
 
-	public get verbName() {
-		return this._verbName
+	public get name() {
+		return this._name;
 	}
 
-	public get verbArguments() {
-		return this._verbArguments;
+	public get arguments() {
+		return this._arguments;
 	}
 
 	public constructor(position: ContextPosition, invokedEntity: Expression | undefined, verbName: Expression | undefined, verbArguments: (Expression | undefined)[]) {
 		super(position);
 
 		this._invokedEntity = invokedEntity;
-		this._verbName = verbName;
-		this._verbArguments = verbArguments;
+		this._name = verbName;
+		this._arguments = verbArguments;
 	}
 
 	public toString(lineInfo = true): string {
-		return `${this._invokedEntity?.toString(lineInfo)}:(${this._verbName?.toString(lineInfo)})(${this._verbArguments.map(x => x?.toString(lineInfo)).join(', ')})`;
+		const object = this._invokedEntity?.toString(lineInfo);
+		const verbName = this._name ? this._name.toString(lineInfo) : '';
+		const closeParensVerbName = verbName === '' ? '' : ')';
+		const openParensArguments = closeParensVerbName === '' ? '' : '(';
+		const verbArguments = this._arguments.map(x => x?.toString(lineInfo)).join(', ');
+		const closeParensArguments = openParensArguments === '' ? '' : ')';
+
+		return `${object}:(${verbName}${closeParensVerbName}${openParensArguments}${verbArguments}${closeParensArguments}`;
+	}
+}
+
+export class PartialComputedVerbInvocationNode extends ComputedVerbInvocationNode {
+	public toString(lineInfo = true): string {
+		const result = super.toString(lineInfo);
+
+		if (result.endsWith(')')) {
+			return result.slice(0, result.length - 1);
+		}
+
+		return result;
+	}
+
+	public isPartial(): boolean {
+		return true;
 	}
 }
 
 export class CorifiedVerbInvocationNode extends BaseNode {
 	private _invokedEntity: Expression | undefined;
-	private _verbArguments: (Expression | undefined)[];
+	private _arguments: (Expression | undefined)[];
 
 	public get invokedEntity() {
 		return this._invokedEntity;
 	}
 
-	public get verbArguments() {
-		return this._verbArguments;
+	public get arguments() {
+		return this._arguments;
 	}
 
 	public constructor(position: ContextPosition, invokedEntity: Expression | undefined, verbArguments: (Expression | undefined)[]) {
 		super(position);
 
 		this._invokedEntity = invokedEntity;
-		this._verbArguments = verbArguments;
+		this._arguments = verbArguments;
 	}
 
 	public toString(lineInfo = true): string {
-		return `${this._invokedEntity?.toString(lineInfo)}(${this._verbArguments.map(x => x?.toString(lineInfo)).join(', ')})`;
+		const object = this._invokedEntity?.toString(lineInfo);
+		const verbArguments = this._arguments.map(x => x?.toString(lineInfo)).join(', ');
+
+		return `${object}(${verbArguments})`;
+
+	}
+}
+
+export class PartialCorifiedVerbInvocationNode extends CorifiedVerbInvocationNode {
+	public toString(lineInfo = true): string {
+		const result = super.toString(lineInfo);
+
+		if (result.endsWith(')')) {
+			return result.slice(0, result.length - 1);
+		}
+
+		return result;
+	}
+
+	public isPartial(): boolean {
+		return true;
 	}
 }
 
 export class BuiltInFunctionInvocationNode extends BaseNode {
-	private _functionName: string | undefined;
-	private _functionArguments: (Expression | undefined)[];
+	private _invokedEntity: Expression | undefined;
+	private _arguments: (Expression | undefined)[];
 
-	public get functionName() {
-		return this._functionName
+	public get invokedEntity() {
+		return this._invokedEntity;
 	}
 
-	public get functionArguments() {
-		return this._functionArguments;
+	public get arguments() {
+		return this._arguments;
 	}
 
-	public constructor(position: ContextPosition, functionName: string | undefined, functionArguments: (Expression | undefined)[]) {
+	public constructor(position: ContextPosition, invokedEntity: Expression | undefined, functionArguments: (Expression | undefined)[]) {
 		super(position);
 
-		this._functionName = functionName;
-		this._functionArguments = functionArguments;
+		this._invokedEntity = invokedEntity;
+		this._arguments = functionArguments;
 	}
 
 	public toString(lineInfo = true): string {
-		return `${this._functionName}(${this._functionArguments.map(x => x?.toString(lineInfo)).join(', ')})`;
+		const invokedEntity = this._invokedEntity?.toString(lineInfo);
+		const functionArguments = this._arguments.map(x => x?.toString(lineInfo)).join(', ');
+
+		return `${invokedEntity}(${functionArguments})`;
+	}
+}
+
+export class PartialBuiltInFunctionInvocationNode extends BuiltInFunctionInvocationNode {
+	public toString(lineInfo = true): string {
+		const result = super.toString(lineInfo);
+
+		if (result.endsWith(')')) {
+			return result.slice(0, result.length - 1);
+		}
+
+		return result;
+	}
+
+	public isPartial(): boolean {
+		return true;
 	}
 }
 
@@ -1193,7 +1321,7 @@ export class VariableNode extends ReferenceNode {
 	}
 }
 
-export class OptionalTargetNode extends WrappedNode<VariableNode> {
+export class OptionalVariableNode extends WrappedNode<VariableNode> {
 	public toString(lineInfo = true): string {
 		return `?${this._value?.toString(lineInfo)}`;
 	}

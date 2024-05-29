@@ -74,4 +74,4 @@ class CustomReporter extends reporters.Base {
 	}
 }
 
-module.exports = CustomReporter
+module.exports = CustomReporter;

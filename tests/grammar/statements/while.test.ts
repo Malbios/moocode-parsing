@@ -26,10 +26,7 @@ endwhile
 
     expect(whileStatement?.statements().statement_list()).to.have.length(1);
 
-    const primaryExpression = ParsingHelpers.getPrimaryExpression(whileStatement?.statements().statement(0));
-    ExpectHelpers.expectIdentifier(primaryExpression?._pe, 'x');
-    expect(primaryExpression?.bf_invocation_list()).to.have.length(1);
-    expect(primaryExpression?.bf_invocation(0)._arguments).to.not.exist;
+    ExpectHelpers.expectBuiltInFunctionWithNoArguments(whileStatement?.statements().statement(0), 'x');
   });
 
   test('should parse a while loop with name', () => {
@@ -53,9 +50,6 @@ endwhile
 
     expect(whileStatement?.statements().statement_list()).to.have.length(1);
 
-    const primaryExpression = ParsingHelpers.getPrimaryExpression(whileStatement?.statements().statement(0));
-    ExpectHelpers.expectIdentifier(primaryExpression?._pe, 'x');
-    expect(primaryExpression?.bf_invocation_list()).to.have.length(1);
-    expect(primaryExpression?.bf_invocation(0)._arguments).to.not.exist;
+    ExpectHelpers.expectBuiltInFunctionWithNoArguments(whileStatement?.statements().statement(0), 'x');
   });
 });

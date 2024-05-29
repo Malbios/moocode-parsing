@@ -142,7 +142,7 @@ export class FlowControlStatementNode<T extends BaseNode> extends BaseNode {
 	}
 }
 
-export abstract class MoocodeVisitor<T extends BaseNode> extends MoocodeParserVisitor<T | undefined> {
+export abstract class MoocodeVisitor<T extends BaseNode | undefined> extends MoocodeParserVisitor<T | undefined> {
 	public override visit(tree: ParseTree): T | undefined {
 		const result = super.visit(tree);
 

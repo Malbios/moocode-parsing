@@ -1,6 +1,5 @@
 import { ParserRuleContext, TerminalNode, Token } from 'antlr4';
 
-import { InvalidOperationError } from './error';
 
 export enum ErrorCode {
 	ANY,
@@ -28,30 +27,30 @@ export enum ErrorCode {
 export class ContextPosition {
 	private static _default = new ContextPosition(new Token(), undefined);
 
-	private _start: Token;
+	private _start: Token | undefined;
 	private _stop: Token | undefined;
 
-	public get start(): number {
-		return this._start.start;
+	public get start() {
+		return this._start?.start ?? -1;
 	}
 
-	public get stop(): number {
-		return this._stop?.stop ?? 0;
+	public get stop() {
+		return this._stop?.stop ?? -1;
 	}
 
-	public get startToken(): Token {
+	public get startToken() {
 		return this._start;
 	}
 
-	public get stopToken(): Token | undefined {
+	public get stopToken() {
 		return this._stop;
 	}
 
 	public get range(): string {
-		const start = `${this._start.line}:${this._start.column}`;
-		const stopLine = this._stop?.line ?? 0;
+		const start = `${this._start?.line ?? -1}:${this._start?.column ?? -1}`;
+		const stopLine = this._stop?.line ?? -1;
 
-		let stopColumn = this._stop?.column ?? 0;
+		let stopColumn = this._stop?.column ?? -1;
 		if (this._stop) {
 			stopColumn += this._stop.getInputStream().getText(this._stop.start, this._stop.stop).length;
 		}
@@ -61,7 +60,7 @@ export class ContextPosition {
 		return `${start} - ${stop}`;
 	}
 
-	private constructor(start: Token, stop: Token | undefined) {
+	private constructor(start: Token | undefined, stop: Token | undefined) {
 		this._start = start;
 		this._stop = stop;
 	}
@@ -78,31 +77,19 @@ export class ContextPosition {
 		const start = context.start;
 		const stop = context.stop;
 
-		// if ((stop?.stop ?? 0) < start.start) {
-		// 	throw new InvalidOperationError('stop cannot be before start');
-		// }
-
 		return new ContextPosition(start, stop);
 	}
 
-	public static fromValues(start: Token, stop: Token | undefined): ContextPosition {
-		if (start.start < 0) {
-			throw new InvalidOperationError('start cannot be negative');
-		}
-
-		if ((stop?.stop ?? 0) < 0) {
-			throw new InvalidOperationError('stop cannot be negative');
-		}
-
-		if ((stop?.stop ?? 0) < start.start) {
-			throw new InvalidOperationError('stop cannot be before start');
-		}
-
+	public static fromValues(start: Token | undefined, stop: Token | undefined): ContextPosition {
 		return new ContextPosition(start, stop);
 	}
 }
 
-export function getContextAsText<T extends ParserRuleContext>(context: T): string {
+export function getContextAsText<T extends ParserRuleContext>(context: T | undefined): string {
+	if (!context) {
+		return '';
+	}
+
 	const input = context.start.getInputStream();
 	const stop = context.stop?.stop ?? input.size;
 

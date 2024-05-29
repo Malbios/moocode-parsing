@@ -12,7 +12,7 @@ suite('AST tests for assignments', () => {
 		const variableAssignmentNode = statementNode.expression as VariableAssignmentNode;
 		expect(variableAssignmentNode.variable?.name).to.equal('x');
 
-		const valueNode = variableAssignmentNode.value as StringNode
+		const valueNode = variableAssignmentNode.value as StringNode;
 		expect(valueNode.value).to.equal('abc');
 	});
 
@@ -24,7 +24,7 @@ suite('AST tests for assignments', () => {
 		const variableAssignmentNode = statementNode.expression as VariableAssignmentNode;
 		expect(variableAssignmentNode.variable?.name).to.equal('x');
 
-		const valueNode = variableAssignmentNode.value as FloatNode
+		const valueNode = variableAssignmentNode.value as FloatNode;
 		expect(valueNode.value).to.equal(1.2);
 	});
 
@@ -36,7 +36,7 @@ suite('AST tests for assignments', () => {
 		const variableAssignmentNode = statementNode.expression as VariableAssignmentNode;
 		expect(variableAssignmentNode.variable?.name).to.equal('x');
 
-		const valueNode = variableAssignmentNode.value as IntegerNode
+		const valueNode = variableAssignmentNode.value as IntegerNode;
 		expect(valueNode.value).to.equal(1438);
 	});
 
@@ -48,7 +48,7 @@ suite('AST tests for assignments', () => {
 		const variableAssignmentNode = statementNode.expression as VariableAssignmentNode;
 		expect(variableAssignmentNode.variable?.name).to.equal('x');
 
-		const valueNode = variableAssignmentNode.value as BooleanNode
+		const valueNode = variableAssignmentNode.value as BooleanNode;
 		expect(valueNode.value).to.equal(true);
 	});
 
@@ -99,7 +99,7 @@ suite('AST tests for assignments', () => {
 		const variableNodeC = listAssignmentNode.list?.elements.at(2) as VariableNode;
 		expect(variableNodeC.name).to.equal('c');
 
-		const valueNode = listAssignmentNode.value as VariableNode
+		const valueNode = listAssignmentNode.value as VariableNode;
 		expect(valueNode.name).to.equal('args');
 	});
 
@@ -111,13 +111,13 @@ suite('AST tests for assignments', () => {
 		const propertyAssignmentNode = statementNode.expression as PropertyAssignmentNode;
 
 		const targetProperty = propertyAssignmentNode.property as PropertyAccessorNode;
-		expect(targetProperty.propertyName).to.equal('name');
+		expect(targetProperty.name).to.equal('name');
 
 		const targetPropertyObject = targetProperty.accessedEntity as VariableNode;
 		expect(targetPropertyObject.name).to.equal('bob');
 
 		const valueProperty = propertyAssignmentNode.value as PropertyAccessor;
-		expect(valueProperty.propertyName).to.equal('surname');
+		expect(valueProperty.name).to.equal('surname');
 
 		const valuePropertyObject = valueProperty.accessedEntity as VariableNode;
 		expect(valuePropertyObject.name).to.equal('smurf');

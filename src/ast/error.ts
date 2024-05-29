@@ -121,34 +121,92 @@ export class LexerErrorListener extends ErrorListener<number> {
 	}
 }
 
-export class MergedContext extends ParserRuleContext {
-	public constructor(contexts: ParserRuleContext[]) {
-		if (contexts.length < 1) {
-			throw new InvalidOperationError('cannot create merged context from no contexts');
-		}
+export class ContextWithError extends ParserRuleContext {
+	private _error: RecognitionException;
 
-		super(undefined, contexts[0].invokingState);
-
-		this.children = contexts;
+	public get child(): ParserRuleContext | undefined {
+		return this.children?.at(0) as ParserRuleContext;
 	}
 
-	public getText(): string {
-		const firstChild = this.children?.at(0) as ParserRuleContext;
-		const lastChild = this.children?.at(this.children.length - 1) as ParserRuleContext;
+	public get error() {
+		return this._error;
+	}
 
-		const inputStream = firstChild?.start.getInputStream();
-		if (!inputStream) {
+	public get position() {
+		if (!this.child) {
+			return ContextPosition.default;
+		}
+
+		return ContextPosition.fromContext(this.child);
+	}
+
+	public get text() {
+		if (!this.child) {
 			return '';
 		}
 
-		const stop = lastChild.stop?.stop ?? inputStream.size;
+		return getContextAsText(this.child);
+	}
 
-		return inputStream.getText(firstChild.start.start, stop);
+	public constructor(context: ParserRuleContext, error: RecognitionException) {
+		super(context.parentCtx, context.invokingState);
+
+		this._error = error;
+		this.children = [context];
 	}
 }
 
 export class CustomErrorStrategy extends DefaultErrorStrategy {
+	recoverInline(recognizer: Parser): Token {
+		const result = super.recoverInline(recognizer);
+		return result;
+	}
+
+	recover(recognizer: Parser, e: RecognitionException): void {
+		super.recover(recognizer, e);
+
+		return;
+	}
+
+	sync(recognizer: Parser): void {
+		super.sync(recognizer);
+
+		return;
+	}
+
 	getMissingSymbol(recognizer: Parser): Token {
-		return recognizer.getCurrentToken();
+		const result = super.getMissingSymbol(recognizer);
+
+		return result;
+	}
+
+	reset(recognizer: Parser): void {
+		super.reset(recognizer);
+
+		return;
+	}
+
+	beginErrorCondition(recognizer: Parser): void {
+		super.beginErrorCondition(recognizer);
+
+		return;
+	}
+
+	inErrorRecoveryMode(recognizer: Parser): boolean {
+		const result = super.inErrorRecoveryMode(recognizer);
+
+		return result;
+	}
+
+	reportError(recognizer: Parser, e: RecognitionException): void {
+		super.reportError(recognizer, e);
+
+		return;
+	}
+
+	reportMatch(recognizer: Parser): void {
+		super.reportMatch(recognizer);
+
+		return;
 	}
 }

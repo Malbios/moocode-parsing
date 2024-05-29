@@ -3,7 +3,10 @@
 import {ParseTreeVisitor} from 'antlr4';
 
 
+import { Property_accessorContext } from "./MoocodePartialParser";
 import { Verb_invocationContext } from "./MoocodePartialParser";
+import { Corified_verb_invocationContext } from "./MoocodePartialParser";
+import { Bf_invocationContext } from "./MoocodePartialParser";
 import { MoocodeContext } from "./MoocodePartialParser";
 import { StatementContext } from "./MoocodePartialParser";
 import { StatementsContext } from "./MoocodePartialParser";
@@ -52,9 +55,7 @@ import { Negative_unary_expressionContext } from "./MoocodePartialParser";
 import { Negated_unary_expressionContext } from "./MoocodePartialParser";
 import { Complement_unary_expressionContext } from "./MoocodePartialParser";
 import { Primary_expressionContext } from "./MoocodePartialParser";
-import { Property_accessorContext } from "./MoocodePartialParser";
 import { ExpressionsContext } from "./MoocodePartialParser";
-import { Bf_invocationContext } from "./MoocodePartialParser";
 import { Primary_expression_startContext } from "./MoocodePartialParser";
 import { Parenthesis_expressionContext } from "./MoocodePartialParser";
 import { Error_catcherContext } from "./MoocodePartialParser";
@@ -66,7 +67,7 @@ import { List_splicerContext } from "./MoocodePartialParser";
 import { Object_referenceContext } from "./MoocodePartialParser";
 import { Object_idContext } from "./MoocodePartialParser";
 import { Corified_valueContext } from "./MoocodePartialParser";
-import { Optional_targetContext } from "./MoocodePartialParser";
+import { Optional_variableContext } from "./MoocodePartialParser";
 import { LiteralContext } from "./MoocodePartialParser";
 import { Bool_literalContext } from "./MoocodePartialParser";
 import { String_literalContext } from "./MoocodePartialParser";
@@ -87,11 +88,29 @@ import { IdentifierContext } from "./MoocodePartialParser";
  */
 export default class MoocodePartialParserVisitor<Result> extends ParseTreeVisitor<Result> {
 	/**
+	 * Visit a parse tree produced by `MoocodePartialParser.property_accessor`.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	visitProperty_accessor?: (ctx: Property_accessorContext) => Result;
+	/**
 	 * Visit a parse tree produced by `MoocodePartialParser.verb_invocation`.
 	 * @param ctx the parse tree
 	 * @return the visitor result
 	 */
 	visitVerb_invocation?: (ctx: Verb_invocationContext) => Result;
+	/**
+	 * Visit a parse tree produced by `MoocodePartialParser.corified_verb_invocation`.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	visitCorified_verb_invocation?: (ctx: Corified_verb_invocationContext) => Result;
+	/**
+	 * Visit a parse tree produced by `MoocodePartialParser.bf_invocation`.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	visitBf_invocation?: (ctx: Bf_invocationContext) => Result;
 	/**
 	 * Visit a parse tree produced by `MoocodePartialParser.moocode`.
 	 * @param ctx the parse tree
@@ -381,23 +400,11 @@ export default class MoocodePartialParserVisitor<Result> extends ParseTreeVisito
 	 */
 	visitPrimary_expression?: (ctx: Primary_expressionContext) => Result;
 	/**
-	 * Visit a parse tree produced by `MoocodePartialParser.property_accessor`.
-	 * @param ctx the parse tree
-	 * @return the visitor result
-	 */
-	visitProperty_accessor?: (ctx: Property_accessorContext) => Result;
-	/**
 	 * Visit a parse tree produced by `MoocodePartialParser.expressions`.
 	 * @param ctx the parse tree
 	 * @return the visitor result
 	 */
 	visitExpressions?: (ctx: ExpressionsContext) => Result;
-	/**
-	 * Visit a parse tree produced by `MoocodePartialParser.bf_invocation`.
-	 * @param ctx the parse tree
-	 * @return the visitor result
-	 */
-	visitBf_invocation?: (ctx: Bf_invocationContext) => Result;
 	/**
 	 * Visit a parse tree produced by `MoocodePartialParser.primary_expression_start`.
 	 * @param ctx the parse tree
@@ -465,11 +472,11 @@ export default class MoocodePartialParserVisitor<Result> extends ParseTreeVisito
 	 */
 	visitCorified_value?: (ctx: Corified_valueContext) => Result;
 	/**
-	 * Visit a parse tree produced by `MoocodePartialParser.optional_target`.
+	 * Visit a parse tree produced by `MoocodePartialParser.optional_variable`.
 	 * @param ctx the parse tree
 	 * @return the visitor result
 	 */
-	visitOptional_target?: (ctx: Optional_targetContext) => Result;
+	visitOptional_variable?: (ctx: Optional_variableContext) => Result;
 	/**
 	 * Visit a parse tree produced by `MoocodePartialParser.literal`.
 	 * @param ctx the parse tree

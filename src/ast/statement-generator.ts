@@ -7,7 +7,7 @@ import { ExpressionGenerator } from './expression-generator';
 import { BreakStatementNode, CommentStatementNode, ContinueStatementNode, ElseIfNode, ElseNode, EmptyStatementNode, ErrorCodeNode, ExceptNode, Expression, ExpressionStatementNode, FinallyNode, ForStatementNode, ForkStatementNode, IfNode, IfStatementNode, PartialExpressionStatementNode, PartialVerbInvocationNode, RangedForStatementNode, ReturnStatementNode, Statement, StringNode, TryStatementNode, VariableNode, WhileStatementNode } from './nodes';
 import { ValueGenerator } from './value-generator';
 
-function generateIfNode(depth: number, context: If_expressionContext | Elseif_expressionContext): IfNode | ElseIfNode {
+function generateIfNode(depth: number, context: If_expressionContext | Elseif_expressionContext, isIf = true, isElseIf = false): IfNode | ElseIfNode {
 	const conditions = ExpressionGenerator.generate<Expression>(context._conditions);
 	const body = StatementGenerator.generateStatements(context._body.statement_list(), depth + 1);
 
@@ -15,9 +15,11 @@ function generateIfNode(depth: number, context: If_expressionContext | Elseif_ex
 		? ContextPosition.fromValues(context.start, conditions?.position.stopToken)
 		: ContextPosition.fromValues(context.start, (body.at(body.length - 1))?.position.stopToken);
 
-	if (context instanceof If_expressionContext) {
+	if (isIf && !isElseIf) {
 		return new IfNode(depth, position, conditions, body);
-	} else if (context instanceof Elseif_expressionContext) {
+	}
+
+	if (!isIf && isElseIf) {
 		return new ElseIfNode(depth, position, conditions, body);
 	}
 
@@ -56,14 +58,14 @@ export class StatementGenerator extends MoocodeVisitor<Statement> {
 		}
 
 		return this.visit(context.getChild(0));
-	}
+	};
 
 	public override visitIf_statement = (context: If_statementContext): IfStatementNode | undefined => {
-		const ifNode = generateIfNode(this._depth, context.if_expression()) as IfNode;
+		const ifNode = generateIfNode(this._depth, context.if_expression(), true) as IfNode;
 
 		const elseIfNodes = new Array<IfNode>();
 		for (const x of context.elseif_expression_list()) {
-			elseIfNodes.push(generateIfNode(this._depth, x) as ElseIfNode);
+			elseIfNodes.push(generateIfNode(this._depth, x, false, true) as ElseIfNode);
 		}
 
 		let elseNode: ElseNode | undefined = undefined;
@@ -74,7 +76,7 @@ export class StatementGenerator extends MoocodeVisitor<Statement> {
 		}
 
 		return new IfStatementNode(this._depth, ContextPosition.fromContext(context), ifNode, elseIfNodes, elseNode);
-	}
+	};
 
 	public override visitFor_loop_statement = (context: For_loop_statementContext): ForStatementNode | RangedForStatementNode | undefined => {
 		const position = ContextPosition.fromContext(context);
@@ -102,7 +104,7 @@ export class StatementGenerator extends MoocodeVisitor<Statement> {
 		}
 
 		throw NodeGenerationError.fromContext(context);
-	}
+	};
 
 	public override visitWhile_loop_statement = (context: While_loop_statementContext): WhileStatementNode | undefined => {
 		const position = ContextPosition.fromContext(context);
@@ -122,7 +124,7 @@ export class StatementGenerator extends MoocodeVisitor<Statement> {
 		}
 
 		return WhileStatementNode.new(this._depth, position, conditions, statements);
-	}
+	};
 
 	public override visitTry_statement = (context: Try_statementContext): TryStatementNode | undefined => {
 		const position = ContextPosition.fromContext(context);
@@ -143,7 +145,7 @@ export class StatementGenerator extends MoocodeVisitor<Statement> {
 		}
 
 		return new TryStatementNode(this._depth, position, statements, exceptNodes, finallyPart);
-	}
+	};
 
 	public override visitFork_statement = (context: Fork_statementContext): ForkStatementNode | undefined => {
 		const position = ContextPosition.fromContext(context);
@@ -157,44 +159,44 @@ export class StatementGenerator extends MoocodeVisitor<Statement> {
 		}
 
 		return ForkStatementNode.new(this._depth, position, expression, statements);
-	}
+	};
 
 	public override visitEmpty_return = (context: Empty_returnContext): ReturnStatementNode | undefined => {
 		return new ReturnStatementNode(this._depth, ContextPosition.fromContext(context));
-	}
+	};
 
 	public override visitNon_empty_return = (context: Non_empty_returnContext): ReturnStatementNode | undefined => {
 		const expression = ExpressionGenerator.generateExpression(context.expression());
 		return new ReturnStatementNode(this._depth, ContextPosition.fromContext(context), expression);
-	}
+	};
 
 	public override visitEmpty_continue = (context: Empty_continueContext): ContinueStatementNode | undefined => {
 		return new ContinueStatementNode(this._depth, ContextPosition.fromContext(context));
-	}
+	};
 
 	public override visitNon_empty_continue = (context: Non_empty_continueContext): ContinueStatementNode | undefined => {
 		const expression = ValueGenerator.generateValue(context.identifier());
 		return new ContinueStatementNode(this._depth, ContextPosition.fromContext(context), expression);
-	}
+	};
 
 	public override visitEmpty_break = (context: Empty_breakContext): BreakStatementNode | undefined => {
 		return new BreakStatementNode(this._depth, ContextPosition.fromContext(context));
-	}
+	};
 
 	public override visitNon_empty_break = (context: Non_empty_breakContext): BreakStatementNode | undefined => {
 		const expression = ValueGenerator.generateValue(context.identifier());
 		return new BreakStatementNode(this._depth, ContextPosition.fromContext(context), expression);
-	}
+	};
 
 	public override visitComment = (context: CommentContext): CommentStatementNode | undefined => {
 		const value = ValueGenerator.generate<StringNode>(context.string_literal());
 
 		return new CommentStatementNode(this._depth, ContextPosition.fromContext(context), value);
-	}
+	};
 
 	public override visitEmpty_statement = (context: Empty_statementContext): EmptyStatementNode | undefined => {
 		return new EmptyStatementNode(this._depth, ContextPosition.fromContext(context));
-	}
+	};
 
 	private constructor(depth: number) {
 		super();
@@ -202,7 +204,11 @@ export class StatementGenerator extends MoocodeVisitor<Statement> {
 		this._depth = depth;
 	}
 
-	public static generate<T extends Statement>(context: ParserRuleContext, depth: number): T | undefined {
+	public static generate<T extends Statement>(context: ParserRuleContext | undefined, depth: number): T | undefined {
+		if (!context) {
+			return undefined;
+		}
+
 		const generator = new StatementGenerator(depth);
 		const result = generator.visit(context) as T;
 
@@ -213,12 +219,16 @@ export class StatementGenerator extends MoocodeVisitor<Statement> {
 		return result;
 	}
 
-	public static generateStatement(context: ParserRuleContext, depth: number): Statement | undefined {
+	public static generateStatement(context: ParserRuleContext | undefined, depth: number): Statement | undefined {
 		return StatementGenerator.generate<Statement>(context, depth);
 	}
 
-	public static generateStatements(contexts: ParserRuleContext[], depth: number): (Statement | undefined)[] {
+	public static generateStatements(contexts: (ParserRuleContext | undefined)[] | undefined, depth: number): (Statement | undefined)[] {
 		const statementNodes = new Array<Statement>();
+
+		if (!contexts) {
+			return statementNodes;
+		}
 
 		for (const x of contexts) {
 			const statement = StatementGenerator.generateStatement(x, depth);

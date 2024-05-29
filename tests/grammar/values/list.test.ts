@@ -95,7 +95,7 @@ suite('CST tests for list values', () => {
                     testListEntries(context, [{
                         action: context =>
                             testListEntries(context, [{ action: context => ExpectHelpers.expectInteger(context, '1') }])
-                    }])
+                    }]);
                 }
             }
         ]);

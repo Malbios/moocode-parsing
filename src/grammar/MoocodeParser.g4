@@ -155,7 +155,6 @@ primary_expression:
 		indexer
 		| property_accessor
 		| verb_invocation
-		| bf_invocation
 	)*;
 
 property_accessor:
@@ -165,14 +164,13 @@ property_accessor:
 	);
 
 verb_invocation:
-	COLON identifier OPEN_PARENS arguments = expressions? CLOSE_PARENS
-	| COLON OPEN_PARENS computed_verb_arguments = expression CLOSE_PARENS OPEN_PARENS arguments =
-		expressions? CLOSE_PARENS;
+	COLON (
+		identifier OPEN_PARENS arguments = expressions? CLOSE_PARENS
+		| OPEN_PARENS computed_verb_arguments = expression CLOSE_PARENS OPEN_PARENS arguments =
+			expressions? CLOSE_PARENS
+	);
 
 expressions: expression (COMMA expression)*;
-
-bf_invocation:
-	OPEN_PARENS arguments = expressions? CLOSE_PARENS;
 
 primary_expression_start:
 	identifier
@@ -181,10 +179,18 @@ primary_expression_start:
 	| list
 	| map
 	| error_code
-	| optional_target
+	| optional_variable
 	| list_splicer
 	| error_catcher
+	| corified_verb_invocation
+	| bf_invocation
 	| parenthesis_expression;
+
+corified_verb_invocation:
+	corified_value OPEN_PARENS arguments = expressions? CLOSE_PARENS;
+
+bf_invocation:
+	identifier OPEN_PARENS arguments = expressions? CLOSE_PARENS;
 
 parenthesis_expression: OPEN_PARENS expression CLOSE_PARENS;
 
@@ -206,7 +212,7 @@ indexer:
 		| start = expression OP_RANGE end = expression
 	) CLOSE_BRACKET;
 
-list_splicer: AT identifier;
+list_splicer: AT expression;
 
 object_reference: object_id | corified_value;
 
@@ -214,7 +220,7 @@ object_id: SHARP MINUS? integer_literal;
 
 corified_value: DOLLAR identifier;
 
-optional_target: QUESTION_MARK identifier;
+optional_variable: QUESTION_MARK identifier;
 
 literal:
 	bool_literal

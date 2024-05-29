@@ -3,10 +3,12 @@ import { ParseTree, ParserRuleContext } from 'antlr4';
 import {
     Additive_expressionContext,
     And_expressionContext,
+    Bf_invocationContext,
     Conditional_and_expressionContext,
     Conditional_expressionContext,
     Conditional_in_expressionContext,
     Conditional_or_expressionContext,
+    Corified_verb_invocationContext,
     Empty_breakContext,
     Empty_continueContext,
     Empty_returnContext,
@@ -165,6 +167,16 @@ export default class ParsingHelpers {
     public static getListSplicer(context: ParserRuleContext | undefined)
         : List_splicerContext | undefined {
         return this.getContext<List_splicerContext>(context, List_splicerContext);
+    }
+
+    public static getBuiltInFunctionInvocation(context: ParserRuleContext | undefined)
+        : Bf_invocationContext | undefined {
+        return this.getContext<Bf_invocationContext>(context, Bf_invocationContext);
+    }
+
+    public static getCorifiedVerbInvocation(context: ParserRuleContext | undefined)
+        : Corified_verb_invocationContext | undefined {
+        return this.getContext<Corified_verb_invocationContext>(context, Corified_verb_invocationContext);
     }
 
     public static getErrorCatcher(context: ParserRuleContext | undefined)
