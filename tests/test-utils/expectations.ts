@@ -11,7 +11,7 @@ import moocodeParser, {
     LiteralContext,
     Object_idContext,
     Object_referenceContext,
-    Optional_targetContext,
+    Optional_variableContext,
     String_literalContext
 } from '../../src/grammar/generated/MoocodeParser';
 
@@ -57,8 +57,8 @@ export default class ExpectHelpers {
         this.expectValue<IdentifierContext>(context, IdentifierContext, expectedValue);
     }
 
-    public static expectOptionalTarget(context: ParserRuleContext | undefined, expectedValue: string) {
-        this.expectValue<Optional_targetContext>(context, Optional_targetContext, expectedValue);
+    public static expectOptionalVariable(context: ParserRuleContext | undefined, expectedValue: string) {
+        this.expectValue<Optional_variableContext>(context, Optional_variableContext, expectedValue);
     }
 
     public static expectObjectReference(context: ParserRuleContext | undefined, expectedValue: string) {
@@ -105,5 +105,12 @@ export default class ExpectHelpers {
     public static expectNonEmptyContinue(context: ParserRuleContext | undefined) {
         const foundContext = ParsingHelpers.getNonEmptyContinue(context);
         expect(foundContext).to.exist;
+    }
+
+    public static expectBuiltInFunctionWithNoArguments(context: ParserRuleContext | undefined, expectedName: string) {
+        const foundContext = ParsingHelpers.getBuiltInFunctionInvocation(context);
+        expect(foundContext).to.exist;
+        this.expectIdentifier(foundContext?.identifier(), expectedName);
+        expect(foundContext?._arguments).to.not.exist;
     }
 }

@@ -10,6 +10,6 @@ suite('CST tests for optional target values', () => {
 
 		ExpectHelpers.expectSyntaxErrors(parser, 0);
 
-		ExpectHelpers.expectOptionalTarget(result, '?abc');
+		ExpectHelpers.expectOptionalVariable(result, '?abc');
 	});
 });

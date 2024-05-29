@@ -1,46 +1,14 @@
 import { ParserRuleContext } from 'antlr4';
 import MoocodeLexer from '../grammar/generated/MoocodeLexer';
-import { Additive_expressionContext, And_expressionContext, AssignmentContext, Bf_invocationContext, Complement_unary_expressionContext, Conditional_and_expressionContext, Conditional_expressionContext, Conditional_in_expressionContext, Conditional_or_expressionContext, Equality_expressionContext, Exclusive_or_expressionContext, ExpressionsContext, Inclusive_or_expressionContext, IndexerContext, Multiplicative_expressionContext, Negated_unary_expressionContext, Negative_unary_expressionContext, Primary_expressionContext, Primary_expression_startContext, Property_accessorContext, Relational_expressionContext, Shift_expressionContext, Verb_invocationContext } from '../grammar/generated/MoocodeParser';
+import { Additive_expressionContext, And_expressionContext, AssignmentContext, Complement_unary_expressionContext, Conditional_and_expressionContext, Conditional_expressionContext, Conditional_in_expressionContext, Conditional_or_expressionContext, Equality_expressionContext, Exclusive_or_expressionContext, ExpressionsContext, Inclusive_or_expressionContext, IndexerContext, Multiplicative_expressionContext, Negated_unary_expressionContext, Negative_unary_expressionContext, Primary_expressionContext, Primary_expression_startContext, Property_accessorContext, Relational_expressionContext, Shift_expressionContext, Verb_invocationContext } from '../grammar/generated/MoocodeParser';
 import { BaseNode, MoocodeVisitor } from './abstract';
 import { ContextPosition, getContextAsText, is } from './common';
 import { NodeGenerationError } from './error';
-import { AdditionNode, ArgumentIndexerNode, BitwiseAndNode, BitwiseExclusiveOrNode, BitwiseInclusiveOrNode, BuiltInFunctionInvocationNode, ComplementNode, ComputedPropertyAccessorNode, ComputedVerbInvocationNode, ConditionalAndNode, ConditionalInNode, ConditionalNode, ConditionalOrNode, CorifiedVerbInvocationNode, DivisionNode, EqualsNode, Expression, GreaterOrEqualNode, GreaterThanNode, Indexer, Invocation, LessOrEqualNode, LessThanNode, ListAssignmentNode, ListNode, ModulationNode, MultiplicationNode, NegatedNode, NegativeNode, OptionalTargetAssignmentNode, OptionalTargetNode, PartialVerbInvocationNode, PropertyAccessor, PropertyAccessorNode, PropertyAssignmentNode, RangeIndexerNode, ShiftLeftNode, ShiftRightNode, SubtractionNode, UnequalsNode, Value, VariableAssignmentNode, VariableNode, VerbInvocationNode } from './nodes';
+import { AdditionNode, BitwiseAndNode, BitwiseExclusiveOrNode, BitwiseInclusiveOrNode, ComplementNode, ComputedPropertyAccessorNode, ComputedVerbInvocationNode, ConditionalAndNode, ConditionalInNode, ConditionalNode, ConditionalOrNode, DivisionNode, EqualsNode, Expression, GreaterOrEqualNode, GreaterThanNode, Indexer, IndexerNode, Invocation, LessOrEqualNode, LessThanNode, ListAssignmentNode, ListNode, ModulationNode, MultiplicationNode, NegatedNode, NegativeNode, OptionalTargetAssignmentNode, OptionalVariableNode, PartialComputedPropertyAccessorNode, PartialComputedVerbInvocationNode, PartialIndexerNode, PartialPropertyAccessorNode, PartialVerbInvocationNode, PropertyAccessor, PropertyAccessorNode, PropertyAssignmentNode, RangeIndexerNode, ShiftLeftNode, ShiftRightNode, SubtractionNode, UnequalsNode, Value, VariableAssignmentNode, VariableNode, VerbInvocationNode } from './nodes';
 import { ValueGenerator } from './value-generator';
 
 function hasNoIndexerAccessorOrInvocation(context: Primary_expressionContext): boolean {
-	return (context.indexer_list().length === 0 && context.property_accessor_list().length === 0 && context.verb_invocation_list().length === 0 && context.bf_invocation_list().length === 0);
-}
-
-function generateNodeFromInfo(context: ParserRuleContext, object: Expression | undefined, info: InfoNode | undefined): Indexer | PropertyAccessor | Invocation | undefined {
-	if (!object) {
-		return undefined;
-	}
-
-	const position = ContextPosition.fromValues(object.position.startToken, info?.position.stopToken);
-
-	if (info instanceof ArgumentIndexerNodeInfo) {
-		return new ArgumentIndexerNode(position, object, info.argument);
-	} else if (info instanceof RangeIndexerNodeInfo) {
-		return new RangeIndexerNode(position, object, info.start, info.end);
-	} else if (info instanceof PropertyAccessorNodeInfo) {
-		return new PropertyAccessorNode(position, object, info.name);
-	} else if (info instanceof ComputedPropertyAccessorNodeInfo) {
-		return new ComputedPropertyAccessorNode(position, object, info.name);
-	} else if (info instanceof VerbInvocationNodeInfo) {
-		return new VerbInvocationNode(position, object, info.name, info.arguments);
-	} else if (info instanceof ComputedVerbInvocationNodeInfo) {
-		return new ComputedVerbInvocationNode(position, object, info.name, info.arguments);
-	} else if (info instanceof PartialVerbInvocationNodeInfo) {
-		return new PartialVerbInvocationNode(position, object, info.name);
-	} else if (info instanceof CallInfo) {
-		if (object.toString().startsWith('$')) {
-			return new CorifiedVerbInvocationNode(position, object, info.arguments);
-		} else {
-			return new BuiltInFunctionInvocationNode(position, object.toString(), info.arguments);
-		}
-	}
-
-	throw NodeGenerationError.fromContext(context);
+	return (context.indexer_list().length === 0 && context.property_accessor_list().length === 0 && context.verb_invocation_list().length === 0);
 }
 
 function generateMultiPartNode<T extends BaseNode>(context: ParserRuleContext, create: (position: ContextPosition, left: Expression | undefined, operator: ParserRuleContext | undefined, right: Expression | undefined) => T | undefined): T | Expression | undefined {
@@ -85,7 +53,7 @@ export class ExpressionGenerator extends MoocodeVisitor<Expression> {
 			return new VariableAssignmentNode(ContextPosition.fromContext(context), leftNode, rightNode);
 		}
 
-		if (leftNode instanceof OptionalTargetNode) {
+		if (leftNode instanceof OptionalVariableNode) {
 			return new OptionalTargetAssignmentNode(ContextPosition.fromContext(context), leftNode, rightNode);
 		}
 
@@ -98,7 +66,7 @@ export class ExpressionGenerator extends MoocodeVisitor<Expression> {
 		}
 
 		throw NodeGenerationError.fromContext(context);
-	}
+	};
 
 	public override visitConditional_expression = (context: Conditional_expressionContext): ConditionalNode | Expression | undefined => {
 		const conditionalIn = context.conditional_in_expression();
@@ -121,31 +89,31 @@ export class ExpressionGenerator extends MoocodeVisitor<Expression> {
 		const ifFalse = ExpressionGenerator.generateExpression(context._false_ex);
 
 		return new ConditionalNode(position, conditions, ifTrue, ifFalse);
-	}
+	};
 
 	public override visitConditional_in_expression = (context: Conditional_in_expressionContext): ConditionalInNode | Expression | undefined => {
 		return generateMultiPartNode(context, (position, left, _, right) => new ConditionalInNode(position, left, right));
-	}
+	};
 
 	public override visitConditional_or_expression = (context: Conditional_or_expressionContext): ConditionalOrNode | Expression | undefined => {
 		return generateMultiPartNode(context, (position, left, _, right) => new ConditionalOrNode(position, left, right));
-	}
+	};
 
 	public override visitConditional_and_expression = (context: Conditional_and_expressionContext): ConditionalAndNode | Expression | undefined => {
 		return generateMultiPartNode(context, (position, left, _, right) => new ConditionalAndNode(position, left, right));
-	}
+	};
 
 	public override visitInclusive_or_expression = (context: Inclusive_or_expressionContext): BitwiseInclusiveOrNode | Expression | undefined => {
 		return generateMultiPartNode(context, (position, left, _, right) => new BitwiseInclusiveOrNode(position, left, right));
-	}
+	};
 
 	public override visitExclusive_or_expression = (context: Exclusive_or_expressionContext): BitwiseExclusiveOrNode | Expression | undefined => {
 		return generateMultiPartNode(context, (position, left, _, right) => new BitwiseExclusiveOrNode(position, left, right));
-	}
+	};
 
 	public override visitAnd_expression = (context: And_expressionContext): BitwiseAndNode | Expression | undefined => {
 		return generateMultiPartNode(context, (position, left, _, right) => new BitwiseAndNode(position, left, right));
-	}
+	};
 
 	public override visitEquality_expression = (context: Equality_expressionContext): EqualsNode | UnequalsNode | Expression | undefined => {
 		return generateMultiPartNode(context, (position, left, operator, right) => {
@@ -159,7 +127,7 @@ export class ExpressionGenerator extends MoocodeVisitor<Expression> {
 
 			throw NodeGenerationError.fromContext(context);
 		});
-	}
+	};
 
 	public override visitRelational_expression = (context: Relational_expressionContext): LessThanNode | GreaterThanNode | LessOrEqualNode | GreaterOrEqualNode | Expression | undefined => {
 		return generateMultiPartNode(context, (position, left, operator, right) => {
@@ -181,7 +149,7 @@ export class ExpressionGenerator extends MoocodeVisitor<Expression> {
 
 			throw NodeGenerationError.fromContext(context);
 		});
-	}
+	};
 
 	public override visitShift_expression = (context: Shift_expressionContext): ShiftLeftNode | ShiftRightNode | Expression | undefined => {
 		return generateMultiPartNode(context, (position, left, operator, right) => {
@@ -195,7 +163,7 @@ export class ExpressionGenerator extends MoocodeVisitor<Expression> {
 
 			throw NodeGenerationError.fromContext(context);
 		});
-	}
+	};
 
 	public override visitAdditive_expression = (context: Additive_expressionContext): AdditionNode | SubtractionNode | Expression | undefined => {
 		return generateMultiPartNode(context, (position, left, operator, right) => {
@@ -209,7 +177,7 @@ export class ExpressionGenerator extends MoocodeVisitor<Expression> {
 
 			throw NodeGenerationError.fromContext(context);
 		});
-	}
+	};
 
 	public override visitMultiplicative_expression = (context: Multiplicative_expressionContext): MultiplicationNode | DivisionNode | ModulationNode | Expression | undefined => {
 		return generateMultiPartNode(context, (position, left, operator, right) => {
@@ -227,7 +195,7 @@ export class ExpressionGenerator extends MoocodeVisitor<Expression> {
 
 			throw NodeGenerationError.fromContext(context);
 		});
-	}
+	};
 
 	public override visitPrimary_expression = (context: Primary_expressionContext): Value | Indexer | PropertyAccessor | Invocation | undefined => {
 		if (hasNoIndexerAccessorOrInvocation(context)) {
@@ -239,53 +207,55 @@ export class ExpressionGenerator extends MoocodeVisitor<Expression> {
 		expression = ValueGenerator.generateValue(context._pe);
 
 		for (let i = 1; i < children.length; i++) {
-			const info = InfoNodeGenerator.generateInfoNode(children[i] as ParserRuleContext);
-			expression = generateNodeFromInfo(context, expression, info);
+			expression = PrimaryExpressionNodeGenerator.generate(expression, children[i] as ParserRuleContext);
 		}
 
 		return expression;
-	}
+	};
 
 	public override visitPrimary_expression_start = (context: Primary_expression_startContext): Value | undefined => {
 		return ValueGenerator.generateValue(context);
-	}
+	};
 
 	public override visitNegated_unary_expression = (context: Negated_unary_expressionContext): NegatedNode | undefined => {
 		const innerExpression = ExpressionGenerator.generateExpression(context.unary_expression());
 		return new NegatedNode(ContextPosition.fromContext(context), innerExpression);
-	}
+	};
 
 	public override visitNegative_unary_expression = (context: Negative_unary_expressionContext): NegativeNode | undefined => {
 		const innerExpression = ExpressionGenerator.generateExpression(context.unary_expression());
 		return new NegativeNode(ContextPosition.fromContext(context), innerExpression);
-	}
+	};
 
 	public override visitComplement_unary_expression = (context: Complement_unary_expressionContext): ComplementNode | undefined => {
 		const innerExpression = ExpressionGenerator.generateExpression(context.unary_expression());
 		return new ComplementNode(ContextPosition.fromContext(context), innerExpression);
-	}
+	};
 
 	private constructor() {
 		super();
 	}
 
-	public static generate<T extends Expression>(context: ParserRuleContext): T | undefined {
+	public static generate<T extends Expression>(context: ParserRuleContext | undefined): T | undefined {
+		if (!context) {
+			return undefined;
+		}
+
 		const generator = new ExpressionGenerator();
 		const result = generator.visit(context) as T;
 
 		if (!result) {
-			// TODO: log?
 			return undefined;
 		}
 
 		return result;
 	}
 
-	public static generateExpression(context: ParserRuleContext): Expression | undefined {
+	public static generateExpression(context: ParserRuleContext | undefined): Expression | undefined {
 		return ExpressionGenerator.generate<Expression>(context);
 	}
 
-	public static generateExpressions(context: ExpressionsContext): (Expression | undefined)[] {
+	public static generateExpressions(context: ExpressionsContext | undefined): (Expression | undefined)[] {
 		const expressions: (Expression | undefined)[] = [];
 
 		if (!context) {
@@ -304,204 +274,92 @@ export class ExpressionGenerator extends MoocodeVisitor<Expression> {
 	}
 }
 
-class InfoNodeGenerator extends MoocodeVisitor<InfoNode> {
-	public override visitIndexer = (context: IndexerContext): ArgumentIndexerNodeInfo | RangeIndexerNodeInfo | undefined => {
+class PrimaryExpressionNodeGenerator extends MoocodeVisitor<Indexer | PropertyAccessor | Invocation | undefined> {
+	public override visitIndexer = (context: IndexerContext): Indexer | undefined => {
+		const position = this.getPosition(context);
+
 		if (context._argument) {
 			const argument = ExpressionGenerator.generateExpression(context._argument);
-			return new ArgumentIndexerNodeInfo(ContextPosition.fromContext(context), argument);
+
+			if (context.CLOSE_BRACKET()) {
+				return new IndexerNode(position, this._invokingEntity, argument);
+			}
+
+			return new PartialIndexerNode(position, this._invokingEntity, argument);
 		} else if (context._start && context._end) {
 			const start = ExpressionGenerator.generateExpression(context._start);
 			const end = ExpressionGenerator.generateExpression(context._end);
-			return new RangeIndexerNodeInfo(ContextPosition.fromContext(context), start, end);
-		} else {
-			throw NodeGenerationError.fromContext(context);
+			return new RangeIndexerNode(position, this._invokingEntity, start, end);
 		}
-	}
 
-	public override visitProperty_accessor = (context: Property_accessorContext): PropertyAccessorNodeInfo | ComputedPropertyAccessorNodeInfo | undefined => {
-		const position = ContextPosition.fromContext(context);
+		throw NodeGenerationError.fromContext(context);
+	};
+
+	public override visitProperty_accessor = (context: Property_accessorContext): PropertyAccessor | undefined => {
+		const position = this.getPosition(context);
 
 		if (context.identifier()) {
-			return new PropertyAccessorNodeInfo(position, getContextAsText(context.identifier()));
+			return new PropertyAccessorNode(position, this._invokingEntity, getContextAsText(context.identifier()));
+		}
+
+		if (!context.OPEN_PARENS()) {
+			return new PartialPropertyAccessorNode(position, this._invokingEntity, undefined);
 		}
 
 		const nameExpression = ExpressionGenerator.generateExpression(context._computed_prop_arguments);
 
-		return new ComputedPropertyAccessorNodeInfo(position, nameExpression);
-	}
+		if (context.CLOSE_PARENS()) {
+			return new ComputedPropertyAccessorNode(position, this._invokingEntity, nameExpression);
+		}
 
-	public override visitVerb_invocation = (context: Verb_invocationContext): VerbInvocationNodeInfo | ComputedVerbInvocationNodeInfo | PartialVerbInvocationNodeInfo | undefined => {
-		const position = ContextPosition.fromContext(context);
+		return new PartialComputedPropertyAccessorNode(position, this._invokingEntity, nameExpression);
+	};
+
+	public override visitVerb_invocation = (context: Verb_invocationContext): VerbInvocationNode | ComputedVerbInvocationNode | undefined => {
+		const position = this.getPosition(context);
 		const argumentExpressions = ExpressionGenerator.generateExpressions(context._arguments);
 
 		if (context.identifier()) {
 			if (context.CLOSE_PARENS_list().length < 1) {
-				return new PartialVerbInvocationNodeInfo(position, getContextAsText(context.identifier()));
+				return new PartialVerbInvocationNode(position, this._invokingEntity, getContextAsText(context.identifier()), argumentExpressions);
 			}
 
-			return new VerbInvocationNodeInfo(position, getContextAsText(context.identifier()), argumentExpressions);
+			return new VerbInvocationNode(position, this._invokingEntity, getContextAsText(context.identifier()), argumentExpressions);
 		}
 
 		const nameExpression = ExpressionGenerator.generateExpression(context._computed_verb_arguments);
 
-		return new ComputedVerbInvocationNodeInfo(position, nameExpression, argumentExpressions);
-	}
+		if (context.CLOSE_PARENS_list().length < 2) {
+			return new PartialComputedVerbInvocationNode(position, this._invokingEntity, nameExpression, argumentExpressions);
+		}
 
-	public override visitBf_invocation = (context: Bf_invocationContext): CallInfo | undefined => {
-		const position = ContextPosition.fromContext(context);
-		const argumentExpressions = ExpressionGenerator.generateExpressions(context._arguments);
+		return new ComputedVerbInvocationNode(position, this._invokingEntity, nameExpression, argumentExpressions);
+	};
 
-		return new CallInfo(position, argumentExpressions);
-	}
+	private _invokingEntity: Value | Indexer | PropertyAccessor | Invocation | undefined;
 
-	private constructor() {
+	private constructor(invokingEntity: Value | Indexer | PropertyAccessor | Invocation | undefined) {
 		super();
+
+		this._invokingEntity = invokingEntity;
 	}
 
-	public static generate<T extends InfoNode>(context: ParserRuleContext): T | undefined {
-		const generator = new InfoNodeGenerator();
-		const result = generator.visit(context) as T;
+	private getPosition(context: ParserRuleContext | undefined): ContextPosition {
+		return ContextPosition.fromValues(this._invokingEntity?.position.startToken, context?.stop);
+	}
+
+	public static generate(invokingEntity: Value | Indexer | PropertyAccessor | Invocation | undefined, context: ParserRuleContext | undefined): Indexer | PropertyAccessor | Invocation | undefined {
+		if (!context) {
+			return undefined;
+		}
+
+		const generator = new PrimaryExpressionNodeGenerator(invokingEntity);
+		const result = generator.visit(context);
 
 		if (!result) {
 			throw NodeGenerationError.fromContext(context);
 		}
 
 		return result;
-	}
-
-	public static generateInfoNode(context: ParserRuleContext): InfoNode | undefined {
-		return InfoNodeGenerator.generate<InfoNode>(context);
-	}
-}
-
-type InfoNode = (ArgumentIndexerNodeInfo | RangeIndexerNodeInfo | PropertyAccessorNodeInfo | ComputedPropertyAccessorNodeInfo | VerbInvocationNodeInfo | ComputedVerbInvocationNodeInfo | PartialVerbInvocationNodeInfo | CallInfo);
-
-class ArgumentIndexerNodeInfo extends BaseNode {
-	private _argument: Expression | undefined;
-
-	public get argument() {
-		return this._argument;
-	}
-
-	public constructor(position: ContextPosition, argument: Expression | undefined) {
-		super(position);
-
-		this._argument = argument;
-	}
-}
-
-class RangeIndexerNodeInfo extends BaseNode {
-	private _start: Expression | undefined;
-	private _end: Expression | undefined;
-
-	public get start() {
-		return this._start
-	}
-
-	public get end() {
-		return this._end
-	}
-
-	public constructor(position: ContextPosition, start: Expression | undefined, end: Expression | undefined) {
-		super(position);
-
-		this._start = start;
-		this._end = end;
-	}
-}
-
-class PropertyAccessorNodeInfo extends BaseNode {
-	private _name: string | undefined;
-
-	public get name() {
-		return this._name
-	}
-
-	public constructor(position: ContextPosition, name: string | undefined) {
-		super(position);
-
-		this._name = name;
-	}
-}
-
-class ComputedPropertyAccessorNodeInfo extends BaseNode {
-	private _name: Expression | undefined;
-
-	public get name() {
-		return this._name
-	}
-
-	public constructor(position: ContextPosition, name: Expression | undefined) {
-		super(position);
-
-		this._name = name;
-	}
-}
-
-class VerbInvocationNodeInfo extends BaseNode {
-	private _name: string | undefined;
-	private _arguments: (Expression | undefined)[];
-
-	public get name() {
-		return this._name
-	}
-
-	public get arguments() {
-		return this._arguments;
-	}
-
-	public constructor(position: ContextPosition, name: string | undefined, functionArguments: (Expression | undefined)[]) {
-		super(position);
-
-		this._name = name;
-		this._arguments = functionArguments;
-	}
-}
-
-class ComputedVerbInvocationNodeInfo extends BaseNode {
-	private _name: Expression | undefined;
-	private _arguments: (Expression | undefined)[];
-
-	public get name() {
-		return this._name
-	}
-
-	public get arguments() {
-		return this._arguments;
-	}
-
-	public constructor(position: ContextPosition, name: Expression | undefined, functionArguments: (Expression | undefined)[]) {
-		super(position);
-
-		this._name = name;
-		this._arguments = functionArguments;
-	}
-}
-
-class PartialVerbInvocationNodeInfo extends BaseNode {
-	private _name: string | undefined;
-
-	public get name() {
-		return this._name
-	}
-
-	public constructor(position: ContextPosition, name: string | undefined) {
-		super(position);
-
-		this._name = name;
-	}
-}
-
-class CallInfo extends BaseNode {
-	private _arguments: (Expression | undefined)[];
-
-	public get arguments() {
-		return this._arguments;
-	}
-
-	public constructor(position: ContextPosition, functionArguments: (Expression | undefined)[]) {
-		super(position);
-
-		this._arguments = functionArguments;
 	}
 }

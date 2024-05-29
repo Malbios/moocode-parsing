@@ -24,7 +24,7 @@ const errorCodes = [
     'E_FILE',
     'E_EXEC',
     'E_INTRPT'
-]
+];
 
 suite('CST tests for error values', () => {
     errorCodes.forEach(errorCode => {

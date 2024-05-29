@@ -7,17 +7,14 @@ import ParsingHelpers from '../../test-utils/parsing';
 
 suite('CST tests for error catcher expressions', () => {
     test('should parse an error catcher', () => {
-        const parser = CommonHelpers.getParser('`stuff(1) ! E_VARNF => "yes"\'');
+        const parser = CommonHelpers.getParser('`stuff ! E_VARNF => "yes"\'');
         const result = parser.expression();
 
         ExpectHelpers.expectSyntaxErrors(parser, 0);
 
         const errorCatcher = ParsingHelpers.getErrorCatcher(result);
-        const primaryExpression = ParsingHelpers.getPrimaryExpression(errorCatcher?._try_);
 
-        ExpectHelpers.expectIdentifier(primaryExpression?._pe, 'stuff');
-        expect(primaryExpression?.bf_invocation_list()).to.have.length(1);
-        ExpectHelpers.expectInteger(primaryExpression?.bf_invocation(0), '1');
+        ExpectHelpers.expectIdentifier(errorCatcher?._try_, 'stuff');
 
         expect(errorCatcher?.error_codes().expression_list()).to.have.length(1);
         ExpectHelpers.expectError(errorCatcher?.error_codes().expression(0), 'E_VARNF');
@@ -26,17 +23,14 @@ suite('CST tests for error catcher expressions', () => {
     });
 
     test('should parse an error catcher with multiple error codes', () => {
-        const parser = CommonHelpers.getParser('`stuff(1) ! E_TYPE, E_VARNF, E_PERM => "yes"\'');
+        const parser = CommonHelpers.getParser('`stuff ! E_TYPE, E_VARNF, E_PERM => "yes"\'');
         const result = parser.expression();
 
         ExpectHelpers.expectSyntaxErrors(parser, 0);
 
         const errorCatcher = ParsingHelpers.getErrorCatcher(result);
-        const primaryExpression = ParsingHelpers.getPrimaryExpression(errorCatcher?._try_);
 
-        ExpectHelpers.expectIdentifier(primaryExpression?._pe, 'stuff');
-        expect(primaryExpression?.bf_invocation_list()).to.have.length(1);
-        ExpectHelpers.expectInteger(primaryExpression?.bf_invocation(0), '1');
+        ExpectHelpers.expectIdentifier(errorCatcher?._try_, 'stuff');
 
         expect(errorCatcher?.error_codes().expression_list()).to.have.length(3);
         ExpectHelpers.expectError(errorCatcher?.error_codes().expression(0), 'E_TYPE');
@@ -47,17 +41,14 @@ suite('CST tests for error catcher expressions', () => {
     });
 
     test('should parse an error catcher with variable for error value', () => {
-        const parser = CommonHelpers.getParser('`stuff(1) ! my_var => "yes"\'');
+        const parser = CommonHelpers.getParser('`stuff ! my_var => "yes"\'');
         const result = parser.expression();
 
         ExpectHelpers.expectSyntaxErrors(parser, 0);
 
         const errorCatcher = ParsingHelpers.getErrorCatcher(result);
-        const primaryExpression = ParsingHelpers.getPrimaryExpression(errorCatcher?._try_);
 
-        ExpectHelpers.expectIdentifier(primaryExpression?._pe, 'stuff');
-        expect(primaryExpression?.bf_invocation_list()).to.have.length(1);
-        ExpectHelpers.expectInteger(primaryExpression?.bf_invocation(0), '1');
+        ExpectHelpers.expectIdentifier(errorCatcher?._try_, 'stuff');
 
         expect(errorCatcher?.error_codes().expression_list()).to.have.length(1);
         ExpectHelpers.expectIdentifier(errorCatcher?.error_codes().expression(0), 'my_var');
@@ -66,17 +57,14 @@ suite('CST tests for error catcher expressions', () => {
     });
 
     test('should parse an error catcher with ANY as error code', () => {
-        const parser = CommonHelpers.getParser('`stuff(1) ! ANY => "yes"\'');
+        const parser = CommonHelpers.getParser('`stuff ! ANY => "yes"\'');
         const result = parser.expression();
 
         ExpectHelpers.expectSyntaxErrors(parser, 0);
 
         const errorCatcher = ParsingHelpers.getErrorCatcher(result);
-        const primaryExpression = ParsingHelpers.getPrimaryExpression(errorCatcher?._try_);
 
-        ExpectHelpers.expectIdentifier(primaryExpression?._pe, 'stuff');
-        expect(primaryExpression?.bf_invocation_list()).to.have.length(1);
-        ExpectHelpers.expectInteger(primaryExpression?.bf_invocation(0), '1');
+        ExpectHelpers.expectIdentifier(errorCatcher?._try_, 'stuff');
 
         expect(errorCatcher?.error_codes().expression_list()).to.have.length(1);
         expect(errorCatcher?.error_codes().expression(0).getText()).to.equal('ANY');
@@ -85,17 +73,14 @@ suite('CST tests for error catcher expressions', () => {
     });
 
     test('should parse an error catcher with no on error expression', () => {
-        const parser = CommonHelpers.getParser('`stuff(1) ! ANY\'');
+        const parser = CommonHelpers.getParser('`stuff ! ANY\'');
         const result = parser.expression();
 
         ExpectHelpers.expectSyntaxErrors(parser, 0);
 
         const errorCatcher = ParsingHelpers.getErrorCatcher(result);
-        const primaryExpression = ParsingHelpers.getPrimaryExpression(errorCatcher?._try_);
 
-        ExpectHelpers.expectIdentifier(primaryExpression?._pe, 'stuff');
-        expect(primaryExpression?.bf_invocation_list()).to.have.length(1);
-        ExpectHelpers.expectInteger(primaryExpression?.bf_invocation(0), '1');
+        ExpectHelpers.expectIdentifier(errorCatcher?._try_, 'stuff');
 
         expect(errorCatcher?.error_codes().expression_list()).to.have.length(1);
         expect(errorCatcher?.error_codes().expression(0).getText()).to.equal('ANY');

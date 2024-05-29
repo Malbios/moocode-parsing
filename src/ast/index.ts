@@ -1,11 +1,12 @@
-import { CharStream, CommonTokenStream, ParserRuleContext } from 'antlr4';
+import { CharStream, CommonTokenStream, ParserRuleContext, TerminalNode } from 'antlr4';
 import MoocodeLexer from '../grammar/generated/MoocodeLexer';
 import MoocodeParser from '../grammar/generated/MoocodeParser';
 import MoocodePartialParser from '../grammar/generated/MoocodePartialParser';
 import { Ast, ParsedExpression, SyntaxError } from '../interfaces';
-import { CustomErrorStrategy, InvalidOperationError, LexerErrorListener, MergedContext, ParserErrorListener } from './error';
+import { ContextPosition, getContextAsText } from './common';
+import { CustomErrorStrategy, InvalidOperationError, LexerErrorListener, ParserErrorListener } from './error';
 import { ExpressionGenerator } from './expression-generator';
-import { InvalidStatementNode, Statement } from './nodes';
+import { InvalidExpressionNode, InvalidStatementNode, Statement } from './nodes';
 import { StatementGenerator } from './statement-generator';
 
 interface Cst {
@@ -38,18 +39,23 @@ function generateCst(input: string, getResult: (parser: MoocodeParser) => Parser
         lexer => new MoocodeParser(new CommonTokenStream(lexer)), getResult);
 }
 
-function generatePartialCst(input: string, getResult: (parser: MoocodePartialParser) => ParserRuleContext[]): Cst {
-    return internalGenerateCst<MoocodePartialParser>(input,
-        lexer => new MoocodePartialParser(new CommonTokenStream(lexer)), getResult);
-}
+// function generatePartialCst(input: string, getResult: (parser: MoocodePartialParser) => ParserRuleContext[]): Cst {
+//     return internalGenerateCst<MoocodePartialParser>(input,
+//         lexer => new MoocodePartialParser(new CommonTokenStream(lexer)), getResult);
+// }
 
-function hasError(context: ParserRuleContext): boolean {
+function hasErrorOrArtificialToken(context: ParserRuleContext): boolean {
     if (context.exception) {
         return true;
     }
 
+    const token = context as unknown as TerminalNode;
+    if (token?.symbol?.start === -1 && token?.symbol?.stop === -1 && token?.symbol?.tokenIndex === -1) {
+        return true;
+    }
+
     for (const child of context.children ?? []) {
-        if (hasError(child as ParserRuleContext)) {
+        if (hasErrorOrArtificialToken(child as ParserRuleContext)) {
             return true;
         }
     }
@@ -57,77 +63,52 @@ function hasError(context: ParserRuleContext): boolean {
     return false;
 }
 
-function getSanitizedCst(contexts: ParserRuleContext[]): ParserRuleContext[] {
-    const result: ParserRuleContext[] = [];
+interface SanitizedCst {
+    valid: ParserRuleContext[];
+    invalid: ParserRuleContext[];
+}
 
-    let contextsWithError: ParserRuleContext[] = [];
+function getSanitizedCst(contexts: ParserRuleContext[]): SanitizedCst {
+    const valid: ParserRuleContext[] = [];
+    const invalid: ParserRuleContext[] = [];
 
     for (const context of contexts) {
-        if (!hasError(context)) {
-            if (contextsWithError.length > 0) {
-                result.push(new MergedContext(contextsWithError));
-                contextsWithError = [];
-            }
-
-            result.push(context);
+        if (hasErrorOrArtificialToken(context)) {
+            invalid.push(context);
             continue;
         }
 
-        contextsWithError.push(context);
+        valid.push(context);
     }
 
-    if (contextsWithError.length > 0) {
-        result.push(new MergedContext(contextsWithError));
-    }
-
-    return result;
+    return { valid: valid, invalid: invalid };
 }
 
-function internalGenerateAst(contexts: ParserRuleContext[]): (Statement | undefined)[] {
-    const results: (Statement | undefined)[] = [];
-
-    for (const context of contexts) {
-        if (context instanceof MergedContext) {
-            const cst = generatePartialCst(context.getText(), parser => parser.moocode().statement_list());
-
-            const newContext = cst.contexts.at(0);
-
-            if (newContext) {
-                results.push(StatementGenerator.generateStatement(newContext, 0));
-            }
-
-            continue;
-        }
-
-        results.push(StatementGenerator.generateStatement(context, 0));
-    }
-
-    return results;
-}
-
-interface SanitizedAst {
+interface InternalAst {
     valid: Statement[];
     invalid: InvalidStatementNode[];
 }
 
-function getSanitizedAst(statements: (Statement | undefined)[]): SanitizedAst {
-    const validStatements: Statement[] = [];
-    const invalidStatements: InvalidStatementNode[] = [];
+function internalGenerateAst(cst: SanitizedCst): InternalAst {
+    const valid: Statement[] = [];
+    const invalid: InvalidStatementNode[] = [];
 
-    for (const statement of statements) {
-        if (!statement) {
-            continue;
+    for (const context of cst.valid) {
+        const result = StatementGenerator.generateStatement(context, 0);
+
+        if (result) {
+            valid.push(result);
         }
-
-        if (statement instanceof InvalidStatementNode) {
-            invalidStatements.push(statement);
-            continue;
-        }
-
-        validStatements.push(statement);
     }
 
-    return { valid: validStatements, invalid: invalidStatements };
+    for (const context of cst.invalid) {
+        const position = ContextPosition.fromContext(context);
+        const text = getContextAsText(context);
+
+        invalid.push(new InvalidStatementNode(position, text));
+    }
+
+    return { valid: valid, invalid: invalid };
 }
 
 export function generateAst(input: string): Ast {
@@ -137,9 +118,7 @@ export function generateAst(input: string): Ast {
 
     const ast = internalGenerateAst(sanitizedCst);
 
-    const sanitizedAst = getSanitizedAst(ast);
-
-    return { valid: sanitizedAst.valid, invalid: sanitizedAst.invalid, lexerErrors: cst.lexerErrors, parserErrors: cst.parserErrors };
+    return { valid: ast.valid, invalid: ast.invalid, lexerErrors: cst.lexerErrors, parserErrors: cst.parserErrors };
 }
 
 export function parseExpression(input: string): ParsedExpression {
@@ -150,8 +129,25 @@ export function parseExpression(input: string): ParsedExpression {
     }
 
     if (cst.contexts.length > 1) {
-        throw new InvalidOperationError(`found more than one expression in input; ${input}`);
+        throw new InvalidOperationError(`found more than one expression in input: ${input}`);
     }
 
-    return { expression: ExpressionGenerator.generateExpression(cst.contexts[0]), lexerErrors: cst.lexerErrors, parserErrors: cst.parserErrors };
+    const context = cst.contexts[0];
+
+    if (hasErrorOrArtificialToken(context)) {
+        const position = ContextPosition.fromContext(context);
+        const text = getContextAsText(context);
+
+        return {
+            expression: new InvalidExpressionNode(position, text),
+            lexerErrors: cst.lexerErrors,
+            parserErrors: cst.parserErrors
+        };
+    }
+
+    return {
+        expression: ExpressionGenerator.generateExpression(cst.contexts[0]),
+        lexerErrors: cst.lexerErrors,
+        parserErrors: cst.parserErrors
+    };
 }

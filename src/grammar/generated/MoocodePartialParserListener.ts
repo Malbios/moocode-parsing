@@ -3,7 +3,10 @@
 import {ParseTreeListener} from "antlr4";
 
 
+import { Property_accessorContext } from "./MoocodePartialParser";
 import { Verb_invocationContext } from "./MoocodePartialParser";
+import { Corified_verb_invocationContext } from "./MoocodePartialParser";
+import { Bf_invocationContext } from "./MoocodePartialParser";
 import { MoocodeContext } from "./MoocodePartialParser";
 import { StatementContext } from "./MoocodePartialParser";
 import { StatementsContext } from "./MoocodePartialParser";
@@ -52,9 +55,7 @@ import { Negative_unary_expressionContext } from "./MoocodePartialParser";
 import { Negated_unary_expressionContext } from "./MoocodePartialParser";
 import { Complement_unary_expressionContext } from "./MoocodePartialParser";
 import { Primary_expressionContext } from "./MoocodePartialParser";
-import { Property_accessorContext } from "./MoocodePartialParser";
 import { ExpressionsContext } from "./MoocodePartialParser";
-import { Bf_invocationContext } from "./MoocodePartialParser";
 import { Primary_expression_startContext } from "./MoocodePartialParser";
 import { Parenthesis_expressionContext } from "./MoocodePartialParser";
 import { Error_catcherContext } from "./MoocodePartialParser";
@@ -66,7 +67,7 @@ import { List_splicerContext } from "./MoocodePartialParser";
 import { Object_referenceContext } from "./MoocodePartialParser";
 import { Object_idContext } from "./MoocodePartialParser";
 import { Corified_valueContext } from "./MoocodePartialParser";
-import { Optional_targetContext } from "./MoocodePartialParser";
+import { Optional_variableContext } from "./MoocodePartialParser";
 import { LiteralContext } from "./MoocodePartialParser";
 import { Bool_literalContext } from "./MoocodePartialParser";
 import { String_literalContext } from "./MoocodePartialParser";
@@ -84,6 +85,16 @@ import { IdentifierContext } from "./MoocodePartialParser";
  */
 export default class MoocodePartialParserListener extends ParseTreeListener {
 	/**
+	 * Enter a parse tree produced by `MoocodePartialParser.property_accessor`.
+	 * @param ctx the parse tree
+	 */
+	enterProperty_accessor?: (ctx: Property_accessorContext) => void;
+	/**
+	 * Exit a parse tree produced by `MoocodePartialParser.property_accessor`.
+	 * @param ctx the parse tree
+	 */
+	exitProperty_accessor?: (ctx: Property_accessorContext) => void;
+	/**
 	 * Enter a parse tree produced by `MoocodePartialParser.verb_invocation`.
 	 * @param ctx the parse tree
 	 */
@@ -93,6 +104,26 @@ export default class MoocodePartialParserListener extends ParseTreeListener {
 	 * @param ctx the parse tree
 	 */
 	exitVerb_invocation?: (ctx: Verb_invocationContext) => void;
+	/**
+	 * Enter a parse tree produced by `MoocodePartialParser.corified_verb_invocation`.
+	 * @param ctx the parse tree
+	 */
+	enterCorified_verb_invocation?: (ctx: Corified_verb_invocationContext) => void;
+	/**
+	 * Exit a parse tree produced by `MoocodePartialParser.corified_verb_invocation`.
+	 * @param ctx the parse tree
+	 */
+	exitCorified_verb_invocation?: (ctx: Corified_verb_invocationContext) => void;
+	/**
+	 * Enter a parse tree produced by `MoocodePartialParser.bf_invocation`.
+	 * @param ctx the parse tree
+	 */
+	enterBf_invocation?: (ctx: Bf_invocationContext) => void;
+	/**
+	 * Exit a parse tree produced by `MoocodePartialParser.bf_invocation`.
+	 * @param ctx the parse tree
+	 */
+	exitBf_invocation?: (ctx: Bf_invocationContext) => void;
 	/**
 	 * Enter a parse tree produced by `MoocodePartialParser.moocode`.
 	 * @param ctx the parse tree
@@ -574,16 +605,6 @@ export default class MoocodePartialParserListener extends ParseTreeListener {
 	 */
 	exitPrimary_expression?: (ctx: Primary_expressionContext) => void;
 	/**
-	 * Enter a parse tree produced by `MoocodePartialParser.property_accessor`.
-	 * @param ctx the parse tree
-	 */
-	enterProperty_accessor?: (ctx: Property_accessorContext) => void;
-	/**
-	 * Exit a parse tree produced by `MoocodePartialParser.property_accessor`.
-	 * @param ctx the parse tree
-	 */
-	exitProperty_accessor?: (ctx: Property_accessorContext) => void;
-	/**
 	 * Enter a parse tree produced by `MoocodePartialParser.expressions`.
 	 * @param ctx the parse tree
 	 */
@@ -593,16 +614,6 @@ export default class MoocodePartialParserListener extends ParseTreeListener {
 	 * @param ctx the parse tree
 	 */
 	exitExpressions?: (ctx: ExpressionsContext) => void;
-	/**
-	 * Enter a parse tree produced by `MoocodePartialParser.bf_invocation`.
-	 * @param ctx the parse tree
-	 */
-	enterBf_invocation?: (ctx: Bf_invocationContext) => void;
-	/**
-	 * Exit a parse tree produced by `MoocodePartialParser.bf_invocation`.
-	 * @param ctx the parse tree
-	 */
-	exitBf_invocation?: (ctx: Bf_invocationContext) => void;
 	/**
 	 * Enter a parse tree produced by `MoocodePartialParser.primary_expression_start`.
 	 * @param ctx the parse tree
@@ -714,15 +725,15 @@ export default class MoocodePartialParserListener extends ParseTreeListener {
 	 */
 	exitCorified_value?: (ctx: Corified_valueContext) => void;
 	/**
-	 * Enter a parse tree produced by `MoocodePartialParser.optional_target`.
+	 * Enter a parse tree produced by `MoocodePartialParser.optional_variable`.
 	 * @param ctx the parse tree
 	 */
-	enterOptional_target?: (ctx: Optional_targetContext) => void;
+	enterOptional_variable?: (ctx: Optional_variableContext) => void;
 	/**
-	 * Exit a parse tree produced by `MoocodePartialParser.optional_target`.
+	 * Exit a parse tree produced by `MoocodePartialParser.optional_variable`.
 	 * @param ctx the parse tree
 	 */
-	exitOptional_target?: (ctx: Optional_targetContext) => void;
+	exitOptional_variable?: (ctx: Optional_variableContext) => void;
 	/**
 	 * Enter a parse tree produced by `MoocodePartialParser.literal`.
 	 * @param ctx the parse tree

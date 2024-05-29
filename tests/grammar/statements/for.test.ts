@@ -37,10 +37,7 @@ endfor
 
     expect(forStatement?.statements().statement_list()).to.have.length(1);
 
-    const primaryExpression = ParsingHelpers.getPrimaryExpression(forStatement?.statements().statement(0));
-    ExpectHelpers.expectIdentifier(primaryExpression?._pe, 'x');
-    expect(primaryExpression?.bf_invocation_list()).to.have.length(1);
-    expect(primaryExpression?.bf_invocation(0)._arguments).to.not.exist;
+    ExpectHelpers.expectBuiltInFunctionWithNoArguments(forStatement?.statements().statement(0), 'x');
   });
 
   test('should parse a for loop with key', () => {
@@ -73,16 +70,13 @@ endfor
 
     expect(forStatement?.statements().statement_list()).to.have.length(1);
 
-    const primaryExpression = ParsingHelpers.getPrimaryExpression(forStatement?.statements().statement(0));
-    ExpectHelpers.expectIdentifier(primaryExpression?._pe, 'x');
-    expect(primaryExpression?.bf_invocation_list()).to.have.length(1);
-    expect(primaryExpression?.bf_invocation(0)._arguments).to.not.exist;
+    ExpectHelpers.expectBuiltInFunctionWithNoArguments(forStatement?.statements().statement(0), 'x');
   });
 
   test('should parse a for loop with start..stop range', () => {
     const code = `
 for o in [#0..max_object()]
-  break;
+  x();
 endfor
 `;
     const parser = CommonHelpers.getParser(code);
@@ -100,15 +94,14 @@ endfor
 
     ExpectHelpers.expectObjectId(rangedForExpression?._start, '#0');
 
-    const primaryExpression = ParsingHelpers.getPrimaryExpression(rangedForExpression?._end);
+    const bfInvocation = ParsingHelpers.getBuiltInFunctionInvocation(rangedForExpression?._end);
 
-    ExpectHelpers.expectIdentifier(primaryExpression?._pe, 'max_object');
-    expect(primaryExpression?.bf_invocation_list()).to.have.length(1);
-    expect(primaryExpression?.bf_invocation(0)._arguments).to.not.exist;
+    ExpectHelpers.expectIdentifier(bfInvocation?.identifier(), 'max_object');
+    expect(bfInvocation?._arguments).to.not.exist;
 
     expect(forStatement?.statements().statement_list()).to.have.length(1);
 
-    ExpectHelpers.expectEmptyBreak(forStatement?.statements().statement(0));
+    ExpectHelpers.expectBuiltInFunctionWithNoArguments(forStatement?.statements().statement(0), 'x');
   });
 
   test('should parse a nested for loop', () => {
@@ -160,9 +153,6 @@ endfor
 
     expect(innerForStatement?.statements().statement_list()).to.have.length(1);
 
-    const primaryExpression = ParsingHelpers.getPrimaryExpression(innerForStatement?.statements().statement(0));
-    ExpectHelpers.expectIdentifier(primaryExpression?._pe, 'x');
-    expect(primaryExpression?.bf_invocation_list()).to.have.length(1);
-    expect(primaryExpression?.bf_invocation(0)._arguments).to.not.exist;
+    ExpectHelpers.expectBuiltInFunctionWithNoArguments(innerForStatement?.statements().statement(0), 'x');
   });
 });

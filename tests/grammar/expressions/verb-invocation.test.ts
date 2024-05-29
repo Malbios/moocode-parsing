@@ -69,19 +69,4 @@ suite('CST tests for verb invocation expressions', () => {
 
         expect(verbInvocation?._arguments).to.not.exist;
     });
-
-    test('should parse a corified verb invocation', () => {
-        const parser = CommonHelpers.getParser('$verb_name()');
-        const result = parser.expression();
-
-        ExpectHelpers.expectSyntaxErrors(parser, 0);
-
-        const primaryExpression = ParsingHelpers.getPrimaryExpression(result);
-
-        ExpectHelpers.expectCorifiedObject(primaryExpression?._pe, '$verb_name');
-
-        expect(primaryExpression?.bf_invocation_list()).to.have.length(1);
-
-        expect(primaryExpression?.bf_invocation(0)._arguments).to.not.exist;
-    });
 });
