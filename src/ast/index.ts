@@ -94,10 +94,16 @@ function internalGenerateAst(cst: SanitizedCst): InternalAst {
     const invalid: InvalidStatementNode[] = [];
 
     for (const context of cst.valid) {
-        const result = StatementGenerator.generateStatement(context, 0);
+        try {
+            const result = StatementGenerator.generateStatement(context, 0);
 
-        if (result) {
-            valid.push(result);
+            if (result) {
+                valid.push(result);
+            }
+        } catch (error: unknown) {
+            const genericError = error as Error;
+
+            invalid.push(new InvalidStatementNode(ContextPosition.fromContext(context), getContextAsText(context), genericError));
         }
     }
 
