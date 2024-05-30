@@ -30,16 +30,22 @@ function getDepthIndent(depth: number): string {
 }
 
 export class InvalidStatementNode extends BaseNode {
+	private _error?: Error;
 	private _text: string;
+
+	public get error() {
+		return this._error;
+	}
 
 	public get text() {
 		return this._text;
 	}
 
-	public constructor(position: ContextPosition, text: string) {
+	public constructor(position: ContextPosition, text: string, error?: Error) {
 		super(position);
 
 		this._text = text;
+		this._error = error;
 	}
 
 	public toString(lineInfo?: boolean): string {
